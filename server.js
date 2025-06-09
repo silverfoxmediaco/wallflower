@@ -47,14 +47,36 @@ if (process.env.NODE_ENV === 'production') {
 // MongoDB connection with better error handling
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/wallflower', {
+    const mongoUri = process.env.MONGODB_URI;
+    
+    if (!mongoUri) {
+      throw new Error('MONGODB_URI is not defined in environment variables');
+    }
+    
+    console.log('Attempting to connect to MongoDB...');
+    console.log('Connection string starts with:', mongoUri.substring(0, 30) + '...');
+    
+    await mongoose.connect(mongoUri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
     });
+    
     console.log('MongoDB connected successfully');
+    console.log('Database:', mongoose.connection.db.databaseName);
   } catch (err) {
-    console.error('MongoDB connection error:', err);
-    // Don't exit the process in production
+    console.error('MongoDB connection error:', err.message);
+    
+    // More specific error messages
+    if (err.message.includes('ENOTFOUND')) {
+      console.error('Error: Cannot resolve MongoDB cluster address. Check your connection string.');
+    } else if (err.message.includes('authentication failed')) {
+      console.error('Error: Authentication failed. Check your username and password.');
+    } else if (err.message.includes('whitelist')) {
+      console.error('Error: IP whitelist issue. Ensure 0.0.0.0/0 is in your Atlas Network Access.');
+    }
+    
+    // Don't exit in production, let the app run without DB
     if (process.env.NODE_ENV !== 'production') {
       process.exit(1);
     }
