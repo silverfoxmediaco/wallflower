@@ -34,12 +34,13 @@ app.use('/api/auth', require('./src/backend/routes/authRoutes'));
 // Serve static files from the React app in production
 if (process.env.NODE_ENV === 'production') {
   // Serve static files from the React build
-  app.use(express.static(path.join(__dirname, 'client/dist')));
+  // Based on your file structure, it looks like the build output is in 'dist' at the root
+  app.use(express.static(path.join(__dirname, 'dist')));
 
   // The "catchall" handler: for any request that doesn't
   // match one above, send back React's index.html file.
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'client/dist', 'index.html'));
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
   });
 }
 
