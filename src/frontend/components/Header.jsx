@@ -103,16 +103,16 @@ const Header = ({ onSignupClick, onLoginClick, isLoggedIn, onLogout }) => {
               // Logged In Menu
               <>
                 <Link to="/garden" className="nav-link">
-                  My Garden 🌻
+                  My Garden
                 </Link>
                 <Link to="/browse" className="nav-link">
-                  Browse 🌱
+                  Browse
                 </Link>
                 <Link to="/messages" className="nav-link">
-                  Messages 💌
+                  Messages
                 </Link>
                 <Link to="/profile" className="nav-link">
-                  Profile 🌸
+                  Profile
                 </Link>
                 <button 
                   className="nav-button"
@@ -180,16 +180,16 @@ const Header = ({ onSignupClick, onLoginClick, isLoggedIn, onLogout }) => {
             // Logged In Mobile Menu
             <>
               <Link to="/garden" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
-                My Garden 🌻
+                My Garden
               </Link>
               <Link to="/browse" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
-                Browse 🌱
+                Browse
               </Link>
               <Link to="/messages" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
-                Messages 💌
+                Messages
               </Link>
               <Link to="/profile" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
-                Profile 🌸
+                Profile
               </Link>
               <button 
                 className="nav-button mobile"
