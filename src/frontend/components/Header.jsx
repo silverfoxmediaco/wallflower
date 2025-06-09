@@ -1,10 +1,15 @@
+// Header Component
+// Path: src/frontend/components/Header.jsx
+// Purpose: Navigation header with authentication state handling
+
 import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import './Header.css';
 
-const Header = ({ onSignupClick, onLoginClick }) => {
+const Header = ({ onSignupClick, onLoginClick, isLoggedIn, onLogout }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // This would come from auth context
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -36,46 +41,50 @@ const Header = ({ onSignupClick, onLoginClick }) => {
     }
   };
 
+  const handleLogoutClick = () => {
+    setIsMobileMenuOpen(false);
+    onLogout();
+  };
+
   return (
     <header className={`header ${isScrolled ? 'scrolled' : ''}`}>
       <nav className="nav-container">
         <div className="nav-content">
           {/* Logo */}
-          <a href="/" className="logo-link">
+          <Link to="/" className="logo-link">
             <img 
               src="/assets/images/wallflowerlogotrans.png" 
               alt="Wallflower" 
               className="logo-image"
             />
-            
-          </a>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="nav-menu desktop">
-            <a 
-              href="#how-it-works" 
-              className="nav-link"
-              onClick={(e) => handleNavClick(e, 'how-it-works')}
-            >
-              How it Works
-            </a>
-            <a 
-              href="#features" 
-              className="nav-link"
-              onClick={(e) => handleNavClick(e, 'features')}
-            >
-              Features
-            </a>
-            <a 
-              href="#about" 
-              className="nav-link"
-              onClick={(e) => handleNavClick(e, 'about')}
-            >
-              About
-            </a>
-            
             {!isLoggedIn ? (
+              // Logged Out Menu
               <>
+                <a 
+                  href="#how-it-works" 
+                  className="nav-link"
+                  onClick={(e) => handleNavClick(e, 'how-it-works')}
+                >
+                  How it Works
+                </a>
+                <a 
+                  href="#features" 
+                  className="nav-link"
+                  onClick={(e) => handleNavClick(e, 'features')}
+                >
+                  Features
+                </a>
+                <a 
+                  href="#about" 
+                  className="nav-link"
+                  onClick={(e) => handleNavClick(e, 'about')}
+                >
+                  About
+                </a>
                 <a 
                   href="#login" 
                   className="nav-link"
@@ -91,15 +100,26 @@ const Header = ({ onSignupClick, onLoginClick }) => {
                 </button>
               </>
             ) : (
+              // Logged In Menu
               <>
-                <a href="/garden" className="nav-link">
-                  My Garden
-                </a>
-                <a href="/profile" className="nav-link">
-                  <div className="user-avatar">
-                    <img src="/api/placeholder/32/32" alt="User" />
-                  </div>
-                </a>
+                <Link to="/garden" className="nav-link">
+                  My Garden 🌻
+                </Link>
+                <Link to="/browse" className="nav-link">
+                  Browse 🌱
+                </Link>
+                <Link to="/messages" className="nav-link">
+                  Messages 💌
+                </Link>
+                <Link to="/profile" className="nav-link">
+                  Profile 🌸
+                </Link>
+                <button 
+                  className="nav-button"
+                  onClick={handleLogoutClick}
+                >
+                  Logout
+                </button>
               </>
             )}
           </div>
@@ -118,30 +138,30 @@ const Header = ({ onSignupClick, onLoginClick }) => {
 
         {/* Mobile Navigation */}
         <div className={`nav-menu mobile ${isMobileMenuOpen ? 'active' : ''}`}>
-          <a 
-            href="#how-it-works" 
-            className="nav-link"
-            onClick={(e) => handleNavClick(e, 'how-it-works')}
-          >
-            How it Works
-          </a>
-          <a 
-            href="#features" 
-            className="nav-link"
-            onClick={(e) => handleNavClick(e, 'features')}
-          >
-            Features
-          </a>
-          <a 
-            href="#about" 
-            className="nav-link"
-            onClick={(e) => handleNavClick(e, 'about')}
-          >
-            About
-          </a>
-          
           {!isLoggedIn ? (
+            // Logged Out Mobile Menu
             <>
+              <a 
+                href="#how-it-works" 
+                className="nav-link"
+                onClick={(e) => handleNavClick(e, 'how-it-works')}
+              >
+                How it Works
+              </a>
+              <a 
+                href="#features" 
+                className="nav-link"
+                onClick={(e) => handleNavClick(e, 'features')}
+              >
+                Features
+              </a>
+              <a 
+                href="#about" 
+                className="nav-link"
+                onClick={(e) => handleNavClick(e, 'about')}
+              >
+                About
+              </a>
               <a 
                 href="#login" 
                 className="nav-link"
@@ -157,20 +177,24 @@ const Header = ({ onSignupClick, onLoginClick }) => {
               </button>
             </>
           ) : (
+            // Logged In Mobile Menu
             <>
-              <a href="/garden" className="nav-link">
-                My Garden
-              </a>
-              <a href="/messages" className="nav-link">
-                Messages
-              </a>
-              <a href="/profile" className="nav-link">
-                Profile
-              </a>
-              <a href="/settings" className="nav-link">
-                Settings
-              </a>
-              <button className="nav-link logout">
+              <Link to="/garden" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
+                My Garden 🌻
+              </Link>
+              <Link to="/browse" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
+                Browse 🌱
+              </Link>
+              <Link to="/messages" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
+                Messages 💌
+              </Link>
+              <Link to="/profile" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
+                Profile 🌸
+              </Link>
+              <button 
+                className="nav-button mobile"
+                onClick={handleLogoutClick}
+              >
                 Logout
               </button>
             </>

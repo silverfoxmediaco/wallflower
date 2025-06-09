@@ -1,51 +1,118 @@
-import React, { useState } from 'react';
+// App Component
+// Path: src/App.jsx
+// Purpose: Main application component with routing
+
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 import Header from './frontend/components/Header';
 import HowItWorks from './frontend/components/HowItWorks';
 import SignupModal from './frontend/components/SignupModal';
+import LoginModal from './frontend/components/LoginModal';
+import Profile from './frontend/components/profile/profile';
+import GardeningInterface from './frontend/components/browse/GardeningInterface';
+
+// Protected Route component
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem('token');
+  return token ? children : <Navigate to="/" />;
+};
+
+// Landing Page component
+const LandingPage = ({ onSignupClick }) => (
+  <>
+    <section className="hero" id="hero">
+      <div className="container">
+        <h2 className="hero-title">
+          Dating at your own pace,<br />
+          blooming in your own time
+        </h2>
+        <p className="hero-subtitle text-muted">
+          A gentle space for introverts to make meaningful connections
+        </p>
+        <button 
+          className="btn btn-primary" 
+          onClick={onSignupClick}
+        >
+          Start Your Garden
+        </button>
+      </div>
+    </section>
+    
+    <div id="how-it-works">
+      <HowItWorks onStartPlanting={onSignupClick} />
+    </div>
+  </>
+);
 
 function App() {
   const [showSignupModal, setShowSignupModal] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false); // Add login modal state
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    // Check if user is logged in
+    const token = localStorage.getItem('token');
+    setIsLoggedIn(!!token);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setIsLoggedIn(false);
+    window.location.href = '/';
+  };
 
   return (
-    <div className="App">
-      <Header 
-        onSignupClick={() => setShowSignupModal(true)}
-        onLoginClick={() => setShowLoginModal(true)}
-      />
-      
-      <main className="main-content">
-        <section className="hero" id="hero">
-          <div className="container">
-            <h2 className="hero-title">
-              Dating at your own pace,<br />
-              blooming in your own time
-            </h2>
-            <p className="hero-subtitle text-muted">
-              A gentle space for introverts to make meaningful connections
-            </p>
-            <button 
-              className="btn btn-primary" 
-              onClick={() => setShowSignupModal(true)}
-            >
-              Start Your Garden
-            </button>
-          </div>
-        </section>
+    <Router>
+      <div className="App">
+        <Header 
+          onSignupClick={() => setShowSignupModal(true)}
+          onLoginClick={() => setShowLoginModal(true)}
+          isLoggedIn={isLoggedIn}
+          onLogout={handleLogout}
+        />
         
-        <div id="how-it-works">
-          <HowItWorks onStartPlanting={() => setShowSignupModal(true)} />
-        </div>
-      </main>
-      
-      <SignupModal 
-        isOpen={showSignupModal} 
-        onClose={() => setShowSignupModal(false)} 
-      />
-      
-      {/* Add LoginModal when you create it */}
-    </div>
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={
+              <LandingPage onSignupClick={() => setShowSignupModal(true)} />
+            } />
+            
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/browse" element={
+              <ProtectedRoute>
+                <GardeningInterface />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/garden" element={
+              <ProtectedRoute>
+                <div className="container" style={{ paddingTop: '2rem' }}>
+                  <h1>My Garden 🌻</h1>
+                  <p>Your matches and conversations will appear here.</p>
+                </div>
+              </ProtectedRoute>
+            } />
+          </Routes>
+        </main>
+        
+        <SignupModal 
+          isOpen={showSignupModal} 
+          onClose={() => setShowSignupModal(false)} 
+        />
+        
+        <LoginModal 
+          isOpen={showLoginModal} 
+          onClose={() => setShowLoginModal(false)} 
+        />
+      </div>
+    </Router>
   );
 }
 
