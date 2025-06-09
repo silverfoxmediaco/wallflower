@@ -1,60 +1,165 @@
-import React, { useState } from 'react';
+// GardeningInterface Component
+// Path: src/frontend/components/browse/GardeningInterface.jsx
+// Purpose: Browse profiles and send seeds
+
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './GardeningInterface.css';
 
 const GardeningInterface = () => {
-  const [currentProfile, setCurrentProfile] = useState(0);
-  const [seedsRemaining, setSeedsRemaining] = useState(5);
-  
-  // Mock user data - replace with real data later
-  const mockProfiles = [
-    {
-      id: 1,
-      username: "BookwormBee",
-      age: 28,
-      height: "5'6\"",
-      bodyType: "Average",
-      location: "Austin, TX",
-      distance: "5 miles away",
-      bio: "Introvert who loves cozy bookstores and quiet coffee shops. Looking for someone to share comfortable silences and deep conversations with.",
-      interests: ["Reading", "Creative Writing", "Indie Films", "Tea Collection", "Yoga"],
-      photos: ["/api/placeholder/400/600"],
-      videos: [],
-      lastActive: "Active today",
-      personalityType: "INFJ"
-    },
-    {
-      id: 2,
-      username: "GardenSoul",
-      age: 32,
-      height: "5'10\"",
-      bodyType: "Fit",
-      location: "Portland, OR", 
-      distance: "12 miles away",
-      bio: "Plant parent and sunset chaser. I find peace in my garden and joy in farmers markets. Seeking someone who appreciates life's quiet moments.",
-      interests: ["Gardening", "Cooking", "Hiking", "Photography", "Meditation"],
-      photos: ["/api/placeholder/400/600"],
-      videos: [],
-      lastActive: "Active 2 hours ago",
-      personalityType: "ISFP"
-    }
-  ];
+  const [profiles, setProfiles] = useState([]);
+  const [currentProfileIndex, setCurrentProfileIndex] = useState(0);
+  const [seedsRemaining, setSeedsRemaining] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-  const profile = mockProfiles[currentProfile];
+  // Fetch profiles on component mount
+  useEffect(() => {
+    fetchProfiles();
+  }, []);
 
-  const handlePlantSeed = () => {
-    if (seedsRemaining > 0) {
-      setSeedsRemaining(seedsRemaining - 1);
-      // Add animation and move to next profile
-      setTimeout(() => {
-        setCurrentProfile((prev) => (prev + 1) % mockProfiles.length);
-      }, 500);
+  const fetchProfiles = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        navigate('/');
+        return;
+      }
+
+      const response = await fetch('/api/match/browse', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setProfiles(data.profiles);
+        setSeedsRemaining(data.seedsRemaining);
+        setLoading(false);
+      } else {
+        setError(data.message);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error('Fetch profiles error:', error);
+      setError('Failed to load profiles');
+      setLoading(false);
     }
   };
 
-  const handlePass = () => {
-    // Move to next profile
-    setCurrentProfile((prev) => (prev + 1) % mockProfiles.length);
+  const handlePlantSeed = async () => {
+    if (seedsRemaining > 0 && profiles[currentProfileIndex]) {
+      try {
+        const token = localStorage.getItem('token');
+        const currentProfile = profiles[currentProfileIndex];
+
+        const response = await fetch('/api/match/send-seed', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            recipientId: currentProfile.id
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          setSeedsRemaining(data.seedsRemaining);
+          
+          // Show success message (you can make this prettier)
+          alert(`Seed sent to ${currentProfile.username}! 🌱`);
+          
+          // Move to next profile
+          setTimeout(() => {
+            if (currentProfileIndex < profiles.length - 1) {
+              setCurrentProfileIndex(prev => prev + 1);
+            } else {
+              // No more profiles
+              setProfiles([]);
+            }
+          }, 500);
+        } else {
+          alert(data.message);
+        }
+      } catch (error) {
+        console.error('Send seed error:', error);
+        alert('Failed to send seed');
+      }
+    }
   };
+
+  const handlePass = async () => {
+    if (profiles[currentProfileIndex]) {
+      try {
+        const token = localStorage.getItem('token');
+        const currentProfile = profiles[currentProfileIndex];
+
+        await fetch('/api/match/pass', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            profileId: currentProfile.id
+          })
+        });
+
+        // Move to next profile
+        if (currentProfileIndex < profiles.length - 1) {
+          setCurrentProfileIndex(prev => prev + 1);
+        } else {
+          // No more profiles
+          setProfiles([]);
+        }
+      } catch (error) {
+        console.error('Pass profile error:', error);
+      }
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="gardening-container">
+        <div className="loading-message">
+          <p>Finding your perfect garden matches... 🌸</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="gardening-container">
+        <div className="error-message">
+          <p>{error}</p>
+          <button onClick={() => navigate('/')}>Go Back</button>
+        </div>
+      </div>
+    );
+  }
+
+  if (profiles.length === 0 || !profiles[currentProfileIndex]) {
+    return (
+      <div className="gardening-container">
+        <div className="no-profiles-message">
+          <h2>No more profiles to browse! 🌻</h2>
+          <p>Check back later for new members or browse your matches in your garden.</p>
+          <button className="btn-primary" onClick={() => navigate('/garden')}>
+            Visit My Garden
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const profile = profiles[currentProfileIndex];
 
   return (
     <div className="gardening-container">
@@ -69,13 +174,22 @@ const GardeningInterface = () => {
       <div className="profile-card">
         {/* Photo Section */}
         <div className="photo-section">
-          <img 
-            src={profile.photos[0]} 
-            alt={profile.username}
-            className="profile-photo"
-          />
+          {profile.photos && profile.photos.length > 0 ? (
+            <img 
+              src={profile.photos[0].url || profile.photos[0]} 
+              alt={profile.username}
+              className="profile-photo"
+            />
+          ) : (
+            <div className="no-photo">
+              <span>🌸</span>
+              <p>No photo yet</p>
+            </div>
+          )}
           <div className="photo-navigation">
-            <span className="photo-indicator">1 / {profile.photos.length}</span>
+            <span className="photo-indicator">
+              1 / {profile.photos?.length || 1}
+            </span>
           </div>
           <div className="profile-badges">
             <span className="personality-badge">{profile.personalityType}</span>
@@ -87,7 +201,7 @@ const GardeningInterface = () => {
         <div className="info-section">
           <div className="profile-header">
             <h2 className="profile-name">{profile.username}, {profile.age}</h2>
-            <p className="profile-location">{profile.distance}</p>
+            <p className="profile-location">{profile.location}</p>
           </div>
 
           <div className="profile-details">
@@ -109,28 +223,31 @@ const GardeningInterface = () => {
             <p>{profile.bio}</p>
           </div>
 
-          <div className="interests-section">
-            <h3 className="interests-title">Interests</h3>
-            <div className="interests-grid">
-              {profile.interests.map((interest, index) => (
-                <span key={index} className="interest-tag">
-                  {interest}
-                </span>
+          {profile.interests && profile.interests.length > 0 && (
+            <div className="interests-section">
+              <h3 className="interests-title">Interests</h3>
+              <div className="interests-grid">
+                {profile.interests.map((interest, index) => (
+                  <span key={index} className="interest-tag">
+                    {interest}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Prompts Section */}
+          {profile.prompts && profile.prompts.filter(p => p.answer).length > 0 && (
+            <div className="prompts-section">
+              <h3 className="prompts-title">Get to know me</h3>
+              {profile.prompts.filter(p => p.answer).map((prompt, index) => (
+                <div key={index} className="prompt-item">
+                  <p className="prompt-question">{prompt.question}</p>
+                  <p className="prompt-answer">{prompt.answer}</p>
+                </div>
               ))}
             </div>
-          </div>
-
-          {/* Media Section */}
-          <div className="media-section">
-            <button className="media-btn">
-              📷 View All Photos ({profile.photos.length})
-            </button>
-            {profile.videos.length > 0 && (
-              <button className="media-btn">
-                🎥 View Videos ({profile.videos.length})
-              </button>
-            )}
-          </div>
+          )}
         </div>
       </div>
 
@@ -172,152 +289,6 @@ const GardeningInterface = () => {
           <button className="cta-btn">View Seed Packages</button>
         </div>
       )}
-    </div>
-  );
-};
-
-// Profile Creation/Edit Form Component
-export const ProfileForm = () => {
-  const [formData, setFormData] = useState({
-    username: '',
-    age: '',
-    height: '',
-    bodyType: '',
-    location: '',
-    bio: '',
-    interests: [],
-    personalityType: ''
-  });
-
-  const bodyTypes = ['Slim', 'Average', 'Athletic', 'Fit', 'Curvy', 'Full Figured'];
-  const heightOptions = [];
-  
-  // Generate height options from 4'0" to 7'0"
-  for (let feet = 4; feet <= 7; feet++) {
-    for (let inches = 0; inches < 12; inches++) {
-      if (feet === 7 && inches > 0) break;
-      heightOptions.push(`${feet}'${inches}"`);
-    }
-  }
-
-  const interestOptions = [
-    'Reading', 'Writing', 'Art', 'Music', 'Cooking', 'Baking',
-    'Gardening', 'Hiking', 'Yoga', 'Meditation', 'Photography',
-    'Board Games', 'Video Games', 'Movies', 'Travel', 'Crafts',
-    'Volunteering', 'Pets', 'Nature', 'Museums', 'Coffee',
-    'Tea', 'Wine Tasting', 'Astronomy', 'History', 'Languages'
-  ];
-
-  return (
-    <div className="profile-form">
-      <h2>Create Your Garden Profile</h2>
-      
-      <div className="form-section">
-        <label>Garden Name (Username)</label>
-        <input 
-          type="text" 
-          placeholder="Choose a unique garden name"
-          value={formData.username}
-          onChange={(e) => setFormData({...formData, username: e.target.value})}
-        />
-      </div>
-
-      <div className="form-row">
-        <div className="form-section">
-          <label>Age</label>
-          <input 
-            type="number" 
-            min="18" 
-            max="100"
-            value={formData.age}
-            onChange={(e) => setFormData({...formData, age: e.target.value})}
-          />
-        </div>
-
-        <div className="form-section">
-          <label>Height</label>
-          <select 
-            value={formData.height}
-            onChange={(e) => setFormData({...formData, height: e.target.value})}
-          >
-            <option value="">Select height</option>
-            {heightOptions.map(height => (
-              <option key={height} value={height}>{height}</option>
-            ))}
-          </select>
-        </div>
-
-        <div className="form-section">
-          <label>Body Type</label>
-          <select 
-            value={formData.bodyType}
-            onChange={(e) => setFormData({...formData, bodyType: e.target.value})}
-          >
-            <option value="">Select body type</option>
-            {bodyTypes.map(type => (
-              <option key={type} value={type}>{type}</option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>Location</label>
-        <input 
-          type="text" 
-          placeholder="City, State"
-          value={formData.location}
-          onChange={(e) => setFormData({...formData, location: e.target.value})}
-        />
-      </div>
-
-      <div className="form-section">
-        <label>About Your Garden (Bio)</label>
-        <textarea 
-          rows="4"
-          placeholder="Share what makes your garden unique..."
-          value={formData.bio}
-          onChange={(e) => setFormData({...formData, bio: e.target.value})}
-        />
-      </div>
-
-      <div className="form-section">
-        <label>Interests (Choose up to 10)</label>
-        <div className="interests-select-grid">
-          {interestOptions.map(interest => (
-            <label key={interest} className="interest-checkbox">
-              <input 
-                type="checkbox"
-                checked={formData.interests.includes(interest)}
-                onChange={(e) => {
-                  if (e.target.checked && formData.interests.length < 10) {
-                    setFormData({...formData, interests: [...formData.interests, interest]});
-                  } else if (!e.target.checked) {
-                    setFormData({...formData, interests: formData.interests.filter(i => i !== interest)});
-                  }
-                }}
-              />
-              <span>{interest}</span>
-            </label>
-          ))}
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>Upload Photos</label>
-        <div className="upload-area">
-          <input type="file" accept="image/*" multiple />
-          <p>Upload up to 6 photos</p>
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>Upload Introduction Video (Optional)</label>
-        <div className="upload-area">
-          <input type="file" accept="video/*" />
-          <p>Share a 30-second introduction</p>
-        </div>
-      </div>
     </div>
   );
 };

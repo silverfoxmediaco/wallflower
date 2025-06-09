@@ -11,6 +11,7 @@ import SignupModal from './frontend/components/SignupModal';
 import LoginModal from './frontend/components/LoginModal';
 import Profile from './frontend/components/profile/profile';
 import GardeningInterface from './frontend/components/browse/GardeningInterface';
+import MockProfilesManager from './frontend/components/admin/MockProfilesManager';
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
@@ -97,6 +98,12 @@ function App() {
                   <h1>My Garden 🌻</h1>
                   <p>Your matches and conversations will appear here.</p>
                 </div>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/admin/mock-profiles" element={
+              <ProtectedRoute>
+                <MockProfilesManager />
               </ProtectedRoute>
             } />
           </Routes>
