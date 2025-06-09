@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './App.css';
 import Header from './frontend/components/Header';
 import HowItWorks from './frontend/components/HowItWorks';
-import SignupModal from './frontend/components/SignUpModal';
+import SignupModal from './frontend/components/SignupModal';
 
 function App() {
   const [showSignupModal, setShowSignupModal] = useState(false);
