@@ -5,6 +5,7 @@ const dotenv = require('dotenv');
 const path = require('path');
 const { createServer } = require('http');
 const { Server } = require('socket.io');
+const fs = require('fs');
 
 // Load environment variables
 dotenv.config();
@@ -23,6 +24,26 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Debug route to check file structure
+app.get('/api/debug', (req, res) => {
+  const distPath = path.join(__dirname, 'dist');
+  const distExists = fs.existsSync(distPath);
+  let distContents = [];
+  
+  if (distExists) {
+    distContents = fs.readdirSync(distPath);
+  }
+  
+  res.json({
+    cwd: process.cwd(),
+    dirname: __dirname,
+    distPath: distPath,
+    distExists: distExists,
+    distContents: distContents,
+    nodeEnv: process.env.NODE_ENV
+  });
+});
+
 // API Routes
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Wallflower API is running' });
@@ -33,14 +54,32 @@ app.use('/api/auth', require('./src/backend/routes/authRoutes'));
 
 // Serve static files from the React app in production
 if (process.env.NODE_ENV === 'production') {
+  const staticPath = path.join(__dirname, 'dist');
+  
+  console.log('Production mode - serving static files from:', staticPath);
+  console.log('Directory exists:', fs.existsSync(staticPath));
+  
   // Serve static files from the React build
-  // Based on your file structure, it looks like the build output is in 'dist' at the root
-  app.use(express.static(path.join(__dirname, 'dist')));
+  app.use(express.static(staticPath));
 
   // The "catchall" handler: for any request that doesn't
   // match one above, send back React's index.html file.
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+    const indexPath = path.join(__dirname, 'dist', 'index.html');
+    console.log('Attempting to serve index.html from:', indexPath);
+    console.log('File exists:', fs.existsSync(indexPath));
+    
+    if (fs.existsSync(indexPath)) {
+      res.sendFile(indexPath);
+    } else {
+      res.status(404).json({ 
+        error: 'index.html not found', 
+        path: indexPath,
+        distContents: fs.existsSync(path.join(__dirname, 'dist')) 
+          ? fs.readdirSync(path.join(__dirname, 'dist')) 
+          : 'dist folder not found'
+      });
+    }
   });
 }
 
@@ -54,27 +93,16 @@ const connectDB = async () => {
     }
     
     console.log('Attempting to connect to MongoDB...');
-    console.log('Connection string starts with:', mongoUri.substring(0, 30) + '...');
     
     await mongoose.connect(mongoUri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
+      serverSelectionTimeoutMS: 5000,
     });
     
     console.log('MongoDB connected successfully');
-    console.log('Database:', mongoose.connection.db.databaseName);
   } catch (err) {
     console.error('MongoDB connection error:', err.message);
-    
-    // More specific error messages
-    if (err.message.includes('ENOTFOUND')) {
-      console.error('Error: Cannot resolve MongoDB cluster address. Check your connection string.');
-    } else if (err.message.includes('authentication failed')) {
-      console.error('Error: Authentication failed. Check your username and password.');
-    } else if (err.message.includes('whitelist')) {
-      console.error('Error: IP whitelist issue. Ensure 0.0.0.0/0 is in your Atlas Network Access.');
-    }
     
     // Don't exit in production, let the app run without DB
     if (process.env.NODE_ENV !== 'production') {
@@ -96,4 +124,6 @@ io.on('connection', (socket) => {
 const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV}`);
+  console.log(`Current directory: ${process.cwd()}`);
 });
