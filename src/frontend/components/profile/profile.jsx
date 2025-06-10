@@ -9,6 +9,7 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(true); // Start in edit mode for new users
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
   const [photoError, setPhotoError] = useState('');
+  const [showPreview, setShowPreview] = useState(false);
   const [profileData, setProfileData] = useState({
     username: '',
     age: '',
@@ -567,7 +568,12 @@ const Profile = () => {
 
         {/* Action Buttons */}
         <div className="profile-actions">
-          <button className="btn-secondary">Preview Profile</button>
+          <button 
+            className="btn-secondary"
+            onClick={() => setShowPreview(true)}
+          >
+            Preview Profile
+          </button>
           <button 
             className="btn-primary" 
             disabled={calculateCompletion() < 60}
@@ -577,6 +583,78 @@ const Profile = () => {
           </button>
         </div>
       </div>
+
+      {/* Preview Modal */}
+      {showPreview && (
+        <div className="preview-modal-overlay" onClick={() => setShowPreview(false)}>
+          <div className="preview-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="close-preview" onClick={() => setShowPreview(false)}>×</button>
+            <h2>Profile Preview</h2>
+            <p className="preview-subtitle">This is how others will see your profile</p>
+            
+            <div className="preview-content">
+              {/* Photo */}
+              <div className="preview-photo">
+                {profileData.photos[0] ? (
+                  <img 
+                    src={profileData.photos[0].thumbnailUrl || profileData.photos[0].url} 
+                    alt="Profile preview" 
+                  />
+                ) : (
+                  <div className="no-photo-preview">
+                    <span>🌸</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Info */}
+              <div className="preview-info">
+                <h3>{profileData.username || 'Username'}, {profileData.age || '??'}</h3>
+                <p className="preview-location">{profileData.location || 'Location not set'}</p>
+                
+                {profileData.personalityType && (
+                  <span className="preview-personality">{profileData.personalityType}</span>
+                )}
+
+                <div className="preview-details">
+                  {profileData.height && <span>Height: {profileData.height}</span>}
+                  {profileData.bodyType && <span>Body Type: {profileData.bodyType}</span>}
+                  {profileData.lookingFor && <span>Looking for: {profileData.lookingFor}</span>}
+                </div>
+
+                {profileData.bio && (
+                  <div className="preview-bio">
+                    <h4>About Me</h4>
+                    <p>{profileData.bio}</p>
+                  </div>
+                )}
+
+                {profileData.interests.length > 0 && (
+                  <div className="preview-interests">
+                    <h4>Interests</h4>
+                    <div className="interests-list">
+                      {profileData.interests.map((interest, idx) => (
+                        <span key={idx} className="interest-chip">{interest}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {profileData.prompts.some(p => p.answer) && (
+                  <div className="preview-prompts">
+                    {profileData.prompts.filter(p => p.answer).map((prompt, idx) => (
+                      <div key={idx} className="preview-prompt">
+                        <p className="prompt-q">{prompt.question}</p>
+                        <p className="prompt-a">{prompt.answer}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

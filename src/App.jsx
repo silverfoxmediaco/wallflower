@@ -12,6 +12,7 @@ import SignupModal from './frontend/components/SignupModal';
 import LoginModal from './frontend/components/LoginModal';
 import Profile from './frontend/components/profile/profile';
 import GardeningInterface from './frontend/components/browse/GardeningInterface';
+import Garden from './frontend/components/garden/Garden';
 import MockProfilesManager from './frontend/components/admin/MockProfilesManager';
 
 // Protected Route component
@@ -99,10 +100,7 @@ function App() {
             
             <Route path="/garden" element={
               <ProtectedRoute>
-                <div className="container" style={{ paddingTop: '2rem' }}>
-                  <h1>My Garden 🌻</h1>
-                  <p>Your matches and conversations will appear here.</p>
-                </div>
+                <Garden />
               </ProtectedRoute>
             } />
             

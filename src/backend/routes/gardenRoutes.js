@@ -1,9 +1,12 @@
-// Example: src/backend/routes/gardenRoutes.js
+// Garden Routes
+// Path: src/backend/routes/gardenRoutes.js
+// Purpose: Define garden-related API endpoints
+
 const express = require('express');
 const router = express.Router();
+const { getGarden } = require('../controllers/gardenController');
 
-router.get('/', (req, res) => {
-  res.json({ message: 'Garden routes coming soon! 🌻' });
-});
+// GET /api/garden - Get user's garden data
+router.get('/', getGarden);
 
 module.exports = router;
