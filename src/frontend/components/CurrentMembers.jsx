@@ -1,6 +1,6 @@
 // CurrentMembers Component
 // Path: src/frontend/components/CurrentMembers.jsx
-// Purpose: Display member statistics and testimonials on landing page
+// Purpose: Display member statistics and actual member profiles on landing page
 
 import React, { useState, useEffect } from 'react';
 import './CurrentMembers.css';
@@ -13,6 +13,7 @@ const CurrentMembers = () => {
     successStories: '...',
     activeGardens: '...'
   });
+  const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,40 +24,25 @@ const CurrentMembers = () => {
         if (data.success) {
           setMemberStats(data.stats);
         }
-        setLoading(false);
       })
       .catch(err => {
         console.error('Failed to fetch member stats:', err);
+      });
+
+    // Fetch actual member profiles
+    fetch('/api/members/featured')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setMembers(data.members);
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Failed to fetch members:', err);
         setLoading(false);
       });
   }, []);
-
-  const testimonials = [
-    {
-      id: 1,
-      name: 'Sarah',
-      age: 28,
-      personality: 'INFJ',
-      quote: "Finally, a dating app that doesn't drain my social battery. I love taking things slow here.",
-      avatar: '🌻'
-    },
-    {
-      id: 2,
-      name: 'Michael',
-      age: 32,
-      personality: 'INTJ',
-      quote: "The seed system is brilliant. No pressure, just genuine connections at my own pace.",
-      avatar: '🌿'
-    },
-    {
-      id: 3,
-      name: 'Emma',
-      age: 26,
-      personality: 'ISFP',
-      quote: "I met my partner here after years of overwhelming dating apps. Wallflower just gets it.",
-      avatar: '🌸'
-    }
-  ];
 
   return (
     <section className="current-members" id="current-members">
@@ -96,22 +82,66 @@ const CurrentMembers = () => {
           </div>
         </div>
 
-        {/* Member Testimonials */}
-        <div className="testimonials-section">
-          <h3 className="testimonials-title">What Our Members Say</h3>
-          <div className="testimonials-grid">
-            {testimonials.map(testimonial => (
-              <div key={testimonial.id} className="testimonial-card">
-                <div className="testimonial-header">
-                  <span className="testimonial-avatar">{testimonial.avatar}</span>
-                  <div className="testimonial-info">
-                    <span className="testimonial-name">{testimonial.name}, {testimonial.age}</span>
-                    <span className="testimonial-personality">{testimonial.personality}</span>
+        {/* Featured Members Section */}
+        <div className="featured-members-section">
+          <h3 className="section-subtitle">Meet Some Wallflowers</h3>
+          <div className="members-grid">
+            {loading ? (
+              <div className="loading-message">Loading members...</div>
+            ) : members.length > 0 ? (
+              members.map(member => (
+                <div key={member._id} className="member-card">
+                  <div className="member-photo">
+                    {member.profile?.photos?.[0] ? (
+                      <img 
+                        src={member.profile.photos[0].thumbnailUrl || member.profile.photos[0].url} 
+                        alt={member.username} 
+                      />
+                    ) : (
+                      <div className="no-photo">
+                        <span>🌸</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="member-info">
+                    <h4 className="member-name">
+                      {member.username}, {member.profile?.age || '??'}
+                    </h4>
+                    <p className="member-location">
+                      {member.profile?.location || 'Location not set'}
+                    </p>
+                    {member.profile?.personalityType && (
+                      <span className="personality-badge">
+                        {member.profile.personalityType}
+                      </span>
+                    )}
+                    <p className="member-bio">
+                      {member.profile?.bio ? 
+                        (member.profile.bio.length > 100 ? 
+                          member.profile.bio.substring(0, 100) + '...' : 
+                          member.profile.bio
+                        ) : 
+                        'No bio yet'
+                      }
+                    </p>
+                    {member.profile?.interests && member.profile.interests.length > 0 && (
+                      <div className="member-interests">
+                        {member.profile.interests.slice(0, 3).map((interest, idx) => (
+                          <span key={idx} className="interest-tag">{interest}</span>
+                        ))}
+                        {member.profile.interests.length > 3 && (
+                          <span className="more-interests">+{member.profile.interests.length - 3}</span>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
-                <p className="testimonial-quote">"{testimonial.quote}"</p>
+              ))
+            ) : (
+              <div className="no-members-message">
+                <p>Be one of the first to join our community! 🌱</p>
               </div>
-            ))}
+            )}
           </div>
         </div>
 

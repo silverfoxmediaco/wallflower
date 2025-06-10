@@ -49,18 +49,15 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Wallflower API is running' });
 });
 
-// Add auth routes
+// Auth routes
 app.use('/api/auth', require('./src/backend/routes/authRoutes'));
 app.use('/api/profile', require('./src/backend/routes/profileRoutes'));
-// Add stats routes (public - no auth required)
 app.use('/api/stats', require('./src/backend/routes/statsRoutes'));
-// Add garden routes
 app.use('/api/garden', require('./src/backend/routes/gardenRoutes'));
-// Add match routes
 app.use('/api/match', require('./src/backend/routes/matchRoutes'));
-// Add chat routes
 app.use('/api/chat', require('./src/backend/routes/chatRoutes'));
 app.use('/api/admin', require('./src/backend/routes/adminRoutes'));
+app.use('/api/members', require('./src/backend/routes/membersRoutes'));
 
 // Serve static files from the React app in production
 if (process.env.NODE_ENV === 'production') {
