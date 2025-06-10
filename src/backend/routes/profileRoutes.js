@@ -4,7 +4,12 @@
 
 const express = require('express');
 const router = express.Router();
-const { getProfile, updateProfile, uploadPhotos } = require('../controllers/profileController');
+const { 
+  getProfile, 
+  updateProfile, 
+  uploadPhotos, 
+  deletePhoto 
+} = require('../controllers/profileController');
 
 // GET /api/profile - Get current user's profile
 router.get('/', getProfile);
@@ -14,5 +19,8 @@ router.put('/', updateProfile);
 
 // POST /api/profile/photos - Upload photos
 router.post('/photos', uploadPhotos);
+
+// DELETE /api/profile/photos/:photoId - Delete a specific photo
+router.delete('/photos/:photoId', deletePhoto);
 
 module.exports = router;
