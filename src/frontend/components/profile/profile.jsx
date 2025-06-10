@@ -75,11 +75,11 @@ const Profile = () => {
         });
 
         const data = await response.json();
-        if (data.success && data.profile.profile) {
-          const profile = data.profile.profile;
+        if (data.success && data.profile) {
+          const profile = data.profile.profile || {};
           setProfileData(prev => ({
             ...prev,
-            username: data.profile.username || '',
+            username: data.profile.username || '', // Set username from user object
             age: profile.age || '',
             height: profile.height || '',
             bodyType: profile.bodyType || '',
@@ -157,7 +157,7 @@ const Profile = () => {
   };
 
   const calculateCompletion = () => {
-    const requiredFields = ['username', 'age', 'bio', 'location'];
+    const requiredFields = ['age', 'bio', 'location']; // Removed 'username' since it's pre-filled
     const filledRequired = requiredFields.filter(field => profileData[field]).length;
     const hasPhoto = profileData.photos.length > 0;
     const hasInterests = profileData.interests.length >= 3;
@@ -264,13 +264,14 @@ const Profile = () => {
           
           <div className="form-grid">
             <div className="form-group">
-              <label>Garden Name (Username)*</label>
+              <label>Garden Name (Username)</label>
               <input
                 type="text"
                 value={profileData.username}
-                onChange={(e) => handleInputChange('username', e.target.value)}
-                placeholder="e.g., QuietDaisy, BookishRose"
+                disabled
+                style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
               />
+              <small className="form-hint">Username cannot be changed</small>
             </div>
 
             <div className="form-group">
