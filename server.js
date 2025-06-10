@@ -51,8 +51,9 @@ app.get('/api/health', (req, res) => {
 
 // Add auth routes
 app.use('/api/auth', require('./src/backend/routes/authRoutes'));
-
 app.use('/api/profile', require('./src/backend/routes/profileRoutes'));
+// Add stats routes (public - no auth required)
+app.use('/api/stats', require('./src/backend/routes/statsRoutes'));
 // Add garden routes
 app.use('/api/garden', require('./src/backend/routes/gardenRoutes'));
 // Add match routes
