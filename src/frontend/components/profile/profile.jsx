@@ -88,7 +88,8 @@ const Profile = () => {
             interests: profile.interests || [],
             personalityType: profile.personalityType || '',
             lookingFor: profile.lookingFor || '',
-            prompts: profile.prompts || [
+            // Ensure prompts always has the default structure
+            prompts: (profile.prompts && profile.prompts.length > 0) ? profile.prompts : [
               { question: '', answer: '' },
               { question: '', answer: '' },
               { question: '', answer: '' }
@@ -209,6 +210,10 @@ const Profile = () => {
       alert('Something went wrong. Please try again.');
     }
   };
+
+  // Debug logging
+  console.log('Current prompts:', profileData.prompts);
+  console.log('Prompts length:', profileData.prompts?.length);
 
   return (
     <div className="profile-container">
@@ -391,38 +396,72 @@ const Profile = () => {
           <h2>Conversation Starters</h2>
           <p className="section-description">Answer at least one prompt to help others get to know you</p>
           
-          <div style={{ border: '2px solid red', padding: '20px', minHeight: '200px' }}>
-            {console.log('Prompts data:', profileData.prompts)}
-            {profileData.prompts && profileData.prompts.length > 0 ? (
-              profileData.prompts.map((prompt, index) => (
-                <div key={index} className="prompt-group" style={{ marginBottom: '20px', border: '1px solid blue', padding: '10px' }}>
-                  <select
-                    value={prompt.question}
-                    onChange={(e) => handlePromptChange(index, 'question', e.target.value)}
-                    className="prompt-select"
-                    style={{ width: '100%', marginBottom: '10px' }}
-                  >
-                    <option value="">Choose a prompt...</option>
-                    {promptQuestions.map(q => (
-                      <option key={q} value={q}>{q}</option>
-                    ))}
-                  </select>
-                  
-                  {prompt.question && (
-                    <textarea
-                      value={prompt.answer}
-                      onChange={(e) => handlePromptChange(index, 'answer', e.target.value)}
-                      placeholder="Your answer..."
-                      rows="3"
-                      maxLength="200"
-                      className="prompt-answer"
-                      style={{ width: '100%' }}
-                    />
-                  )}
-                </div>
-              ))
-            ) : (
-              <p>No prompts available</p>
+          <div className="prompt-group">
+            <select
+              value={profileData.prompts?.[0]?.question || ''}
+              onChange={(e) => handlePromptChange(0, 'question', e.target.value)}
+              className="prompt-select"
+            >
+              <option value="">Choose a prompt...</option>
+              {promptQuestions.map(q => (
+                <option key={q} value={q}>{q}</option>
+              ))}
+            </select>
+            {profileData.prompts?.[0]?.question && (
+              <textarea
+                value={profileData.prompts[0].answer || ''}
+                onChange={(e) => handlePromptChange(0, 'answer', e.target.value)}
+                placeholder="Your answer..."
+                rows="3"
+                maxLength="200"
+                className="prompt-answer"
+              />
+            )}
+          </div>
+
+          <div className="prompt-group">
+            <select
+              value={profileData.prompts?.[1]?.question || ''}
+              onChange={(e) => handlePromptChange(1, 'question', e.target.value)}
+              className="prompt-select"
+            >
+              <option value="">Choose a prompt...</option>
+              {promptQuestions.map(q => (
+                <option key={q} value={q}>{q}</option>
+              ))}
+            </select>
+            {profileData.prompts?.[1]?.question && (
+              <textarea
+                value={profileData.prompts[1].answer || ''}
+                onChange={(e) => handlePromptChange(1, 'answer', e.target.value)}
+                placeholder="Your answer..."
+                rows="3"
+                maxLength="200"
+                className="prompt-answer"
+              />
+            )}
+          </div>
+
+          <div className="prompt-group">
+            <select
+              value={profileData.prompts?.[2]?.question || ''}
+              onChange={(e) => handlePromptChange(2, 'question', e.target.value)}
+              className="prompt-select"
+            >
+              <option value="">Choose a prompt...</option>
+              {promptQuestions.map(q => (
+                <option key={q} value={q}>{q}</option>
+              ))}
+            </select>
+            {profileData.prompts?.[2]?.question && (
+              <textarea
+                value={profileData.prompts[2].answer || ''}
+                onChange={(e) => handlePromptChange(2, 'answer', e.target.value)}
+                placeholder="Your answer..."
+                rows="3"
+                maxLength="200"
+                className="prompt-answer"
+              />
             )}
           </div>
         </section>
