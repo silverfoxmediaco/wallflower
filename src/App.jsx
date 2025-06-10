@@ -10,7 +10,7 @@ import HowItWorks from './frontend/components/HowItWorks';
 import CurrentMembers from './frontend/components/CurrentMembers';
 import SignupModal from './frontend/components/SignupModal';
 import LoginModal from './frontend/components/LoginModal';
-import Profile from './frontend/components/profile/Profile';
+import Profile from './frontend/components/profile/profile';
 import GardeningInterface from './frontend/components/browse/GardeningInterface';
 import MockProfilesManager from './frontend/components/admin/MockProfilesManager';
 
