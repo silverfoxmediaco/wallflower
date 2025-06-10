@@ -60,12 +60,22 @@
   height: 60px;
   width: auto;
   display: block;
-  
 }
 
-.logo-image:hover {
+/* Fix for shaking header */
+.header .logo-image {
+  transition: opacity 0.3s ease;
+  transform: none !important;
+}
+
+.header .logo-image:hover {
+  transform: none !important;
   opacity: 0.8;
-  transform: scale(1.05);
+}
+
+/* Ensure no animations on header elements */
+.header * {
+  animation: none !important;
 }
 
 /* Navigation Menu */
@@ -222,6 +232,21 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* Fix for prompts section */
+.prompt-group {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  height: auto !important;
+}
+
+.prompt-select,
+.prompt-answer {
+  display: block !important;
+  visibility: visible !important;
+  width: 100%;
 }
 
 /* Responsive Design */
