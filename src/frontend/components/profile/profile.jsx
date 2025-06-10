@@ -1,4 +1,8 @@
-import React, { useState } from 'react';
+// Profile Component
+// Path: src/frontend/components/profile/Profile.jsx
+// Purpose: User profile creation and editing
+
+import React, { useState, useEffect } from 'react';
 import './Profile.css';
 
 const Profile = () => {
@@ -56,6 +60,48 @@ const Profile = () => {
     "My love language is...",
     "After work you'll find me..."
   ];
+
+  // Load existing profile data on component mount
+  useEffect(() => {
+    const loadProfile = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      try {
+        const response = await fetch('/api/profile', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const data = await response.json();
+        if (data.success && data.profile.profile) {
+          const profile = data.profile.profile;
+          setProfileData(prev => ({
+            ...prev,
+            username: data.profile.username || '',
+            age: profile.age || '',
+            height: profile.height || '',
+            bodyType: profile.bodyType || '',
+            location: profile.location || '',
+            bio: profile.bio || '',
+            interests: profile.interests || [],
+            personalityType: profile.personalityType || '',
+            lookingFor: profile.lookingFor || '',
+            prompts: profile.prompts || [
+              { question: '', answer: '' },
+              { question: '', answer: '' },
+              { question: '', answer: '' }
+            ]
+          }));
+        }
+      } catch (error) {
+        console.error('Load profile error:', error);
+      }
+    };
+
+    loadProfile();
+  }, []);
 
   const handleInputChange = (field, value) => {
     setProfileData(prev => ({
@@ -121,6 +167,47 @@ const Profile = () => {
     const completed = filledRequired + (hasPhoto ? 1 : 0) + (hasInterests ? 1 : 0) + (hasPrompt ? 1 : 0);
     
     return Math.round((completed / total) * 100);
+  };
+
+  const handleSaveProfile = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please log in to save your profile');
+        return;
+      }
+
+      const response = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          age: profileData.age,
+          height: profileData.height,
+          bodyType: profileData.bodyType,
+          location: profileData.location,
+          bio: profileData.bio,
+          interests: profileData.interests,
+          personalityType: profileData.personalityType,
+          lookingFor: profileData.lookingFor,
+          prompts: profileData.prompts.filter(p => p.question && p.answer)
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert('Profile saved successfully! 🌸');
+        setIsEditing(false);
+      } else {
+        alert(data.message || 'Failed to save profile');
+      }
+    } catch (error) {
+      console.error('Save profile error:', error);
+      alert('Something went wrong. Please try again.');
+    }
   };
 
   return (
@@ -333,7 +420,11 @@ const Profile = () => {
         {/* Action Buttons */}
         <div className="profile-actions">
           <button className="btn-secondary">Preview Profile</button>
-          <button className="btn-primary" disabled={calculateCompletion() < 60}>
+          <button 
+            className="btn-primary" 
+            disabled={calculateCompletion() < 60}
+            onClick={handleSaveProfile}
+          >
             Save Profile
           </button>
         </div>
