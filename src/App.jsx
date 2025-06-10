@@ -7,9 +7,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import './App.css';
 import Header from './frontend/components/Header';
 import HowItWorks from './frontend/components/HowItWorks';
+import CurrentMembers from './frontend/components/CurrentMembers';
 import SignupModal from './frontend/components/SignupModal';
 import LoginModal from './frontend/components/LoginModal';
-import Profile from './frontend/components/profile/profile';
+import Profile from './frontend/components/profile/Profile';
 import GardeningInterface from './frontend/components/browse/GardeningInterface';
 import MockProfilesManager from './frontend/components/admin/MockProfilesManager';
 
@@ -42,6 +43,10 @@ const LandingPage = ({ onSignupClick }) => (
     
     <div id="how-it-works">
       <HowItWorks onStartPlanting={onSignupClick} />
+    </div>
+    
+    <div id="current-members">
+      <CurrentMembers />
     </div>
   </>
 );
