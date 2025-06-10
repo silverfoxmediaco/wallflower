@@ -9,8 +9,8 @@ const storage = new CloudinaryStorage({
     folder: 'wallflower-profiles',
     allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
     transformation: [
-      { width: 800, height: 800, crop: 'limit' }, // Max size
-      { quality: 'auto' } // Auto quality optimization
+      { width: 800, height: 800, crop: 'limit' },
+      { quality: 'auto' }
     ]
   }
 });
@@ -18,7 +18,7 @@ const storage = new CloudinaryStorage({
 const upload = multer({ 
   storage: storage,
   limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB limit
+    fileSize: 5 * 1024 * 1024
   }
 });
 
