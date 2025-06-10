@@ -179,6 +179,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: var(--space-xs);
+      margin-bottom: var(--space-md);
     }
     
     .interest-tag {
@@ -194,6 +195,25 @@
       color: var(--color-text-muted);
       font-size: 0.75rem;
       padding: var(--space-xs) var(--space-sm);
+    }
+    
+    .view-profile-btn {
+      width: 100%;
+      padding: var(--space-md);
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: var(--space-md);
+    }
+    
+    .view-profile-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(147, 125, 194, 0.3);
     }
     
     .loading-message,

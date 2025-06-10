@@ -16,6 +16,19 @@ const CurrentMembers = () => {
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Handle view profile click
+  const handleViewProfile = (memberId) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      // If not logged in, prompt to sign up
+      alert('Please sign up or log in to view full profiles! 🌸');
+      // In a real app, you'd trigger the signup modal here
+    } else {
+      // If logged in, navigate to browse or profile view
+      window.location.href = '/browse';
+    }
+  };
+
   useEffect(() => {
     // Fetch real member statistics
     fetch('/api/stats/members')
@@ -134,6 +147,9 @@ const CurrentMembers = () => {
                         )}
                       </div>
                     )}
+                    <button className="view-profile-btn" onClick={() => handleViewProfile(member._id)}>
+                      View Profile
+                    </button>
                   </div>
                 </div>
               ))
