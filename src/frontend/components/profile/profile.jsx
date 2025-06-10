@@ -391,31 +391,36 @@ const Profile = () => {
           <h2>Conversation Starters</h2>
           <p className="section-description">Answer at least one prompt to help others get to know you</p>
           
-          {profileData.prompts.map((prompt, index) => (
-            <div key={index} className="prompt-group">
-              <select
-                value={prompt.question}
-                onChange={(e) => handlePromptChange(index, 'question', e.target.value)}
-                className="prompt-select"
-              >
-                <option value="">Choose a prompt...</option>
-                {promptQuestions.map(q => (
-                  <option key={q} value={q}>{q}</option>
-                ))}
-              </select>
-              
-              {prompt.question && (
-                <textarea
-                  value={prompt.answer}
-                  onChange={(e) => handlePromptChange(index, 'answer', e.target.value)}
-                  placeholder="Your answer..."
-                  rows="3"
-                  maxLength="200"
-                  className="prompt-answer"
-                />
-              )}
-            </div>
-          ))}
+          {console.log('Prompts data:', profileData.prompts)}
+          {profileData.prompts && profileData.prompts.length > 0 ? (
+            profileData.prompts.map((prompt, index) => (
+              <div key={index} className="prompt-group">
+                <select
+                  value={prompt.question}
+                  onChange={(e) => handlePromptChange(index, 'question', e.target.value)}
+                  className="prompt-select"
+                >
+                  <option value="">Choose a prompt...</option>
+                  {promptQuestions.map(q => (
+                    <option key={q} value={q}>{q}</option>
+                  ))}
+                </select>
+                
+                {prompt.question && (
+                  <textarea
+                    value={prompt.answer}
+                    onChange={(e) => handlePromptChange(index, 'answer', e.target.value)}
+                    placeholder="Your answer..."
+                    rows="3"
+                    maxLength="200"
+                    className="prompt-answer"
+                  />
+                )}
+              </div>
+            ))
+          ) : (
+            <p>No prompts available</p>
+          )}
         </section>
 
         {/* Action Buttons */}
