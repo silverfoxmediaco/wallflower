@@ -31,14 +31,17 @@ const Garden = () => {
       const data = await response.json();
       console.log('Garden API response:', data); // Debug log
       
-      if (data.success && data.garden) {
+      if (data.success) {
+        // Check if data is nested in 'garden' or at root level
+        const gardenData = data.garden || data;
         setGardenData({
-          seedsReceived: data.garden.seedsReceived || [],
-          seedsSent: data.garden.seedsSent || [],
-          matches: data.garden.matches || [],
-          flowersInBloom: data.garden.flowersInBloom || []
+          seedsReceived: gardenData.seedsReceived || [],
+          seedsSent: gardenData.seedsSent || [],
+          matches: gardenData.matches || [],
+          flowersInBloom: gardenData.flowersInBloom || []
         });
       } else {
+        console.error('Garden API returned success: false', data);
         // Set empty arrays if no data
         setGardenData({
           seedsReceived: [],
