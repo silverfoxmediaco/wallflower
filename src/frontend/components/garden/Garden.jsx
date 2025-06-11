@@ -30,12 +30,37 @@ const Garden = () => {
       });
 
       const data = await response.json();
-      if (data.success) {
-        setGardenData(data.garden);
+      console.log('Garden API response:', data); // Debug log
+      
+      if (data.success && data.garden) {
+        setGardenData({
+          seedsReceived: data.garden.seedsReceived || [],
+          seedsSent: data.garden.seedsSent || [],
+          seedsAccepted: data.garden.seedsAccepted || [],
+          matches: data.garden.matches || [],
+          flowersInBloom: data.garden.flowersInBloom || []
+        });
+      } else {
+        // Set empty arrays if no data
+        setGardenData({
+          seedsReceived: [],
+          seedsSent: [],
+          seedsAccepted: [],
+          matches: [],
+          flowersInBloom: []
+        });
       }
       setLoading(false);
     } catch (error) {
       console.error('Error fetching garden data:', error);
+      // Set empty arrays on error
+      setGardenData({
+        seedsReceived: [],
+        seedsSent: [],
+        seedsAccepted: [],
+        matches: [],
+        flowersInBloom: []
+      });
       setLoading(false);
     }
   };

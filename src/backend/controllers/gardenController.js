@@ -41,6 +41,8 @@ exports.getGarden = [verifyToken, async (req, res) => {
     
     // Find matches (users who both sent seeds to each other)
     const matches = [];
+    const seedsAccepted = [];
+    
     for (const sentSeed of user.seeds.sent) {
       const recipientId = sentSeed.to.toString();
       const receivedFromSameUser = user.seeds.received.some(
@@ -52,15 +54,35 @@ exports.getGarden = [verifyToken, async (req, res) => {
         if (matchUser) {
           matches.push(matchUser);
         }
+      } else {
+        // Seeds accepted are those you sent that were reciprocated
+        const recipientUser = await User.findById(recipientId);
+        if (recipientUser) {
+          const theyAlsoSentToYou = recipientUser.seeds.sent.some(
+            s => s.to.toString() === req.userId
+          );
+          if (theyAlsoSentToYou) {
+            const acceptedUser = await User.findById(recipientId).select('-password -email');
+            if (acceptedUser) {
+              seedsAccepted.push(acceptedUser);
+            }
+          }
+        }
       }
     }
+    
+    // Flowers in bloom would be matches with active conversations
+    // For now, this is empty until messaging is implemented
+    const flowersInBloom = [];
     
     res.json({
       success: true,
       garden: {
         seedsReceived: seedsReceived,
         seedsSent: seedsSent,
-        matches: matches
+        seedsAccepted: seedsAccepted,
+        matches: matches,
+        flowersInBloom: flowersInBloom
       }
     });
   } catch (error) {
