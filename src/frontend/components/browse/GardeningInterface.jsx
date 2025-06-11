@@ -21,6 +21,7 @@ const GardeningInterface = () => {
   // Swipe thresholds
   const swipeThreshold = 100;
   const rotationMultiplier = 0.1;
+  const tapThreshold = 5; // Maximum movement to consider it a tap
 
   useEffect(() => {
     fetchProfiles();
@@ -218,6 +219,20 @@ const GardeningInterface = () => {
     alert('Filter functionality coming soon! 🎯');
   };
 
+  // Handle profile card click/tap
+  const handleProfileClick = (e) => {
+    // Only navigate if it's a tap (not a drag)
+    const moveDistance = Math.abs(dragCurrent.x - dragStart.x) + Math.abs(dragCurrent.y - dragStart.y);
+    
+    if (!isDragging && moveDistance < tapThreshold) {
+      e.stopPropagation();
+      const currentProfile = profiles[currentProfileIndex];
+      if (currentProfile && currentProfile.id) {
+        navigate(`/profile/${currentProfile.id}`);
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="gardening-container">
@@ -270,6 +285,7 @@ const GardeningInterface = () => {
         <div 
           className={`profile-card-simple ${isDragging ? 'dragging' : ''}`}
           ref={cardRef}
+          onClick={handleProfileClick}
           onMouseDown={handleDragStart}
           onMouseMove={handleDragMove}
           onMouseUp={handleDragEnd}
