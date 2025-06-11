@@ -94,17 +94,17 @@ const GardeningInterface = () => {
     const isSwipeLeft = deltaX < -swipeThreshold;
     
     if (cardRef.current) {
-      if (isSwipeLeft) {
-        // Swipe left - pass
+      if (isSwipeLeft && currentProfileIndex < profiles.length - 1) {
+        // Swipe left - show next profile
         cardRef.current.classList.add('swipe-left');
         setTimeout(() => {
-          handlePass();
+          moveToNextProfile();
         }, 300);
-      } else if (isSwipeRight) {
-        // Swipe right - plant seed
+      } else if (isSwipeRight && currentProfileIndex > 0) {
+        // Swipe right - show previous profile
         cardRef.current.classList.add('swipe-right');
         setTimeout(() => {
-          handlePlantSeed();
+          moveToPreviousProfile();
         }, 300);
       } else {
         // Return to center
@@ -196,6 +196,18 @@ const GardeningInterface = () => {
     } else {
       // No more profiles
       setProfiles([]);
+    }
+  };
+
+  const moveToPreviousProfile = () => {
+    if (currentProfileIndex > 0) {
+      setCurrentProfileIndex(prev => prev - 1);
+      // Reset card position
+      if (cardRef.current) {
+        cardRef.current.classList.remove('swipe-left', 'swipe-right');
+        cardRef.current.style.transform = '';
+        cardRef.current.style.opacity = '';
+      }
     }
   };
 
@@ -322,7 +334,7 @@ const GardeningInterface = () => {
           onClick={handlePass}
           title="Pass"
         >
-          <span className="btn-icon">👎</span>
+          <span className="btn-icon">🍂</span>
           <span className="btn-text">Pass</span>
         </button>
         
@@ -341,7 +353,7 @@ const GardeningInterface = () => {
           onClick={handleMaybeLater}
           title="Maybe later"
         >
-          <span className="btn-icon">⭐</span>
+          <span className="btn-icon">🌙</span>
           <span className="btn-text">Later</span>
         </button>
       </div>

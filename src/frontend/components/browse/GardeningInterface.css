@@ -55,7 +55,7 @@
 .profile-card-simple {
   position: absolute;
   width: 100%;
-  height: calc(100vh - 180px); /* Leave space for action buttons */
+  height: calc(100vh - 200px); /* More space for action buttons */
   background: white;
   border-radius: 24px;
   overflow: hidden;
@@ -187,7 +187,7 @@
   color: white;
 }
 
-/* Action Buttons - Fixed Bottom */
+/* Action Buttons - Fixed Bottom with more spacing */
 .action-buttons {
   position: fixed;
   bottom: 0;
@@ -196,7 +196,7 @@
   display: flex;
   justify-content: center;
   gap: var(--space-xl);
-  padding: var(--space-lg);
+  padding: var(--space-xl) var(--space-lg) var(--space-lg);
   background: linear-gradient(to top, white, rgba(255, 255, 255, 0.95));
   z-index: 10;
 }
@@ -396,12 +396,12 @@
 /* Responsive - Full height on all devices */
 @media (max-width: 768px) {
   .profile-card-simple {
-    height: calc(100vh - 160px);
+    height: calc(100vh - 180px);
   }
   
   .action-buttons {
     gap: var(--space-lg);
-    padding: var(--space-md);
+    padding: var(--space-lg) var(--space-md) var(--space-md);
   }
   
   .action-btn {
@@ -437,41 +437,3 @@
     height: 40px;
   }
 }
-
-/* Remove old styles */
-/*.profile-card,
-.photo-section,
-.info-section,
-.profile-header,
-.profile-name,
-.profile-location,
-.profile-details,
-.detail-row,
-.detail-label,
-.detail-value,
-.profile-bio,
-.interests-section,
-.interests-title,
-.interests-grid,
-.interest-tag,
-.prompts-section,
-.prompts-title,
-.prompt-item,
-.prompt-question,
-.prompt-answer,
-.media-section,
-.media-btn,
-.personality-badge,
-.profile-form,
-.form-section,
-.form-row,
-.interests-select-grid,
-.interest-checkbox,
-.upload-area,
-.view-profile-hint,
-.profile-summary,
-.seeds-counter,
-.seeds-icon,
-.seeds-text,
-.get-seeds-btn {*/
-  /* Removed - no longer needed */
