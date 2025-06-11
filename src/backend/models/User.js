@@ -36,8 +36,28 @@ const userSchema = new mongoose.Schema({
     personalityType: String,
     lookingFor: String,
     photos: [{
-      url: String,
-      isMain: Boolean,
+      url: {
+        type: String,
+        required: true
+      },
+      publicId: {
+        type: String,
+        required: true
+      },
+      isMain: {
+        type: Boolean,
+        default: false
+      },
+      displayMode: {
+        type: String,
+        enum: ['contain', 'cover'],
+        default: 'contain'
+      },
+      thumbnailUrl: String,
+      uploadedAt: {
+        type: Date,
+        default: Date.now
+      }
     }],
     prompts: [{
       question: String,

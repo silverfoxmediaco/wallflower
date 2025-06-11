@@ -11,7 +11,7 @@ import HowItWorks from './frontend/components/HowItWorks';
 import CurrentMembers from './frontend/components/CurrentMembers';
 import SignupModal from './frontend/components/SignupModal';
 import LoginModal from './frontend/components/LoginModal';
-import Profile from './frontend/components/profile/profile';
+import Profile from './frontend/components/profile/Profile'; // Fixed: uppercase 'P'
 import ProfileView from './frontend/components/profile/ProfileView';
 import GardeningInterface from './frontend/components/browse/GardeningInterface';
 import Garden from './frontend/components/garden/Garden';
