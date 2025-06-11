@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 import Header from './frontend/components/Header';
+import Footer from './frontend/components/Footer';
 import HowItWorks from './frontend/components/HowItWorks';
 import CurrentMembers from './frontend/components/CurrentMembers';
 import SignupModal from './frontend/components/SignupModal';
@@ -118,6 +119,8 @@ function App() {
             } />
           </Routes>
         </main>
+        
+        <Footer />
         
         <SignupModal 
           isOpen={showSignupModal} 

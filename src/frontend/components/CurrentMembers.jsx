@@ -167,24 +167,7 @@ const CurrentMembers = ({ onSignupClick }) => {
           </div>
         </div>
 
-        {/* Community Features */}
-        <div className="community-features">
-          <div className="feature-highlight">
-            <span className="feature-icon">🛡️</span>
-            <h4>Safe & Respectful</h4>
-            <p>Our community values consent and boundaries</p>
-          </div>
-          <div className="feature-highlight">
-            <span className="feature-icon">🌙</span>
-            <h4>Introvert-Friendly</h4>
-            <p>Designed for those who recharge in solitude</p>
-          </div>
-          <div className="feature-highlight">
-            <span className="feature-icon">💜</span>
-            <h4>Quality Over Quantity</h4>
-            <p>Meaningful connections, not endless swiping</p>
-          </div>
-        </div>
+        {/* Community Features section removed */}
       </div>
     </section>
   );
