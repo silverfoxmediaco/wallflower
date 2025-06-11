@@ -45,6 +45,8 @@ const Garden = () => {
     // In a complete implementation, you'd navigate to /profile/:userId
     window.location.href = '/browse';
   };
+
+  const handleSendSeedBack = async (userId) => {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch('/api/match/send-seed', {
