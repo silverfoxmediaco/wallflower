@@ -27,7 +27,7 @@
   /* Garden Stats */
   .garden-stats {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: var(--space-md);
     margin-bottom: var(--space-xl);
     max-width: 1000px;
@@ -35,15 +35,15 @@
     margin-right: auto;
   }
   
-  @media (max-width: 1024px) {
+  @media (max-width: 768px) {
     .garden-stats {
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
     }
   }
   
-  @media (max-width: 640px) {
+  @media (max-width: 480px) {
     .garden-stats {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: 1fr;
     }
   }
   
@@ -54,11 +54,34 @@
     text-align: center;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
   }
   
-  .stat-box:hover {
+  .stat-box.clickable {
+    cursor: pointer;
+    border: 2px solid transparent;
+  }
+  
+  .stat-box.clickable:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: var(--color-accent-1);
+  }
+  
+  .stat-box.clickable.active {
+    border-color: var(--color-primary);
+    box-shadow: 0 4px 16px rgba(147, 125, 194, 0.2);
+  }
+  
+  .stat-box.clickable.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--gradient-primary);
   }
   
   .stat-box.matches {
@@ -78,7 +101,8 @@
     margin-bottom: var(--space-xs);
   }
   
-  .stat-box.matches .stat-number {
+  .stat-box.matches .stat-number,
+  .stat-box.flowers .stat-number {
     color: white;
   }
   
@@ -88,44 +112,10 @@
     font-weight: 500;
   }
   
-  .stat-box.matches .stat-label {
+  .stat-box.matches .stat-label,
+  .stat-box.flowers .stat-label {
     color: white;
     opacity: 0.9;
-  }
-  
-  /* Tabs */
-  .garden-tabs {
-    display: flex;
-    justify-content: center;
-    gap: var(--space-sm);
-    margin-bottom: var(--space-xl);
-    background: white;
-    padding: var(--space-sm);
-    border-radius: 999px;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  
-  .tab {
-    padding: var(--space-sm) var(--space-lg);
-    border: none;
-    background: transparent;
-    color: var(--color-text-muted);
-    font-weight: 500;
-    cursor: pointer;
-    border-radius: 999px;
-    transition: all 0.3s ease;
-    font-family: var(--font-primary);
-  }
-  
-  .tab:hover {
-    background: var(--color-background);
-  }
-  
-  .tab.active {
-    background: var(--gradient-primary);
-    color: white;
   }
   
   /* Garden Content */
@@ -167,10 +157,6 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
   
-  .seed-card.accepted {
-    border-color: var(--color-success);
-  }
-  
   .seed-photo,
   .match-photo,
   .flower-photo {
@@ -184,7 +170,8 @@
   }
   
   .seed-photo img,
-  .match-photo img {
+  .match-photo img,
+  .flower-photo img {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -201,8 +188,10 @@
   }
   
   .seed-info,
-  .match-info {
+  .match-info,
+  .flower-info {
     text-align: center;
+    width: 100%;
   }
   
   .seed-info h3,
@@ -219,44 +208,11 @@
     margin-bottom: var(--space-md);
   }
   
-  .location {
-    color: var(--color-text-muted);
-    font-size: 0.875rem;
-    margin-bottom: var(--space-sm);
-  }
-  
-  .bio {
-    font-size: 0.875rem;
-    color: var(--color-text-primary);
-    line-height: 1.5;
-    margin-bottom: var(--space-md);
-  }
-  
-  .seed-status {
-    color: var(--color-success);
-    font-size: 0.875rem;
-    font-weight: 500;
-    margin-bottom: var(--space-sm);
-  }
-  
-  .accepted-text {
-    color: var(--color-success);
-    font-size: 0.875rem;
-    font-weight: 600;
-    margin-bottom: var(--space-md);
-  }
-  
-  .view-profile-text {
-    color: var(--color-primary);
-    font-size: 0.875rem;
-    font-weight: 500;
-    margin-top: var(--space-md);
-  }
-  
   .waiting-text {
     color: var(--color-text-muted);
     font-style: italic;
     font-size: 0.875rem;
+    margin-bottom: var(--space-md);
   }
   
   .match-text {
@@ -300,12 +256,6 @@
     color: white;
   }
   
-  .view-profile-btn.primary {
-    background: var(--gradient-primary);
-    color: white;
-    border: none;
-  }
-  
   .send-seed-btn {
     background: var(--gradient-primary);
     color: white;
@@ -339,7 +289,7 @@
   /* Empty State */
   .empty-state {
     text-align: center;
-    padding: var(--space-xl) * 2;
+    padding: calc(var(--space-xl) * 2);
   }
   
   .empty-icon {
@@ -356,24 +306,24 @@
   /* Loading */
   .loading {
     text-align: center;
-    padding: var(--space-xl) * 3;
+    padding: calc(var(--space-xl) * 3);
     font-size: 1.125rem;
     color: var(--color-text-muted);
   }
   
   /* Responsive */
   @media (max-width: 768px) {
-    .garden-stats {
-      grid-template-columns: 1fr;
-    }
-    
-    .garden-tabs {
-      flex-direction: column;
-      border-radius: 16px;
+    .garden-container {
+      padding: var(--space-lg) var(--space-md);
     }
     
     .seeds-grid,
-    .matches-grid {
+    .matches-grid,
+    .flowers-grid {
       grid-template-columns: 1fr;
+    }
+    
+    .garden-content {
+      padding: var(--space-lg);
     }
   }
