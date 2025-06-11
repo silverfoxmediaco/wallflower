@@ -3,9 +3,12 @@
 // Purpose: Display member statistics and actual member profiles on landing page
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './CurrentMembers.css';
 
-const CurrentMembers = () => {
+const CurrentMembers = ({ onSignupClick }) => {
+  const navigate = useNavigate();
+  
   // Real data from API
   const [memberStats, setMemberStats] = useState({
     total: '...',
@@ -20,12 +23,15 @@ const CurrentMembers = () => {
   const handleViewProfile = (memberId) => {
     const token = localStorage.getItem('token');
     if (!token) {
-      // If not logged in, prompt to sign up
-      alert('Please sign up or log in to view full profiles! 🌸');
-      // In a real app, you'd trigger the signup modal here
+      // If not logged in, trigger signup modal
+      if (onSignupClick) {
+        onSignupClick();
+      } else {
+        alert('Please sign up or log in to view full profiles! 🌸');
+      }
     } else {
-      // If logged in, navigate to browse or profile view
-      window.location.href = '/browse';
+      // If logged in, navigate to the specific user's profile using React Router
+      navigate(`/profile/${memberId}`);
     }
   };
 
