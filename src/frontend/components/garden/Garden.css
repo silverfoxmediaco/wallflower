@@ -27,12 +27,24 @@
   /* Garden Stats */
   .garden-stats {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-lg);
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--space-md);
     margin-bottom: var(--space-xl);
-    max-width: 600px;
+    max-width: 1000px;
     margin-left: auto;
     margin-right: auto;
+  }
+  
+  @media (max-width: 1024px) {
+    .garden-stats {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  @media (max-width: 640px) {
+    .garden-stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
   
   .stat-box {
@@ -51,6 +63,11 @@
   
   .stat-box.matches {
     background: var(--gradient-primary);
+    color: white;
+  }
+  
+  .stat-box.flowers {
+    background: linear-gradient(135deg, #E0AED0 0%, #B0C5A4 100%);
     color: white;
   }
   
@@ -121,35 +138,49 @@
   
   /* Seeds Grid */
   .seeds-grid,
-  .matches-grid {
+  .matches-grid,
+  .flowers-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: var(--space-lg);
   }
   
   .seed-card,
-  .match-card {
+  .match-card,
+  .flower-card {
     background: var(--color-background);
     border-radius: 16px;
     padding: var(--space-lg);
     transition: all 0.3s ease;
     border: 2px solid transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
   
   .seed-card:hover,
-  .match-card:hover {
+  .match-card:hover,
+  .flower-card:hover {
     border-color: var(--color-accent-1);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
   
+  .seed-card.accepted {
+    border-color: var(--color-success);
+  }
+  
   .seed-photo,
-  .match-photo {
-    width: 100px;
-    height: 100px;
+  .match-photo,
+  .flower-photo {
+    width: 80px;
+    height: 80px;
     margin: 0 auto var(--space-md);
     border-radius: 50%;
     overflow: hidden;
+    border: 3px solid white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
   
   .seed-photo img,
@@ -175,10 +206,17 @@
   }
   
   .seed-info h3,
-  .match-info h3 {
-    font-size: 1.25rem;
+  .match-info h3,
+  .flower-info h3 {
+    font-size: 1.125rem;
     color: var(--color-text-primary);
     margin-bottom: var(--space-xs);
+  }
+  
+  .seed-details {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    margin-bottom: var(--space-md);
   }
   
   .location {
@@ -194,6 +232,27 @@
     margin-bottom: var(--space-md);
   }
   
+  .seed-status {
+    color: var(--color-success);
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: var(--space-sm);
+  }
+  
+  .accepted-text {
+    color: var(--color-success);
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: var(--space-md);
+  }
+  
+  .view-profile-text {
+    color: var(--color-primary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-top: var(--space-md);
+  }
+  
   .waiting-text {
     color: var(--color-text-muted);
     font-style: italic;
@@ -206,17 +265,45 @@
     margin-bottom: var(--space-md);
   }
   
+  .blooming-status {
+    color: var(--color-accent-1);
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: var(--space-md);
+  }
+  
   /* Buttons */
+  .view-profile-btn,
   .send-seed-btn,
-  .message-btn {
+  .message-btn,
+  .continue-chat-btn {
     width: 100%;
-    padding: var(--space-md);
+    padding: var(--space-sm) var(--space-md);
     border: none;
     border-radius: 999px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     font-family: var(--font-primary);
+    font-size: 0.875rem;
+    margin-bottom: var(--space-sm);
+  }
+  
+  .view-profile-btn {
+    background: white;
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
+  }
+  
+  .view-profile-btn:hover {
+    background: var(--color-primary);
+    color: white;
+  }
+  
+  .view-profile-btn.primary {
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
   }
   
   .send-seed-btn {
@@ -237,6 +324,16 @@
   .message-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(224, 174, 208, 0.3);
+  }
+  
+  .continue-chat-btn {
+    background: var(--gradient-primary);
+    color: white;
+  }
+  
+  .continue-chat-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(147, 125, 194, 0.3);
   }
   
   /* Empty State */

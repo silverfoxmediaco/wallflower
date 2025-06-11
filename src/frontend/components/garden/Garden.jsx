@@ -9,7 +9,9 @@ const Garden = () => {
   const [gardenData, setGardenData] = useState({
     seedsReceived: [],
     seedsSent: [],
-    matches: []
+    seedsAccepted: [],
+    matches: [],
+    flowersInBloom: []
   });
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('received');
@@ -38,7 +40,11 @@ const Garden = () => {
     }
   };
 
-  const handleSendSeedBack = async (userId) => {
+  const handleViewProfile = (userId) => {
+    // For now, navigate to browse page
+    // In a complete implementation, you'd navigate to /profile/:userId
+    window.location.href = '/browse';
+  };
     try {
       const token = localStorage.getItem('token');
       const response = await fetch('/api/match/send-seed', {
@@ -84,9 +90,17 @@ const Garden = () => {
           <span className="stat-number">{gardenData.seedsSent.length}</span>
           <span className="stat-label">Seeds Sent</span>
         </div>
+        <div className="stat-box">
+          <span className="stat-number">{gardenData.seedsAccepted.length}</span>
+          <span className="stat-label">Seeds Accepted</span>
+        </div>
         <div className="stat-box matches">
           <span className="stat-number">{gardenData.matches.length}</span>
           <span className="stat-label">Matches</span>
+        </div>
+        <div className="stat-box flowers">
+          <span className="stat-number">{gardenData.flowersInBloom.length}</span>
+          <span className="stat-label">Flowers in Bloom</span>
         </div>
       </div>
 
@@ -104,10 +118,22 @@ const Garden = () => {
           Seeds Sent ({gardenData.seedsSent.length})
         </button>
         <button 
+          className={`tab ${activeTab === 'accepted' ? 'active' : ''}`}
+          onClick={() => setActiveTab('accepted')}
+        >
+          Seeds Accepted ({gardenData.seedsAccepted.length})
+        </button>
+        <button 
           className={`tab ${activeTab === 'matches' ? 'active' : ''}`}
           onClick={() => setActiveTab('matches')}
         >
           Matches ({gardenData.matches.length})
+        </button>
+        <button 
+          className={`tab ${activeTab === 'blooming' ? 'active' : ''}`}
+          onClick={() => setActiveTab('blooming')}
+        >
+          Flowers in Bloom ({gardenData.flowersInBloom.length})
         </button>
       </div>
 
@@ -128,16 +154,15 @@ const Garden = () => {
                     )}
                   </div>
                   <div className="seed-info">
-                    <h3>{seed.username}, {seed.profile?.age || '??'}</h3>
-                    <p className="location">{seed.profile?.location || 'Location not set'}</p>
-                    {seed.profile?.bio && (
-                      <p className="bio">{seed.profile.bio.substring(0, 100)}...</p>
-                    )}
+                    <h3>{seed.username}</h3>
+                    <p className="seed-details">
+                      {seed.profile?.age || '??'} • {seed.profile?.location || 'Location not set'}
+                    </p>
                     <button 
-                      className="send-seed-btn"
-                      onClick={() => handleSendSeedBack(seed._id)}
+                      className="view-profile-btn"
+                      onClick={() => handleViewProfile(seed._id)}
                     >
-                      Send Seed Back 🌱
+                      View Profile
                     </button>
                   </div>
                 </div>
@@ -167,9 +192,16 @@ const Garden = () => {
                     )}
                   </div>
                   <div className="seed-info">
-                    <h3>{seed.username}, {seed.profile?.age || '??'}</h3>
-                    <p className="location">{seed.profile?.location || 'Location not set'}</p>
-                    <p className="waiting-text">Waiting for them to send a seed back...</p>
+                    <h3>{seed.username}</h3>
+                    <p className="seed-details">
+                      {seed.profile?.age || '??'} • {seed.profile?.location || 'Location not set'}
+                    </p>
+                    <button 
+                      className="view-profile-btn"
+                      onClick={() => handleViewProfile(seed._id)}
+                    >
+                      View Profile
+                    </button>
                   </div>
                 </div>
               ))
@@ -177,6 +209,45 @@ const Garden = () => {
               <div className="empty-state">
                 <span className="empty-icon">🌰</span>
                 <p>You haven't sent any seeds yet. Start browsing!</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'accepted' && (
+          <div className="seeds-grid">
+            {gardenData.seedsAccepted.length > 0 ? (
+              gardenData.seedsAccepted.map(seed => (
+                <div key={seed._id} className="seed-card accepted">
+                  <div className="seed-photo">
+                    {seed.profile?.photos?.[0] ? (
+                      <img 
+                        src={seed.profile.photos[0].thumbnailUrl || seed.profile.photos[0].url} 
+                        alt={seed.username} 
+                      />
+                    ) : (
+                      <div className="no-photo">🌱</div>
+                    )}
+                  </div>
+                  <div className="seed-info">
+                    <h3>{seed.username}</h3>
+                    <p className="seed-details">
+                      {seed.profile?.age || '??'} • {seed.profile?.location || 'Location not set'}
+                    </p>
+                    <p className="accepted-text">✓ Accepted your seed</p>
+                    <button 
+                      className="view-profile-btn primary"
+                      onClick={() => handleViewProfile(seed._id)}
+                    >
+                      View Profile
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="empty-state">
+                <span className="empty-icon">🌿</span>
+                <p>No seeds accepted yet. Keep planting!</p>
               </div>
             )}
           </div>
@@ -198,11 +269,22 @@ const Garden = () => {
                     )}
                   </div>
                   <div className="match-info">
-                    <h3>{match.username}, {match.profile?.age || '??'}</h3>
-                    <p className="location">{match.profile?.location || 'Location not set'}</p>
+                    <h3>{match.username}</h3>
+                    <p className="seed-details">
+                      {match.profile?.age || '??'} • {match.profile?.location || 'Location not set'}
+                    </p>
                     <p className="match-text">It's a match! 🌸</p>
-                    <button className="message-btn">
-                      Send Message 💌
+                    <button 
+                      className="view-profile-btn"
+                      onClick={() => handleViewProfile(match._id)}
+                    >
+                      View Profile
+                    </button>
+                    <button 
+                      className="message-btn"
+                      onClick={() => alert('Messaging coming soon! 💌')}
+                    >
+                      Send Message
                     </button>
                   </div>
                 </div>
@@ -211,6 +293,51 @@ const Garden = () => {
               <div className="empty-state">
                 <span className="empty-icon">💜</span>
                 <p>No matches yet. When someone you sent a seed to sends one back, you'll match!</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'blooming' && (
+          <div className="flowers-grid">
+            {gardenData.flowersInBloom.length > 0 ? (
+              gardenData.flowersInBloom.map(flower => (
+                <div key={flower._id} className="flower-card">
+                  <div className="flower-photo">
+                    {flower.profile?.photos?.[0] ? (
+                      <img 
+                        src={flower.profile.photos[0].thumbnailUrl || flower.profile.photos[0].url} 
+                        alt={flower.username} 
+                      />
+                    ) : (
+                      <div className="no-photo">🌺</div>
+                    )}
+                  </div>
+                  <div className="flower-info">
+                    <h3>{flower.username}</h3>
+                    <p className="seed-details">
+                      {flower.profile?.age || '??'} • {flower.profile?.location || 'Location not set'}
+                    </p>
+                    <p className="blooming-status">🌺 Actively chatting</p>
+                    <button 
+                      className="view-profile-btn"
+                      onClick={() => handleViewProfile(flower._id)}
+                    >
+                      View Profile
+                    </button>
+                    <button 
+                      className="continue-chat-btn"
+                      onClick={() => alert('Opening chat... 💬')}
+                    >
+                      Continue Chat
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="empty-state">
+                <span className="empty-icon">🌺</span>
+                <p>No active conversations yet. Start chatting with your matches!</p>
               </div>
             )}
           </div>
