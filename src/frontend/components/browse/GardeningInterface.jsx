@@ -1,8 +1,8 @@
 // GardeningInterface Component
 // Path: src/frontend/components/browse/GardeningInterface.jsx
-// Purpose: Browse profiles and send seeds
+// Purpose: Browse profiles and send seeds with swipe navigation
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './GardeningInterface.css';
 
@@ -12,9 +12,15 @@ const GardeningInterface = () => {
   const [seedsRemaining, setSeedsRemaining] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
+  const [swiping, setSwiping] = useState(false);
   const navigate = useNavigate();
+  const cardRef = useRef(null);
 
-  // Fetch profiles on component mount
+  // Minimum swipe distance (in px)
+  const minSwipeDistance = 50;
+
   useEffect(() => {
     fetchProfiles();
   }, []);
@@ -50,6 +56,33 @@ const GardeningInterface = () => {
     }
   };
 
+  const onTouchStart = (e) => {
+    setTouchEnd(0);
+    setTouchStart(e.targetTouches[0].clientX);
+    setSwiping(true);
+  };
+
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe && currentProfileIndex < profiles.length - 1) {
+      setCurrentProfileIndex(prev => prev + 1);
+    }
+    if (isRightSwipe && currentProfileIndex > 0) {
+      setCurrentProfileIndex(prev => prev - 1);
+    }
+    
+    setSwiping(false);
+  };
+
   const handlePlantSeed = async () => {
     if (seedsRemaining > 0 && profiles[currentProfileIndex]) {
       try {
@@ -72,7 +105,7 @@ const GardeningInterface = () => {
         if (data.success) {
           setSeedsRemaining(data.seedsRemaining);
           
-          // Show success message (you can make this prettier)
+          // Show success message
           alert(`Seed sent to ${currentProfile.username}! 🌱`);
           
           // Move to next profile
@@ -124,6 +157,23 @@ const GardeningInterface = () => {
     }
   };
 
+  const handleMaybeLater = () => {
+    // Move to next profile without any action
+    if (currentProfileIndex < profiles.length - 1) {
+      setCurrentProfileIndex(prev => prev + 1);
+    } else {
+      setProfiles([]);
+    }
+  };
+
+  const viewFullProfile = () => {
+    if (profiles[currentProfileIndex]) {
+      // For now, just show an alert since the profile detail page isn't built yet
+      alert('Full profile view coming soon! 🌸');
+      // In the future: navigate(`/profile/${profiles[currentProfileIndex].id}`);
+    }
+  };
+
   if (loading) {
     return (
       <div className="gardening-container">
@@ -139,7 +189,7 @@ const GardeningInterface = () => {
       <div className="gardening-container">
         <div className="error-message">
           <p>{error}</p>
-          <button onClick={() => navigate('/')}>Go Back</button>
+          <button className="btn-primary" onClick={() => navigate('/')}>Go Back</button>
         </div>
       </div>
     );
@@ -170,10 +220,15 @@ const GardeningInterface = () => {
         <button className="get-seeds-btn">Get More Seeds</button>
       </div>
 
-      {/* Profile Card */}
-      <div className="profile-card">
-        {/* Photo Section */}
-        <div className="photo-section">
+      {/* Profile Card - Simplified */}
+      <div 
+        className="profile-card-simple"
+        ref={cardRef}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
+        <div className="photo-container" onClick={viewFullProfile}>
           {profile.photos && profile.photos.length > 0 ? (
             <img 
               src={profile.photos[0].url || profile.photos[0]} 
@@ -186,69 +241,32 @@ const GardeningInterface = () => {
               <p>No photo yet</p>
             </div>
           )}
-          <div className="photo-navigation">
-            <span className="photo-indicator">
-              1 / {profile.photos?.length || 1}
-            </span>
-          </div>
+          
+          {/* Photo navigation indicator */}
+          {profile.photos && profile.photos.length > 1 && (
+            <div className="photo-navigation">
+              <span className="photo-indicator">
+                1 / {profile.photos.length}
+              </span>
+            </div>
+          )}
+          
+          {/* Recently active badge */}
           <div className="profile-badges">
-            <span className="personality-badge">{profile.personalityType}</span>
-            <span className="active-badge">{profile.lastActive}</span>
+            <span className="active-badge">Recently active</span>
+          </div>
+          
+          {/* Tap to view profile hint */}
+          <div className="view-profile-hint">
+            <span>Tap to view full profile</span>
           </div>
         </div>
+      </div>
 
-        {/* Info Section */}
-        <div className="info-section">
-          <div className="profile-header">
-            <h2 className="profile-name">{profile.username}, {profile.age}</h2>
-            <p className="profile-location">{profile.location}</p>
-          </div>
-
-          <div className="profile-details">
-            <div className="detail-row">
-              <span className="detail-label">Height:</span>
-              <span className="detail-value">{profile.height}</span>
-            </div>
-            <div className="detail-row">
-              <span className="detail-label">Body Type:</span>
-              <span className="detail-value">{profile.bodyType}</span>
-            </div>
-            <div className="detail-row">
-              <span className="detail-label">Location:</span>
-              <span className="detail-value">{profile.location}</span>
-            </div>
-          </div>
-
-          <div className="profile-bio">
-            <p>{profile.bio}</p>
-          </div>
-
-          {profile.interests && profile.interests.length > 0 && (
-            <div className="interests-section">
-              <h3 className="interests-title">Interests</h3>
-              <div className="interests-grid">
-                {profile.interests.map((interest, index) => (
-                  <span key={index} className="interest-tag">
-                    {interest}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Prompts Section */}
-          {profile.prompts && profile.prompts.filter(p => p.answer).length > 0 && (
-            <div className="prompts-section">
-              <h3 className="prompts-title">Get to know me</h3>
-              {profile.prompts.filter(p => p.answer).map((prompt, index) => (
-                <div key={index} className="prompt-item">
-                  <p className="prompt-question">{prompt.question}</p>
-                  <p className="prompt-answer">{prompt.answer}</p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+      {/* Profile Info Summary */}
+      <div className="profile-summary">
+        <h2>{profile.username}, {profile.age}</h2>
+        <p>{profile.location}</p>
       </div>
 
       {/* Action Buttons */}
@@ -274,6 +292,7 @@ const GardeningInterface = () => {
         
         <button 
           className="action-btn save-btn"
+          onClick={handleMaybeLater}
           title="Save for later"
         >
           <span className="btn-icon">🌙</span>
