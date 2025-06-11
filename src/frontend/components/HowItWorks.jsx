@@ -63,7 +63,7 @@ const HowItWorks = ({ onStartPlanting }) => {  // Add the prop here
         
         <div className="how-it-works-footer">
           <p className="footer-text text-muted">
-            No swiping. No pressure. Just genuine connections blooming naturally.
+            No pressure. Just genuine connections blooming naturally.
           </p>
         </div>
       </div>
