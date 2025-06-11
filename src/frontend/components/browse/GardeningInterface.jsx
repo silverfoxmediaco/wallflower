@@ -118,7 +118,8 @@ const GardeningInterface = () => {
     setDragCurrent({ x: 0, y: 0 });
   };
 
-  const handlePlantSeed = async () => {
+  const handlePlantSeed = async (e) => {
+    e.stopPropagation(); // Prevent drag events
     if (seedsRemaining > 0 && profiles[currentProfileIndex]) {
       try {
         const token = localStorage.getItem('token');
@@ -154,7 +155,8 @@ const GardeningInterface = () => {
     }
   };
 
-  const handlePass = async () => {
+  const handlePass = async (e) => {
+    e.stopPropagation(); // Prevent drag events
     if (profiles[currentProfileIndex]) {
       try {
         const token = localStorage.getItem('token');
@@ -179,7 +181,8 @@ const GardeningInterface = () => {
     }
   };
 
-  const handleMaybeLater = () => {
+  const handleMaybeLater = (e) => {
+    e.stopPropagation(); // Prevent drag events
     // Move to next profile without any action
     moveToNextProfile();
   };
@@ -309,6 +312,43 @@ const GardeningInterface = () => {
               <h2 className="profile-username">{profile.username}</h2>
             </div>
           </div>
+          
+          {/* Action Buttons - Now inside the card */}
+          <div className="action-buttons">
+            <button 
+              className="action-btn pass-btn" 
+              onClick={handlePass}
+              onMouseDown={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
+              title="Pass"
+            >
+              <span className="btn-icon">🍂</span>
+              <span className="btn-text">Pass</span>
+            </button>
+            
+            <button 
+              className="action-btn plant-btn" 
+              onClick={handlePlantSeed}
+              onMouseDown={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
+              disabled={seedsRemaining === 0}
+              title="Plant a seed"
+            >
+              <span className="btn-icon">🌱</span>
+              <span className="btn-text">Seed</span>
+            </button>
+            
+            <button 
+              className="action-btn save-btn"
+              onClick={handleMaybeLater}
+              onMouseDown={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
+              title="Maybe later"
+            >
+              <span className="btn-icon">🌙</span>
+              <span className="btn-text">Later</span>
+            </button>
+          </div>
         </div>
 
         {/* Preview of next profiles (stacked behind) */}
@@ -325,37 +365,6 @@ const GardeningInterface = () => {
             </div>
           </div>
         )}
-      </div>
-
-      {/* Action Buttons */}
-      <div className="action-buttons">
-        <button 
-          className="action-btn pass-btn" 
-          onClick={handlePass}
-          title="Pass"
-        >
-          <span className="btn-icon">🍂</span>
-          <span className="btn-text">Pass</span>
-        </button>
-        
-        <button 
-          className="action-btn plant-btn" 
-          onClick={handlePlantSeed}
-          disabled={seedsRemaining === 0}
-          title="Plant a seed"
-        >
-          <span className="btn-icon">🌱</span>
-          <span className="btn-text">Seed</span>
-        </button>
-        
-        <button 
-          className="action-btn save-btn"
-          onClick={handleMaybeLater}
-          title="Maybe later"
-        >
-          <span className="btn-icon">🌙</span>
-          <span className="btn-text">Later</span>
-        </button>
       </div>
 
       {/* Out of seeds message */}
