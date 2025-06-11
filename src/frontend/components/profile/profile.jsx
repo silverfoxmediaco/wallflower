@@ -222,38 +222,6 @@ const Profile = () => {
     }
   };
 
-  const togglePhotoDisplayMode = async (photoId) => {
-    const photo = profileData.photos.find(p => p._id === photoId);
-    const currentMode = photo?.displayMode || 'contain';
-    const newMode = currentMode === 'contain' ? 'cover' : 'contain';
-    
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/profile/photos/${photoId}/display-mode`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ displayMode: newMode })
-      });
-      
-      const data = await response.json();
-      if (data.success) {
-        setProfileData(prev => ({
-          ...prev,
-          photos: prev.photos.map(photo => 
-            photo._id === photoId 
-              ? { ...photo, displayMode: newMode }
-              : photo
-          )
-        }));
-      }
-    } catch (error) {
-      console.error('Error updating display mode:', error);
-    }
-  };
-
   const calculateCompletion = () => {
     const requiredFields = ['age', 'bio', 'location'];
     const filledRequired = requiredFields.filter(field => profileData[field]).length;
@@ -353,16 +321,6 @@ const Profile = () => {
                     >
                       ×
                     </button>
-                    {profileData.photos[index]._id && (
-                      <button
-                        className="display-mode-toggle"
-                        onClick={() => togglePhotoDisplayMode(profileData.photos[index]._id)}
-                        title={profileData.photos[index].displayMode === 'cover' ? 'Switch to fit mode' : 'Switch to fill mode'}
-                        aria-label="Toggle display mode"
-                      >
-                        {profileData.photos[index].displayMode === 'cover' ? '🖼️' : '📸'}
-                      </button>
-                    )}
                   </div>
                 ) : (
                   <label className={`photo-upload ${uploadingPhotos ? 'uploading' : ''}`}>
