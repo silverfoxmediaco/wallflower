@@ -1,6 +1,6 @@
 // GardeningInterface Component
 // Path: src/frontend/components/browse/GardeningInterface.jsx
-// Purpose: Browse profiles and send seeds with swipe navigation
+// Purpose: Browse profiles with full-screen swipe interface
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -12,14 +12,15 @@ const GardeningInterface = () => {
   const [seedsRemaining, setSeedsRemaining] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [touchStart, setTouchStart] = useState(0);
-  const [touchEnd, setTouchEnd] = useState(0);
-  const [swiping, setSwiping] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [dragCurrent, setDragCurrent] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
   const navigate = useNavigate();
   const cardRef = useRef(null);
 
-  // Minimum swipe distance (in px)
-  const minSwipeDistance = 50;
+  // Swipe thresholds
+  const swipeThreshold = 100;
+  const rotationMultiplier = 0.1;
 
   useEffect(() => {
     fetchProfiles();
@@ -56,31 +57,65 @@ const GardeningInterface = () => {
     }
   };
 
-  const onTouchStart = (e) => {
-    setTouchEnd(0);
-    setTouchStart(e.targetTouches[0].clientX);
-    setSwiping(true);
+  // Handle drag/swipe start
+  const handleDragStart = (e) => {
+    const startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+    const startY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+    
+    setDragStart({ x: startX, y: startY });
+    setDragCurrent({ x: startX, y: startY });
+    setIsDragging(true);
   };
 
-  const onTouchMove = (e) => {
-    setTouchEnd(e.targetTouches[0].clientX);
+  // Handle drag/swipe move
+  const handleDragMove = (e) => {
+    if (!isDragging) return;
+    
+    const currentX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+    const currentY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+    
+    setDragCurrent({ x: currentX, y: currentY });
+    
+    // Apply transform to card
+    if (cardRef.current) {
+      const deltaX = currentX - dragStart.x;
+      const rotation = deltaX * rotationMultiplier;
+      cardRef.current.style.transform = `translateX(${deltaX}px) rotate(${rotation}deg)`;
+      cardRef.current.style.opacity = 1 - Math.abs(deltaX) / (window.innerWidth / 2);
+    }
   };
 
-  const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
+  // Handle drag/swipe end
+  const handleDragEnd = () => {
+    if (!isDragging) return;
     
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
-
-    if (isLeftSwipe && currentProfileIndex < profiles.length - 1) {
-      setCurrentProfileIndex(prev => prev + 1);
-    }
-    if (isRightSwipe && currentProfileIndex > 0) {
-      setCurrentProfileIndex(prev => prev - 1);
+    const deltaX = dragCurrent.x - dragStart.x;
+    const isSwipeRight = deltaX > swipeThreshold;
+    const isSwipeLeft = deltaX < -swipeThreshold;
+    
+    if (cardRef.current) {
+      if (isSwipeLeft) {
+        // Swipe left - pass
+        cardRef.current.classList.add('swipe-left');
+        setTimeout(() => {
+          handlePass();
+        }, 300);
+      } else if (isSwipeRight) {
+        // Swipe right - plant seed
+        cardRef.current.classList.add('swipe-right');
+        setTimeout(() => {
+          handlePlantSeed();
+        }, 300);
+      } else {
+        // Return to center
+        cardRef.current.style.transform = '';
+        cardRef.current.style.opacity = '';
+      }
     }
     
-    setSwiping(false);
+    setIsDragging(false);
+    setDragStart({ x: 0, y: 0 });
+    setDragCurrent({ x: 0, y: 0 });
   };
 
   const handlePlantSeed = async () => {
@@ -105,18 +140,8 @@ const GardeningInterface = () => {
         if (data.success) {
           setSeedsRemaining(data.seedsRemaining);
           
-          // Show success message
-          alert(`Seed sent to ${currentProfile.username}! 🌱`);
-          
           // Move to next profile
-          setTimeout(() => {
-            if (currentProfileIndex < profiles.length - 1) {
-              setCurrentProfileIndex(prev => prev + 1);
-            } else {
-              // No more profiles
-              setProfiles([]);
-            }
-          }, 500);
+          moveToNextProfile();
         } else {
           alert(data.message);
         }
@@ -124,6 +149,8 @@ const GardeningInterface = () => {
         console.error('Send seed error:', error);
         alert('Failed to send seed');
       }
+    } else if (seedsRemaining === 0) {
+      alert('You\'re out of seeds! Visit your profile to get more.');
     }
   };
 
@@ -145,12 +172,7 @@ const GardeningInterface = () => {
         });
 
         // Move to next profile
-        if (currentProfileIndex < profiles.length - 1) {
-          setCurrentProfileIndex(prev => prev + 1);
-        } else {
-          // No more profiles
-          setProfiles([]);
-        }
+        moveToNextProfile();
       } catch (error) {
         console.error('Pass profile error:', error);
       }
@@ -159,19 +181,26 @@ const GardeningInterface = () => {
 
   const handleMaybeLater = () => {
     // Move to next profile without any action
+    moveToNextProfile();
+  };
+
+  const moveToNextProfile = () => {
     if (currentProfileIndex < profiles.length - 1) {
       setCurrentProfileIndex(prev => prev + 1);
+      // Reset card position
+      if (cardRef.current) {
+        cardRef.current.classList.remove('swipe-left', 'swipe-right');
+        cardRef.current.style.transform = '';
+        cardRef.current.style.opacity = '';
+      }
     } else {
+      // No more profiles
       setProfiles([]);
     }
   };
 
-  const viewFullProfile = () => {
-    if (profiles[currentProfileIndex]) {
-      // For now, just show an alert since the profile detail page isn't built yet
-      alert('Full profile view coming soon! 🌸');
-      // In the future: navigate(`/profile/${profiles[currentProfileIndex].id}`);
-    }
+  const openFilters = () => {
+    alert('Filter functionality coming soon! 🎯');
   };
 
   if (loading) {
@@ -189,7 +218,9 @@ const GardeningInterface = () => {
       <div className="gardening-container">
         <div className="error-message">
           <p>{error}</p>
-          <button className="btn-primary" onClick={() => navigate('/')}>Go Back</button>
+          <button className="btn-primary" onClick={() => navigate('/')}>
+            Go Back
+          </button>
         </div>
       </div>
     );
@@ -213,60 +244,75 @@ const GardeningInterface = () => {
 
   return (
     <div className="gardening-container">
-      {/* Seeds Counter */}
-      <div className="seeds-counter">
-        <span className="seeds-icon">🌱</span>
-        <span className="seeds-text">{seedsRemaining} seeds remaining</span>
-        <button className="get-seeds-btn">Get More Seeds</button>
-      </div>
+      {/* Filter Button */}
+      <button className="filter-button" onClick={openFilters}>
+        <span className="filter-icon">⚙️</span>
+      </button>
 
-      {/* Profile Card - Simplified */}
-      <div 
-        className="profile-card-simple"
-        ref={cardRef}
-        onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
-        onTouchEnd={onTouchEnd}
-      >
-        <div className="photo-container" onClick={viewFullProfile}>
-          {profile.photos && profile.photos.length > 0 ? (
-            <img 
-              src={profile.photos[0].url || profile.photos[0]} 
-              alt={profile.username}
-              className="profile-photo"
-            />
-          ) : (
-            <div className="no-photo">
-              <span>🌸</span>
-              <p>No photo yet</p>
+      {/* Profile Stack */}
+      <div className="profile-stack">
+        {/* Current Profile Card */}
+        <div 
+          className={`profile-card-simple ${isDragging ? 'dragging' : ''}`}
+          ref={cardRef}
+          onMouseDown={handleDragStart}
+          onMouseMove={handleDragMove}
+          onMouseUp={handleDragEnd}
+          onMouseLeave={handleDragEnd}
+          onTouchStart={handleDragStart}
+          onTouchMove={handleDragMove}
+          onTouchEnd={handleDragEnd}
+        >
+          <div className="photo-container">
+            {profile.photos && profile.photos.length > 0 ? (
+              <img 
+                src={profile.photos[0].url || profile.photos[0]} 
+                alt={profile.username}
+                className="profile-photo"
+                draggable="false"
+              />
+            ) : (
+              <div className="no-photo">
+                <span>🌸</span>
+                <p>No photo yet</p>
+              </div>
+            )}
+            
+            {/* Photo navigation indicator */}
+            {profile.photos && profile.photos.length > 1 && (
+              <div className="photo-navigation">
+                <span className="photo-indicator">
+                  1 / {profile.photos.length}
+                </span>
+              </div>
+            )}
+            
+            {/* Recently active badge */}
+            <div className="profile-badges">
+              <span className="active-badge">● Active recently</span>
             </div>
-          )}
-          
-          {/* Photo navigation indicator */}
-          {profile.photos && profile.photos.length > 1 && (
-            <div className="photo-navigation">
-              <span className="photo-indicator">
-                1 / {profile.photos.length}
-              </span>
+            
+            {/* Profile info overlay */}
+            <div className="profile-info-overlay">
+              <h2 className="profile-username">{profile.username}</h2>
             </div>
-          )}
-          
-          {/* Recently active badge */}
-          <div className="profile-badges">
-            <span className="active-badge">Recently active</span>
-          </div>
-          
-          {/* Tap to view profile hint */}
-          <div className="view-profile-hint">
-            <span>Tap to view full profile</span>
           </div>
         </div>
-      </div>
 
-      {/* Profile Info Summary */}
-      <div className="profile-summary">
-        <h2>{profile.username}, {profile.age}</h2>
-        <p>{profile.location}</p>
+        {/* Preview of next profiles (stacked behind) */}
+        {profiles[currentProfileIndex + 1] && (
+          <div className="profile-card-simple" style={{ pointerEvents: 'none' }}>
+            <div className="photo-container">
+              {profiles[currentProfileIndex + 1].photos?.[0] && (
+                <img 
+                  src={profiles[currentProfileIndex + 1].photos[0].url || profiles[currentProfileIndex + 1].photos[0]} 
+                  alt="Next profile"
+                  className="profile-photo"
+                />
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Action Buttons */}
@@ -274,9 +320,9 @@ const GardeningInterface = () => {
         <button 
           className="action-btn pass-btn" 
           onClick={handlePass}
-          title="Pass for now"
+          title="Pass"
         >
-          <span className="btn-icon">🍂</span>
+          <span className="btn-icon">👎</span>
           <span className="btn-text">Pass</span>
         </button>
         
@@ -287,25 +333,26 @@ const GardeningInterface = () => {
           title="Plant a seed"
         >
           <span className="btn-icon">🌱</span>
-          <span className="btn-text">Plant Seed</span>
+          <span className="btn-text">Seed</span>
         </button>
         
         <button 
           className="action-btn save-btn"
           onClick={handleMaybeLater}
-          title="Save for later"
+          title="Maybe later"
         >
-          <span className="btn-icon">🌙</span>
-          <span className="btn-text">Maybe Later</span>
+          <span className="btn-icon">⭐</span>
+          <span className="btn-text">Later</span>
         </button>
       </div>
 
       {/* Out of seeds message */}
       {seedsRemaining === 0 && (
-        <div className="out-of-seeds-message">
+        <div className="out-of-seeds-overlay">
           <p>You're out of seeds! 🌱</p>
-          <p>Get more seeds to continue connecting with amazing people.</p>
-          <button className="cta-btn">View Seed Packages</button>
+          <button className="cta-btn" onClick={() => navigate('/profile')}>
+            Get More Seeds
+          </button>
         </div>
       )}
     </div>
