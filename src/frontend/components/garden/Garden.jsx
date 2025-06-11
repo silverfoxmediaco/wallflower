@@ -19,12 +19,6 @@ const Garden = () => {
     fetchGardenData();
   }, []);
 
-  // Debug: Log when gardenData changes
-  useEffect(() => {
-    console.log('gardenData state updated:', gardenData);
-    console.log('matches count:', gardenData.matches.length);
-  }, [gardenData]);
-
   const fetchGardenData = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -100,14 +94,6 @@ const Garden = () => {
         <p className="garden-subtitle">Watch your connections bloom</p>
       </div>
 
-      {/* Debug line to verify state */}
-      <div style={{ textAlign: 'center', marginBottom: '20px', color: '#666' }}>
-        Debug: Matches = {gardenData.matches.length} | 
-        Seeds Received = {gardenData.seedsReceived.length} | 
-        Seeds Sent = {gardenData.seedsSent.length} | 
-        Flowers = {gardenData.flowersInBloom.length}
-      </div>
-
       {/* Clickable Stats Boxes with key to force re-render */}
       <div className="garden-stats" key={JSON.stringify(gardenData)}>
         <div 
@@ -128,7 +114,7 @@ const Garden = () => {
           className={`stat-box clickable matches ${activeTab === 'matches' ? 'active' : ''}`}
           onClick={() => setActiveTab('matches')}
         >
-          <span className="stat-number">{gardenData.matches.length}</span>
+          <span className="stat-number">{gardenData.matches?.length || 0}</span>
           <span className="stat-label">Matches</span>
         </div>
         <div 
