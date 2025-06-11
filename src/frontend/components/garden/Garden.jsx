@@ -30,6 +30,7 @@ const Garden = () => {
 
       const data = await response.json();
       console.log('Garden API response:', data);
+      console.log('Seeds Received data:', data.garden.seedsReceived);
       
       if (data.success && data.garden) {
         setGardenData({
