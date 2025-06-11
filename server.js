@@ -58,6 +58,7 @@ app.use('/api/match', require('./src/backend/routes/matchRoutes'));
 app.use('/api/chat', require('./src/backend/routes/chatRoutes'));
 app.use('/api/admin', require('./src/backend/routes/adminRoutes'));
 app.use('/api/members', require('./src/backend/routes/membersRoutes'));
+app.use('/api/users', require('./src/backend/routes/usersRoutes'));
 
 // Serve static files from the React app in production
 if (process.env.NODE_ENV === 'production') {

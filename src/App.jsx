@@ -11,6 +11,7 @@ import CurrentMembers from './frontend/components/CurrentMembers';
 import SignupModal from './frontend/components/SignupModal';
 import LoginModal from './frontend/components/LoginModal';
 import Profile from './frontend/components/profile/profile';
+import ProfileView from './frontend/components/profile/ProfileView';
 import GardeningInterface from './frontend/components/browse/GardeningInterface';
 import Garden from './frontend/components/garden/Garden';
 import MockProfilesManager from './frontend/components/admin/MockProfilesManager';
@@ -89,6 +90,12 @@ function App() {
             <Route path="/profile" element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/profile/:userId" element={
+              <ProtectedRoute>
+                <ProfileView />
               </ProtectedRoute>
             } />
             

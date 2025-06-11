@@ -62,9 +62,8 @@ const Garden = () => {
   };
 
   const handleViewProfile = (userId) => {
-    // For now, navigate to browse page
-    // In a complete implementation, you'd navigate to /profile/:userId
-    window.location.href = '/browse';
+    // Navigate to the user's profile
+    window.location.href = `/profile/${userId}`;
   };
 
   const handleSendSeedBack = async (userId) => {

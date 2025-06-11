@@ -41,32 +41,21 @@ exports.getGarden = [verifyToken, async (req, res) => {
     
     // Find matches (users who both sent seeds to each other)
     const matches = [];
-    const seedsAccepted = [];
     
+    // Check each person you sent a seed to
     for (const sentSeed of user.seeds.sent) {
       const recipientId = sentSeed.to.toString();
-      const receivedFromSameUser = user.seeds.received.some(
+      
+      // Check if they also sent you a seed
+      const theyAlsoSentToYou = user.seeds.received.some(
         received => received.from.toString() === recipientId
       );
       
-      if (receivedFromSameUser) {
+      if (theyAlsoSentToYou) {
+        // It's a match! Get their full profile
         const matchUser = await User.findById(recipientId).select('-password -email');
         if (matchUser) {
           matches.push(matchUser);
-        }
-      } else {
-        // Seeds accepted are those you sent that were reciprocated
-        const recipientUser = await User.findById(recipientId);
-        if (recipientUser) {
-          const theyAlsoSentToYou = recipientUser.seeds.sent.some(
-            s => s.to.toString() === req.userId
-          );
-          if (theyAlsoSentToYou) {
-            const acceptedUser = await User.findById(recipientId).select('-password -email');
-            if (acceptedUser) {
-              seedsAccepted.push(acceptedUser);
-            }
-          }
         }
       }
     }
@@ -75,12 +64,22 @@ exports.getGarden = [verifyToken, async (req, res) => {
     // For now, this is empty until messaging is implemented
     const flowersInBloom = [];
     
+    // Remove matches from seedsReceived and seedsSent to avoid duplication
+    const matchIds = matches.map(m => m._id.toString());
+    
+    const filteredSeedsReceived = seedsReceived.filter(
+      seed => !matchIds.includes(seed._id.toString())
+    );
+    
+    const filteredSeedsSent = seedsSent.filter(
+      seed => !matchIds.includes(seed._id.toString())
+    );
+    
     res.json({
       success: true,
       garden: {
-        seedsReceived: seedsReceived,
-        seedsSent: seedsSent,
-        seedsAccepted: seedsAccepted,
+        seedsReceived: filteredSeedsReceived,
+        seedsSent: filteredSeedsSent,
         matches: matches,
         flowersInBloom: flowersInBloom
       }
