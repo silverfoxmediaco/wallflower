@@ -53,7 +53,6 @@
     margin-bottom: var(--space-lg);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     position: relative;
-    z-index: 1;
   }
   
   .profile-section h2 {
@@ -71,6 +70,8 @@
   /* Photo Section */
   .photo-section {
     background: white;
+    position: relative;
+    z-index: 1;
   }
   
   .photo-grid {
@@ -80,7 +81,7 @@
     background: white;
     position: relative;
     z-index: 2;
-    margin-bottom: var(--space-xl);
+    margin-bottom: var(--space-md);
   }
   
   .photo-slot {
@@ -252,12 +253,12 @@
   }
   
   .photo-tips {
-    margin-top: calc(var(--space-xl) * 1.5);
+    margin-top: var(--space-md);
     padding: var(--space-md);
     background: var(--color-background);
     border-radius: 8px;
     position: relative;
-    z-index: 0;
+    z-index: 1;
   }
   
   .tip-title {
