@@ -335,7 +335,7 @@ const Profile = () => {
           <div className="photo-grid">
             {[...Array(6)].map((_, index) => (
               <div key={index} className="photo-slot">
-                {profileData.photos[index] ? (
+                {profileData.photos && profileData.photos[index] ? (
                   <div className="photo-preview">
                     <img 
                       src={profileData.photos[index].thumbnailUrl || profileData.photos[index].url} 
@@ -349,16 +349,20 @@ const Profile = () => {
                       className="remove-photo"
                       onClick={() => removePhoto(profileData.photos[index]._id)}
                       disabled={uploadingPhotos}
+                      aria-label="Remove photo"
                     >
                       ×
                     </button>
-                    <button
-                      className="display-mode-toggle"
-                      onClick={() => togglePhotoDisplayMode(profileData.photos[index]._id)}
-                      title={profileData.photos[index].displayMode === 'cover' ? 'Switch to fit mode' : 'Switch to fill mode'}
-                    >
-                      {profileData.photos[index].displayMode === 'cover' ? '🖼️' : '📸'}
-                    </button>
+                    {profileData.photos[index]._id && (
+                      <button
+                        className="display-mode-toggle"
+                        onClick={() => togglePhotoDisplayMode(profileData.photos[index]._id)}
+                        title={profileData.photos[index].displayMode === 'cover' ? 'Switch to fit mode' : 'Switch to fill mode'}
+                        aria-label="Toggle display mode"
+                      >
+                        {profileData.photos[index].displayMode === 'cover' ? '🖼️' : '📸'}
+                      </button>
+                    )}
                   </div>
                 ) : (
                   <label className={`photo-upload ${uploadingPhotos ? 'uploading' : ''}`}>
