@@ -19,6 +19,11 @@ const Garden = () => {
     fetchGardenData();
   }, []);
 
+  // Debug: Log when gardenData changes
+  useEffect(() => {
+    console.log('Garden data updated:', gardenData);
+  }, [gardenData]);
+
   const fetchGardenData = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -32,13 +37,12 @@ const Garden = () => {
       console.log('Garden API response:', data); // Debug log
       
       if (data.success) {
-        // Check if data is nested in 'garden' or at root level
-        const gardenData = data.garden || data;
+        // Data is nested under 'garden' property
         setGardenData({
-          seedsReceived: gardenData.seedsReceived || [],
-          seedsSent: gardenData.seedsSent || [],
-          matches: gardenData.matches || [],
-          flowersInBloom: gardenData.flowersInBloom || []
+          seedsReceived: data.garden.seedsReceived || [],
+          seedsSent: data.garden.seedsSent || [],
+          matches: data.garden.matches || [],
+          flowersInBloom: data.garden.flowersInBloom || []
         });
       } else {
         console.error('Garden API returned success: false', data);
@@ -112,28 +116,28 @@ const Garden = () => {
           className={`stat-box clickable ${activeTab === 'received' ? 'active' : ''}`}
           onClick={() => setActiveTab('received')}
         >
-          <span className="stat-number">{gardenData.seedsReceived.length}</span>
+          <span className="stat-number">{gardenData.seedsReceived?.length || 0}</span>
           <span className="stat-label">Seeds Received</span>
         </div>
         <div 
           className={`stat-box clickable ${activeTab === 'sent' ? 'active' : ''}`}
           onClick={() => setActiveTab('sent')}
         >
-          <span className="stat-number">{gardenData.seedsSent.length}</span>
+          <span className="stat-number">{gardenData.seedsSent?.length || 0}</span>
           <span className="stat-label">Seeds Sent</span>
         </div>
         <div 
           className={`stat-box clickable matches ${activeTab === 'matches' ? 'active' : ''}`}
           onClick={() => setActiveTab('matches')}
         >
-          <span className="stat-number">{gardenData.matches.length}</span>
+          <span className="stat-number">{gardenData.matches?.length || 0}</span>
           <span className="stat-label">Matches</span>
         </div>
         <div 
           className={`stat-box clickable flowers ${activeTab === 'blooming' ? 'active' : ''}`}
           onClick={() => setActiveTab('blooming')}
         >
-          <span className="stat-number">{gardenData.flowersInBloom.length}</span>
+          <span className="stat-number">{gardenData.flowersInBloom?.length || 0}</span>
           <span className="stat-label">Flowers in Bloom</span>
         </div>
       </div>
