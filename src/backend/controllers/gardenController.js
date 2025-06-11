@@ -64,22 +64,13 @@ exports.getGarden = [verifyToken, async (req, res) => {
     // For now, this is empty until messaging is implemented
     const flowersInBloom = [];
     
-    // Remove matches from seedsReceived and seedsSent to avoid duplication
-    const matchIds = matches.map(m => m._id.toString());
-    
-    const filteredSeedsReceived = seedsReceived.filter(
-      seed => !matchIds.includes(seed._id.toString())
-    );
-    
-    const filteredSeedsSent = seedsSent.filter(
-      seed => !matchIds.includes(seed._id.toString())
-    );
-    
+    // Return all data without filtering
+    // The frontend will handle displaying them in appropriate sections
     res.json({
       success: true,
       garden: {
-        seedsReceived: filteredSeedsReceived,
-        seedsSent: filteredSeedsSent,
+        seedsReceived: seedsReceived,
+        seedsSent: seedsSent,
         matches: matches,
         flowersInBloom: flowersInBloom
       }
