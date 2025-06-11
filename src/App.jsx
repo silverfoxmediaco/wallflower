@@ -48,7 +48,7 @@ const LandingPage = ({ onSignupClick }) => (
     </div>
     
     <div id="current-members">
-      <CurrentMembers />
+      <CurrentMembers onSignupClick={onSignupClick} />
     </div>
   </>
 );
