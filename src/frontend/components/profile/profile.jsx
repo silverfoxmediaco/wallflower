@@ -1,12 +1,12 @@
 // Profile Component
 // Path: src/frontend/components/profile/Profile.jsx
-// Purpose: User profile creation and editing with Cloudinary photo upload
+// Purpose: User profile creation and editing with photo display modes
 
 import React, { useState, useEffect } from 'react';
 import './Profile.css';
 
 const Profile = () => {
-  const [isEditing, setIsEditing] = useState(true); // Start in edit mode for new users
+  const [isEditing, setIsEditing] = useState(true);
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
   const [photoError, setPhotoError] = useState('');
   const [showPreview, setShowPreview] = useState(false);
@@ -27,8 +27,6 @@ const Profile = () => {
       { question: '', answer: '' }
     ]
   });
-
-  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
 
   const bodyTypes = ['Slim', 'Average', 'Athletic', 'Fit', 'Curvy', 'Full Figured', 'Prefer not to say'];
   const personalityTypes = ['INTJ', 'INTP', 'INFJ', 'INFP', 'ISTJ', 'ISFJ', 'ISTP', 'ISFP'];
@@ -64,48 +62,47 @@ const Profile = () => {
     "After work you'll find me..."
   ];
 
-  // Load existing profile data on component mount
   useEffect(() => {
-    const loadProfile = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) return;
-
-      try {
-        const response = await fetch('/api/profile', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        const data = await response.json();
-        if (data.success && data.profile) {
-          const profile = data.profile.profile || {};
-          setProfileData(prev => ({
-            ...prev,
-            username: data.profile.username || '',
-            age: profile.age || '',
-            height: profile.height || '',
-            bodyType: profile.bodyType || '',
-            location: profile.location || '',
-            bio: profile.bio || '',
-            interests: profile.interests || [],
-            personalityType: profile.personalityType || '',
-            lookingFor: profile.lookingFor || '',
-            photos: profile.photos || [],
-            prompts: (profile.prompts && profile.prompts.length > 0) ? profile.prompts : [
-              { question: '', answer: '' },
-              { question: '', answer: '' },
-              { question: '', answer: '' }
-            ]
-          }));
-        }
-      } catch (error) {
-        console.error('Load profile error:', error);
-      }
-    };
-
     loadProfile();
   }, []);
+
+  const loadProfile = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+      const response = await fetch('/api/profile', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+      if (data.success && data.profile) {
+        const profile = data.profile.profile || {};
+        setProfileData(prev => ({
+          ...prev,
+          username: data.profile.username || '',
+          age: profile.age || '',
+          height: profile.height || '',
+          bodyType: profile.bodyType || '',
+          location: profile.location || '',
+          bio: profile.bio || '',
+          interests: profile.interests || [],
+          personalityType: profile.personalityType || '',
+          lookingFor: profile.lookingFor || '',
+          photos: profile.photos || [],
+          prompts: (profile.prompts && profile.prompts.length > 0) ? profile.prompts : [
+            { question: '', answer: '' },
+            { question: '', answer: '' },
+            { question: '', answer: '' }
+          ]
+        }));
+      }
+    } catch (error) {
+      console.error('Load profile error:', error);
+    }
+  };
 
   const handleInputChange = (field, value) => {
     setProfileData(prev => ({
@@ -140,7 +137,6 @@ const Profile = () => {
   const handlePhotoUpload = async (e) => {
     const files = Array.from(e.target.files);
     
-    // Validate files
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     const maxSize = 5 * 1024 * 1024; // 5MB
     
@@ -155,7 +151,6 @@ const Profile = () => {
       }
     }
     
-    // Check total photos won't exceed 6
     if (profileData.photos.length + files.length > 6) {
       setPhotoError(`You can only have 6 photos total. You currently have ${profileData.photos.length}.`);
       return;
@@ -182,7 +177,6 @@ const Profile = () => {
       const data = await response.json();
       
       if (data.success) {
-        // Update local state with new photos
         setProfileData(prev => ({
           ...prev,
           photos: data.photos
@@ -228,6 +222,38 @@ const Profile = () => {
     }
   };
 
+  const togglePhotoDisplayMode = async (photoId) => {
+    const photo = profileData.photos.find(p => p._id === photoId);
+    const currentMode = photo?.displayMode || 'contain';
+    const newMode = currentMode === 'contain' ? 'cover' : 'contain';
+    
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/profile/photos/${photoId}/display-mode`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ displayMode: newMode })
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        setProfileData(prev => ({
+          ...prev,
+          photos: prev.photos.map(photo => 
+            photo._id === photoId 
+              ? { ...photo, displayMode: newMode }
+              : photo
+          )
+        }));
+      }
+    } catch (error) {
+      console.error('Error updating display mode:', error);
+    }
+  };
+
   const calculateCompletion = () => {
     const requiredFields = ['age', 'bio', 'location'];
     const filledRequired = requiredFields.filter(field => profileData[field]).length;
@@ -235,7 +261,7 @@ const Profile = () => {
     const hasInterests = profileData.interests.length >= 3;
     const hasPrompt = profileData.prompts.some(p => p.answer);
     
-    const total = requiredFields.length + 3; // +3 for photo, interests, and prompts
+    const total = requiredFields.length + 3;
     const completed = filledRequired + (hasPhoto ? 1 : 0) + (hasInterests ? 1 : 0) + (hasPrompt ? 1 : 0);
     
     return Math.round((completed / total) * 100);
@@ -314,6 +340,7 @@ const Profile = () => {
                     <img 
                       src={profileData.photos[index].thumbnailUrl || profileData.photos[index].url} 
                       alt={`Photo ${index + 1}`} 
+                      className={`preview-img ${profileData.photos[index].displayMode || 'contain'}`}
                     />
                     {profileData.photos[index].isMain && (
                       <span className="main-photo-badge">Main</span>
@@ -324,6 +351,13 @@ const Profile = () => {
                       disabled={uploadingPhotos}
                     >
                       ×
+                    </button>
+                    <button
+                      className="display-mode-toggle"
+                      onClick={() => togglePhotoDisplayMode(profileData.photos[index]._id)}
+                      title={profileData.photos[index].displayMode === 'cover' ? 'Switch to fit mode' : 'Switch to fill mode'}
+                    >
+                      {profileData.photos[index].displayMode === 'cover' ? '🖼️' : '📸'}
                     </button>
                   </div>
                 ) : (

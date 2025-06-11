@@ -1,6 +1,6 @@
 // ProfileView Component
 // Path: src/frontend/components/profile/ProfileView.jsx
-// Purpose: View another user's profile (read-only)
+// Purpose: View another user's profile with flexible photo display
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -97,6 +97,10 @@ const ProfileView = () => {
     );
   }
 
+  // Get current photo and its display mode
+  const currentPhoto = profile.profile?.photos?.[currentPhotoIndex];
+  const displayMode = currentPhoto?.displayMode || 'contain';
+
   return (
     <div className="profile-view-container">
       <button className="back-button" onClick={() => navigate(-1)}>
@@ -105,13 +109,13 @@ const ProfileView = () => {
 
       <div className="profile-view-card">
         {/* Photo Section */}
-        <div className="photo-section">
-          {profile.profile?.photos?.length > 0 ? (
+        <div className={`photo-section ${displayMode}`}>
+          {currentPhoto ? (
             <>
               <img 
-                src={profile.profile.photos[currentPhotoIndex].url} 
+                src={currentPhoto.url} 
                 alt={profile.username}
-                className="profile-photo"
+                className={`profile-photo ${displayMode}`}
               />
               {profile.profile.photos.length > 1 && (
                 <>
@@ -128,6 +132,10 @@ const ProfileView = () => {
                   </div>
                 </>
               )}
+              {/* Display mode indicator */}
+              <div className="display-mode-indicator">
+                {displayMode === 'cover' ? '🖼️ Fill' : '📸 Fit'}
+              </div>
             </>
           ) : (
             <div className="no-photo-large">

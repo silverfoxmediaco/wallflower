@@ -8,7 +8,8 @@ const {
   getProfile, 
   updateProfile, 
   uploadPhotos, 
-  deletePhoto 
+  deletePhoto,
+  updatePhotoDisplayMode 
 } = require('../controllers/profileController');
 
 // GET /api/profile - Get current user's profile
@@ -22,5 +23,8 @@ router.post('/photos', uploadPhotos);
 
 // DELETE /api/profile/photos/:photoId - Delete a specific photo
 router.delete('/photos/:photoId', deletePhoto);
+
+// PATCH /api/profile/photos/:photoId/display-mode - Update photo display mode
+router.patch('/photos/:photoId/display-mode', updatePhotoDisplayMode);
 
 module.exports = router;

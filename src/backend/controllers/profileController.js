@@ -124,6 +124,7 @@ exports.uploadPhotos = [verifyToken, upload.array('photos', 6), async (req, res)
       url: file.path, // Cloudinary URL
       publicId: file.filename, // For deletion later
       isMain: currentPhotoCount === 0 && index === 0, // First photo is main if no existing photos
+      displayMode: 'contain', // Default display mode
       thumbnailUrl: cloudinary.url(file.filename, {
         width: 200,
         height: 200,
@@ -226,6 +227,58 @@ exports.deletePhoto = [verifyToken, async (req, res) => {
     res.status(500).json({ 
       success: false, 
       message: 'Failed to delete photo' 
+    });
+  }
+}];
+
+// Update photo display mode
+exports.updatePhotoDisplayMode = [verifyToken, async (req, res) => {
+  try {
+    const { photoId } = req.params;
+    const { displayMode } = req.body;
+    
+    // Validate display mode
+    if (!['contain', 'cover'].includes(displayMode)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Invalid display mode. Must be "contain" or "cover"' 
+      });
+    }
+    
+    // Find user and update the specific photo's display mode
+    const user = await User.findOneAndUpdate(
+      { 
+        _id: req.userId,
+        'profile.photos._id': photoId 
+      },
+      { 
+        $set: { 
+          'profile.photos.$.displayMode': displayMode 
+        } 
+      },
+      { 
+        new: true,
+        runValidators: true 
+      }
+    ).select('-password');
+    
+    if (!user) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Photo not found' 
+      });
+    }
+    
+    res.json({ 
+      success: true, 
+      message: 'Display mode updated successfully',
+      photo: user.profile.photos.find(p => p._id.toString() === photoId)
+    });
+  } catch (error) {
+    console.error('Update display mode error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to update display mode' 
     });
   }
 }];
