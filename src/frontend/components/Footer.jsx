@@ -15,7 +15,7 @@ const Footer = () => {
         <div className="footer-section">
           <div className="footer-logo">
             <img 
-              src="/assets/images/wfviolatelogo.png" 
+              src="../../assets/images/wfviolatelogo.png" 
               alt="Wallflower" 
               className="footer-logo-image"
             />
