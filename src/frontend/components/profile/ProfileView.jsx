@@ -132,10 +132,6 @@ const ProfileView = () => {
                   </div>
                 </>
               )}
-              {/* Display mode indicator */}
-              <div className="display-mode-indicator">
-                {displayMode === 'cover' ? '🖼️ Fill' : '📸 Fit'}
-              </div>
             </>
           ) : (
             <div className="no-photo-large">
