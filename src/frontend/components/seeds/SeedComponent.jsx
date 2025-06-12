@@ -5,11 +5,13 @@
 import React, { useState, useEffect } from 'react';
 import './SeedComponent.css';
 
-const SeedComponent = () => {
+const SeedComponent = ({ isEmbedded = false }) => {
   const [seedData, setSeedData] = useState({
     balance: 0,
     history: [],
-    packages: []
+    packages: [],
+    hasActiveSubscription: false,
+    subscriptionEndDate: null
   });
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
@@ -73,7 +75,9 @@ const SeedComponent = () => {
         setSeedData({
           balance: data.balance || 0,
           history: data.history || [],
-          packages: seedPackages
+          packages: seedPackages,
+          hasActiveSubscription: data.hasActiveSubscription || false,
+          subscriptionEndDate: data.subscriptionEndDate || null
         });
       }
     } catch (error) {
@@ -92,26 +96,49 @@ const SeedComponent = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/seeds/create-checkout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          packageId: packageId,
-          seeds: selectedPkg.seeds,
-          amount: selectedPkg.price
-        })
-      });
-
-      const data = await response.json();
       
-      if (data.success && data.url) {
-        // Redirect to Stripe checkout
-        window.location.href = data.url;
+      // Handle subscription differently
+      if (packageId === 'unlimited') {
+        const response = await fetch('/api/seeds/create-subscription', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            priceId: 'price_unlimited_monthly' // This will be your Stripe price ID
+          })
+        });
+
+        const data = await response.json();
+        
+        if (data.success && data.url) {
+          window.location.href = data.url;
+        } else {
+          alert(data.message || 'Failed to create subscription');
+        }
       } else {
-        alert(data.message || 'Failed to create checkout session');
+        // Regular one-time purchase
+        const response = await fetch('/api/seeds/create-checkout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            packageId: packageId,
+            seeds: selectedPkg.seeds,
+            amount: selectedPkg.price
+          })
+        });
+
+        const data = await response.json();
+        
+        if (data.success && data.url) {
+          window.location.href = data.url;
+        } else {
+          alert(data.message || 'Failed to create checkout session');
+        }
       }
     } catch (error) {
       console.error('Purchase error:', error);
@@ -159,11 +186,13 @@ const SeedComponent = () => {
   }
 
   return (
-    <div className="seed-component-container">
-      <div className="seed-header">
-        <h2>My Seeds</h2>
-        <p className="seed-subtitle">Grow meaningful connections</p>
-      </div>
+    <div className={`seed-component-container ${isEmbedded ? 'embedded' : ''}`}>
+      {!isEmbedded && (
+        <div className="seed-header">
+          <h2>My Seeds</h2>
+          <p className="seed-subtitle">Grow meaningful connections</p>
+        </div>
+      )}
 
       {/* Tab Navigation */}
       <div className="seed-tabs">
@@ -190,8 +219,15 @@ const SeedComponent = () => {
               <div className="balance-icon">🌰</div>
               <div className="balance-info">
                 <h3>Current Balance</h3>
-                <p className="balance-number">{seedData.balance}</p>
-                <p className="balance-label">seeds available</p>
+                <p className="balance-number">{seedData.hasActiveSubscription ? '∞' : seedData.balance}</p>
+                <p className="balance-label">
+                  {seedData.hasActiveSubscription ? 'Unlimited Member' : 'seeds available'}
+                </p>
+                {seedData.hasActiveSubscription && seedData.subscriptionEndDate && (
+                  <p className="subscription-info">
+                    Active until {new Date(seedData.subscriptionEndDate).toLocaleDateString()}
+                  </p>
+                )}
               </div>
             </div>
             <div className="balance-tips">
@@ -210,6 +246,52 @@ const SeedComponent = () => {
             <h3>Get More Seeds</h3>
             <p className="purchase-subtitle">Choose a package that works for you</p>
             
+            {/* Unlimited Membership Option */}
+            <div className="membership-card">
+              <div className="membership-header">
+                <h4>Unlimited Membership</h4>
+                <span className="best-value-badge">Best Value</span>
+              </div>
+              <div className="membership-content">
+                <div className="membership-price">
+                  <span className="price-amount">$29.99</span>
+                  <span className="price-period">/month</span>
+                </div>
+                <ul className="membership-benefits">
+                  <li>Unlimited seeds every month</li>
+                  <li>Send as many connections as you want</li>
+                  <li>Priority customer support</li>
+                  <li>Cancel anytime</li>
+                </ul>
+                <button 
+                  className="purchase-button membership-button"
+                  onClick={() => handlePurchase('unlimited')}
+                  disabled={purchasing || seedData.hasActiveSubscription}
+                >
+                  {seedData.hasActiveSubscription ? (
+                    <span>Currently Active</span>
+                  ) : purchasing && selectedPackage?.id === 'unlimited' ? (
+                    <span className="purchasing">Processing...</span>
+                  ) : (
+                    <span>Start Membership</span>
+                  )}
+                </button>
+                {seedData.hasActiveSubscription && (
+                  <button 
+                    className="manage-subscription-link"
+                    onClick={() => window.location.href = '/profile/subscription'}
+                  >
+                    Manage Subscription
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="or-divider">
+              <span>or</span>
+            </div>
+            
+            <h4 className="one-time-header">One-Time Seed Packages</h4>
             <div className="packages-grid">
               {seedPackages.map(pkg => (
                 <div 

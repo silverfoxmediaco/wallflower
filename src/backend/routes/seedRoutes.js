@@ -7,10 +7,12 @@ const router = express.Router();
 const {
   getSeedData,
   createCheckoutSession,
+  createSubscription,
   handleStripeWebhook,
   addBonusSeeds,
   refundSeeds,
-  getSeedHistory
+  getSeedHistory,
+  cancelSubscription
 } = require('../controllers/seedController');
 
 // GET /api/seeds/data - Get user's seed balance and history
@@ -21,6 +23,12 @@ router.get('/history', getSeedHistory);
 
 // POST /api/seeds/create-checkout - Create Stripe checkout session for seed purchase
 router.post('/create-checkout', createCheckoutSession);
+
+// POST /api/seeds/create-subscription - Create Stripe subscription for unlimited seeds
+router.post('/create-subscription', createSubscription);
+
+// POST /api/seeds/cancel-subscription - Cancel active subscription
+router.post('/cancel-subscription', cancelSubscription);
 
 // POST /api/seeds/webhook - Handle Stripe webhook for successful payments
 // Note: This route should not use auth middleware as it's called by Stripe
