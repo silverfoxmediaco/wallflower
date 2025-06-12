@@ -190,6 +190,35 @@
     margin-bottom: var(--space-xl);
   }
   
+  /* Welcome Message */
+  .welcome-message {
+    background: var(--color-accent-2);
+    background: linear-gradient(135deg, rgba(176, 197, 164, 0.2) 0%, rgba(224, 174, 208, 0.2) 100%);
+    border: 2px solid var(--color-accent-2);
+    border-radius: 16px;
+    padding: var(--space-lg);
+    margin-bottom: var(--space-xl);
+    text-align: center;
+  }
+  
+  .welcome-icon {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: var(--space-md);
+  }
+  
+  .welcome-message p {
+    color: var(--color-text-primary);
+    font-weight: 500;
+    margin-bottom: var(--space-sm);
+  }
+  
+  .welcome-subtitle {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    font-weight: 400 !important;
+  }
+  
   /* Membership Card */
   .membership-card {
     background: var(--gradient-primary);

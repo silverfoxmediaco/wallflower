@@ -216,7 +216,7 @@ const SeedComponent = ({ isEmbedded = false }) => {
           {/* Current Balance */}
           <div className="balance-section">
             <div className="balance-card">
-              <div className="balance-icon">🌰</div>
+              <div className="balance-icon">🌱</div>
               <div className="balance-info">
                 <h3>Current Balance</h3>
                 <p className="balance-number">{seedData.hasActiveSubscription ? '∞' : seedData.balance}</p>
@@ -233,10 +233,11 @@ const SeedComponent = ({ isEmbedded = false }) => {
             <div className="balance-tips">
               <h4>How seeds work:</h4>
               <ul>
+                <li>New members get 5 free seeds to start</li>
                 <li>Send a seed to show interest in someone</li>
                 <li>When they send one back, you match!</li>
                 <li>Each seed can only be used once</li>
-                <li>New users start with 5 free seeds</li>
+                <li>Purchase more seeds or go unlimited anytime</li>
               </ul>
             </div>
           </div>
@@ -245,6 +246,15 @@ const SeedComponent = ({ isEmbedded = false }) => {
           <div className="purchase-section">
             <h3>Get More Seeds</h3>
             <p className="purchase-subtitle">Choose a package that works for you</p>
+            
+            {/* Welcome message for new users */}
+            {seedData.balance === 5 && seedData.history.length === 0 && (
+              <div className="welcome-message">
+                <span className="welcome-icon">🎉</span>
+                <p>Welcome to Wallflower! You've received 5 free seeds to start your journey.</p>
+                <p className="welcome-subtitle">Use them wisely to make meaningful connections!</p>
+              </div>
+            )}
             
             {/* Unlimited Membership Option */}
             <div className="membership-card">
