@@ -8,7 +8,7 @@ import './App.css';
 import Header from './frontend/components/Header';
 import Footer from './frontend/components/Footer';
 import HowItWorks from './frontend/components/HowItWorks';
-import CurrentMembers from './frontend/components/CurrentMembers';
+import CurrentMembers from './frontend/components/MeetSomeWallflowers';
 import SignupModal from './frontend/components/SignupModal';
 import LoginModal from './frontend/components/LoginModal';
 import Profile from './frontend/components/profile/profile'; // Fixed: uppercase 'P'

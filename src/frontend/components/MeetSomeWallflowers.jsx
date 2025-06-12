@@ -1,12 +1,12 @@
-// CurrentMembers Component
-// Path: src/frontend/components/CurrentMembers.jsx
+// MeetSomeWallflowers Component
+// Path: src/frontend/components/MeetSomeWallflowers.jsx
 // Purpose: Display member statistics and actual member profiles on landing page
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './CurrentMembers.css';
+import './MeetSomeWallflowers.css';
 
-const CurrentMembers = ({ onSignupClick }) => {
+const MeetSomeWallflowers = ({ onSignupClick }) => {
   const navigate = useNavigate();
   
   // Real data from API
@@ -173,4 +173,4 @@ const CurrentMembers = ({ onSignupClick }) => {
   );
 };
 
-export default CurrentMembers;
+export default MeetSomeWallflowers;
