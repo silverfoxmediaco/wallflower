@@ -129,7 +129,7 @@ const MeetSomeWallflowers = ({ onSignupClick }) => {
                     <p className="member-location">
                       {member.profile?.location || 'Location not set'}
                     </p>
-                    {member.profile?.personalityType && (
+                    {/* {member.profile?.personalityType && (
                       <span className="personality-badge">
                         {member.profile.personalityType}
                       </span>
@@ -152,7 +152,7 @@ const MeetSomeWallflowers = ({ onSignupClick }) => {
                           <span className="more-interests">+{member.profile.interests.length - 3}</span>
                         )}
                       </div>
-                    )}
+                    )} */}
                     <button className="view-profile-btn" onClick={() => handleViewProfile(member._id)}>
                       View Profile
                     </button>
