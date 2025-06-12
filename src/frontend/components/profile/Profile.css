@@ -72,7 +72,6 @@
     background: white;
     position: relative;
     z-index: 1;
-    /* Remove any display: flex that might be inherited */
     display: block !important;
   }
   
