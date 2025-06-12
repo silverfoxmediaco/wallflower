@@ -67,21 +67,22 @@
     margin-bottom: var(--space-lg);
   }
   
-  /* Photo Section */
-  .photo-section {
+  /* Photo Edit Section - Unique to Profile component */
+  .profile-edit-photo-section {
     background: white;
     position: relative;
     z-index: 1;
     display: block !important;
+    max-height: none;
   }
   
-  .photo-section h2 {
+  .profile-edit-photo-section h2 {
     font-size: 1.5rem;
     color: var(--color-text-primary);
     margin-bottom: var(--space-md);
   }
   
-  .photo-section .section-description {
+  .profile-edit-photo-section .section-description {
     color: var(--color-text-muted);
     font-size: 0.95rem;
     margin-bottom: var(--space-lg);

@@ -288,7 +288,7 @@ const Profile = () => {
         </div>
       </div>
 {/* Photo Section */}
-<section className="profile-section photo-section">
+<section className="profile-section profile-edit-photo-section">
           <h2>Your Photos</h2>
           <p className="section-description">Add up to 6 photos that show your authentic self</p>
           
