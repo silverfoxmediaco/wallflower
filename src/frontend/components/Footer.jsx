@@ -50,7 +50,7 @@ const Footer = () => {
           <h4 className="footer-heading">Legal</h4>
           <ul className="footer-links">
             <li><Link to="/privacy">Privacy Policy</Link></li>
-            <li><Link to="/terms">Terms of Service</Link></li>
+            <li><Link to="/terms">Terms of Use</Link></li>
             <li><Link to="/cookie-policy">Cookie Policy</Link></li>
           </ul>
         </div>
