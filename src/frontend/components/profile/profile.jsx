@@ -4,6 +4,7 @@
 
 import React, { useState, useEffect } from 'react';
 import FilterSettings from './FilterSettings';
+import SeedComponent from '../seeds/SeedComponent';
 import './Profile.css';
 
 const Profile = () => {
@@ -12,6 +13,7 @@ const Profile = () => {
   const [photoError, setPhotoError] = useState('');
   const [showPreview, setShowPreview] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [showSeeds, setShowSeeds] = useState(false);
   const [filterPreferences, setFilterPreferences] = useState({});
   const [profileData, setProfileData] = useState({
     username: '',
@@ -612,6 +614,24 @@ const Profile = () => {
               initialFilters={filterPreferences}
               onSave={saveFilterPreferences}
             />
+          )}
+        </section>
+
+        {/* Seeds Section */}
+        <section className="profile-section">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-md)' }}>
+            <h2 style={{ margin: 0 }}>My Seeds</h2>
+            <button 
+              className="btn-secondary" 
+              onClick={() => setShowSeeds(!showSeeds)}
+              style={{ padding: 'var(--space-sm) var(--space-lg)' }}
+            >
+              {showSeeds ? 'Hide' : 'Show'} Seeds
+            </button>
+          </div>
+          
+          {showSeeds && (
+            <SeedComponent isEmbedded={true} />
           )}
         </section>
 
