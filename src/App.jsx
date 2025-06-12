@@ -17,6 +17,12 @@ import GardeningInterface from './frontend/components/browse/GardeningInterface'
 import Garden from './frontend/components/garden/Garden';
 import MockProfilesManager from './frontend/components/admin/MockProfilesManager';
 
+// Import new pages
+import TermsOfService from './frontend/pages/TermsOfService';
+import PrivacyPolicy from './frontend/pages/PrivacyPolicy';
+import CommunityGuidelines from './frontend/pages/CommunityGuidelines';
+import SafetyTips from './frontend/pages/SafetyTips';
+
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('token');
@@ -117,6 +123,12 @@ function App() {
                 <MockProfilesManager />
               </ProtectedRoute>
             } />
+            
+            {/* Footer Pages Routes */}
+            <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/community-guidelines" element={<CommunityGuidelines />} />
+            <Route path="/safety" element={<SafetyTips />} />
           </Routes>
         </main>
         
