@@ -115,7 +115,7 @@ const ProfileView = () => {
               <img 
                 src={currentPhoto.url} 
                 alt={profile.username}
-                className={`profile-photo ${displayMode}`}
+                className={` ${displayMode}`}
               />
               {profile.profile.photos.length > 1 && (
                 <>
