@@ -5,7 +5,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './Footer.css';
-import wallflowerLogo from '../../assets/images/wfviolatelogo.png';
+import wallflowerLogo from '../assets/images/wfviolatelogo.png';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
