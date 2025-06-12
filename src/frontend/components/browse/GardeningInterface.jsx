@@ -215,10 +215,6 @@ const GardeningInterface = () => {
     }
   };
 
-  const openFilters = () => {
-    alert('Filter functionality coming soon! 🎯');
-  };
-
   // Handle profile card click/tap
   const handleProfileClick = (e) => {
     // Only navigate if it's a tap (not a drag)
@@ -274,11 +270,6 @@ const GardeningInterface = () => {
 
   return (
     <div className="gardening-container">
-      {/* Filter Button */}
-      <button className="filter-button" onClick={openFilters}>
-        <span className="filter-icon">⚙️</span>
-      </button>
-
       {/* Profile Stack */}
       <div className="profile-stack">
         {/* Current Profile Card */}

@@ -3,6 +3,7 @@
 // Purpose: User profile creation and editing with photo display modes
 
 import React, { useState, useEffect } from 'react';
+import FilterSettings from './FilterSettings';
 import './Profile.css';
 
 const Profile = () => {
@@ -10,6 +11,8 @@ const Profile = () => {
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
   const [photoError, setPhotoError] = useState('');
   const [showPreview, setShowPreview] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [filterPreferences, setFilterPreferences] = useState({});
   const [profileData, setProfileData] = useState({
     username: '',
     age: '',
@@ -64,6 +67,7 @@ const Profile = () => {
 
   useEffect(() => {
     loadProfile();
+    loadFilterPreferences();
   }, []);
 
   const loadProfile = async () => {
@@ -101,6 +105,51 @@ const Profile = () => {
       }
     } catch (error) {
       console.error('Load profile error:', error);
+    }
+  };
+
+  const loadFilterPreferences = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+      const response = await fetch('/api/profile/filters', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+      if (data.success && data.filters) {
+        setFilterPreferences(data.filters);
+      }
+    } catch (error) {
+      console.error('Load filter preferences error:', error);
+    }
+  };
+
+  const saveFilterPreferences = async (filters) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/profile/filters', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(filters)
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        setFilterPreferences(filters);
+        alert('Match preferences saved! 🌸');
+      } else {
+        alert(data.message || 'Failed to save preferences');
+      }
+    } catch (error) {
+      console.error('Error saving filters:', error);
+      alert('Failed to save preferences');
     }
   };
 
@@ -287,76 +336,76 @@ const Profile = () => {
           </div>
         </div>
       </div>
-{/* Photo Section */}
-<section className="profile-section profile-edit-photo-section">
-          <h2>Your Photos</h2>
-          <p className="section-description">Add up to 6 photos that show your authentic self</p>
-          
-          {photoError && (
-            <div className="photo-error">
-              {photoError}
-            </div>
-          )}
-          
-          <div className="photo-grid">
-            {[...Array(6)].map((_, index) => (
-              <div key={index} className="photo-slot">
-                {profileData.photos && profileData.photos[index] ? (
-                  <div className="photo-preview">
-                    <img 
-                      src={profileData.photos[index].thumbnailUrl || profileData.photos[index].url} 
-                      alt={`Photo ${index + 1}`} 
-                      className={`preview-img ${profileData.photos[index].displayMode || 'contain'}`}
-                    />
-                    {profileData.photos[index].isMain && (
-                      <span className="main-photo-badge">Main</span>
-                    )}
-                    <button 
-                      className="remove-photo"
-                      onClick={() => removePhoto(profileData.photos[index]._id)}
-                      disabled={uploadingPhotos}
-                      aria-label="Remove photo"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ) : (
-                  <label className={`photo-upload ${uploadingPhotos ? 'uploading' : ''}`}>
-                    <input 
-                      type="file" 
-                      accept="image/jpeg,image/jpg,image/png,image/webp"
-                      onChange={handlePhotoUpload}
-                      multiple
-                      disabled={uploadingPhotos}
-                    />
-                    {uploadingPhotos ? (
-                      <>
-                        <div className="upload-spinner"></div>
-                        <span className="upload-text">Uploading...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span className="upload-icon">+</span>
-                        <span className="upload-text">Add Photo</span>
-                      </>
-                    )}
-                  </label>
-                )}
-              </div>
-            ))}
-          </div>
-          <div className="photo-tips">
-            <p className="tip-title">Photo Tips:</p>
-            <ul>
-              <li>Use recent photos that clearly show your face</li>
-              <li>Include a variety - close-ups and full body shots</li>
-              <li>Show yourself doing activities you enjoy</li>
-              <li>Smile naturally - be yourself! 🌸</li>
-            </ul>
-          </div>
-          </section>
-          
+
+      {/* Photo Section */}
+      <section className="profile-section profile-edit-photo-section">
+        <h2>Your Photos</h2>
+        <p className="section-description">Add up to 6 photos that show your authentic self</p>
         
+        {photoError && (
+          <div className="photo-error">
+            {photoError}
+          </div>
+        )}
+        
+        <div className="photo-grid">
+          {[...Array(6)].map((_, index) => (
+            <div key={index} className="photo-slot">
+              {profileData.photos && profileData.photos[index] ? (
+                <div className="photo-preview">
+                  <img 
+                    src={profileData.photos[index].thumbnailUrl || profileData.photos[index].url} 
+                    alt={`Photo ${index + 1}`} 
+                    className={`preview-img ${profileData.photos[index].displayMode || 'contain'}`}
+                  />
+                  {profileData.photos[index].isMain && (
+                    <span className="main-photo-badge">Main</span>
+                  )}
+                  <button 
+                    className="remove-photo"
+                    onClick={() => removePhoto(profileData.photos[index]._id)}
+                    disabled={uploadingPhotos}
+                    aria-label="Remove photo"
+                  >
+                    ×
+                  </button>
+                </div>
+              ) : (
+                <label className={`photo-upload ${uploadingPhotos ? 'uploading' : ''}`}>
+                  <input 
+                    type="file" 
+                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                    onChange={handlePhotoUpload}
+                    multiple
+                    disabled={uploadingPhotos}
+                  />
+                  {uploadingPhotos ? (
+                    <>
+                      <div className="upload-spinner"></div>
+                      <span className="upload-text">Uploading...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="upload-icon">+</span>
+                      <span className="upload-text">Add Photo</span>
+                    </>
+                  )}
+                </label>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="photo-tips">
+          <p className="tip-title">Photo Tips:</p>
+          <ul>
+            <li>Use recent photos that clearly show your face</li>
+            <li>Include a variety - close-ups and full body shots</li>
+            <li>Show yourself doing activities you enjoy</li>
+            <li>Smile naturally - be yourself! 🌸</li>
+          </ul>
+        </div>
+      </section>
+      
       <div className="profile-content">
         
         {/* Basic Info Section */}
@@ -560,6 +609,27 @@ const Profile = () => {
               />
             )}
           </div>
+        </section>
+
+        {/* Match Preferences Section */}
+        <section className="profile-section">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-md)' }}>
+            <h2 style={{ margin: 0 }}>Match Preferences</h2>
+            <button 
+              className="btn-secondary" 
+              onClick={() => setShowFilters(!showFilters)}
+              style={{ padding: 'var(--space-sm) var(--space-lg)' }}
+            >
+              {showFilters ? 'Hide' : 'Show'} Preferences
+            </button>
+          </div>
+          
+          {showFilters && (
+            <FilterSettings 
+              initialFilters={filterPreferences}
+              onSave={saveFilterPreferences}
+            />
+          )}
         </section>
 
         {/* Action Buttons */}
