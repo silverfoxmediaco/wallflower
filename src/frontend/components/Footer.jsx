@@ -5,6 +5,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './Footer.css';
+import wallflowerLogo from '../../assets/images/wfviolatelogo.png';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -14,8 +15,8 @@ const Footer = () => {
       <div className="footer-content">
         <div className="footer-section">
           <div className="footer-logo">
-            <img 
-              src="../../assets/images/wfviolatelogo.png" 
+          <img 
+              src={wallflowerLogo} 
               alt="Wallflower" 
               className="footer-logo-image"
             />
