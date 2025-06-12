@@ -345,7 +345,7 @@ const Profile = () => {
               </div>
             ))}
           </div>
-          
+          </section>
           <div className="photo-tips">
             <p className="tip-title">Photo Tips:</p>
             <ul>
@@ -355,7 +355,7 @@ const Profile = () => {
               <li>Smile naturally - be yourself! 🌸</li>
             </ul>
           </div>
-        </section>
+        
       <div className="profile-content">
         
         {/* Basic Info Section */}
