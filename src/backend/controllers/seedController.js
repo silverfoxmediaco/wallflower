@@ -24,10 +24,10 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-// Get user's seed data (balance and recent history)
-exports.getSeedData = [verifyToken, async (req, res) => {
+// Create Stripe subscription
+exports.createSubscription = [verifyToken, async (req, res) => {
   try {
-    const user = await User.findById(req.userId).select('seeds username');
+    const user = await User.findById(req.userId);
     
     if (!user) {
       return res.status(404).json({ 
@@ -35,6 +35,116 @@ exports.getSeedData = [verifyToken, async (req, res) => {
         message: 'User not found' 
       });
     }
+    
+    // Check if user already has active subscription
+    if (user.subscription && user.subscription.status === 'active') {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'You already have an active subscription' 
+      });
+    }
+    
+    // Create or retrieve Stripe customer
+    let customerId = user.stripeCustomerId;
+    
+    if (!customerId) {
+      const customer = await stripe.customers.create({
+        email: user.email,
+        metadata: {
+          userId: user._id.toString(),
+          username: user.username
+        }
+      });
+      
+      customerId = customer.id;
+      user.stripeCustomerId = customerId;
+      await user.save();
+    }
+    
+    // Create checkout session for subscription
+    const session = await stripe.checkout.sessions.create({
+      customer: customerId,
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price: 'price_1RZKdRH6ZlUYuIRprIByb2ch', // Unlimited Membership price ID
+          quantity: 1,
+        },
+      ],
+      mode: 'subscription',
+      success_url: `${process.env.CLIENT_URL}/profile?subscription=success`,
+      cancel_url: `${process.env.CLIENT_URL}/profile?subscription=cancelled`,
+      metadata: {
+        userId: req.userId
+      }
+    });
+    
+    res.json({ 
+      success: true, 
+      url: session.url,
+      sessionId: session.id 
+    });
+  } catch (error) {
+    console.error('Create subscription error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to create subscription' 
+    });
+  }
+}];
+
+// Cancel subscription
+exports.cancelSubscription = [verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    
+    if (!user || !user.subscription || !user.subscription.stripeSubscriptionId) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'No active subscription found' 
+      });
+    }
+    
+    // Cancel at period end (user keeps access until end of billing period)
+    const subscription = await stripe.subscriptions.update(
+      user.subscription.stripeSubscriptionId,
+      { cancel_at_period_end: true }
+    );
+    
+    // Update user record
+    user.subscription.cancelAtPeriodEnd = true;
+    await user.save();
+    
+    res.json({
+      success: true,
+      message: 'Subscription will be cancelled at the end of the billing period',
+      endsAt: new Date(subscription.current_period_end * 1000)
+    });
+  } catch (error) {
+    console.error('Cancel subscription error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to cancel subscription' 
+    });
+  }
+}];
+
+// Update getSeedData to include subscription info
+exports.getSeedData = [verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select('seeds username subscription');
+    
+    if (!user) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'User not found' 
+      });
+    }
+    
+    // Check if user has active subscription
+    const hasActiveSubscription = user.subscription && 
+      user.subscription.status === 'active' && 
+      (!user.subscription.cancelAtPeriodEnd || new Date(user.subscription.currentPeriodEnd) > new Date());
     
     // Get recent seed transactions (last 10)
     const history = await SeedTransaction.find({ userId: req.userId })
@@ -60,7 +170,9 @@ exports.getSeedData = [verifyToken, async (req, res) => {
     res.json({
       success: true,
       balance: user.seeds.available,
-      history: formattedHistory
+      history: formattedHistory,
+      hasActiveSubscription: hasActiveSubscription,
+      subscriptionEndDate: hasActiveSubscription ? user.subscription.currentPeriodEnd : null
     });
   } catch (error) {
     console.error('Get seed data error:', error);
@@ -70,6 +182,8 @@ exports.getSeedData = [verifyToken, async (req, res) => {
     });
   }
 }];
+
+// Update handleStripeWebhook to handle subscriptions
 
 // Get detailed seed transaction history
 exports.getSeedHistory = [verifyToken, async (req, res) => {
@@ -110,12 +224,28 @@ exports.createCheckoutSession = [verifyToken, async (req, res) => {
   try {
     const { packageId, seeds, amount } = req.body;
     
-    // Validate package
+    // Validate package with Price IDs
     const validPackages = {
-      starter: { seeds: 5, price: 499 }, // Price in cents
-      bloom: { seeds: 15, price: 999 },
-      garden: { seeds: 30, price: 1499 },
-      meadow: { seeds: 60, price: 2499 }
+      starter: { 
+        seeds: 5, 
+        price: 499,
+        priceId: 'price_1RZKZqH6ZlUYuIRpzQO1Wekg' // Starter Pack
+      },
+      bloom: { 
+        seeds: 15, 
+        price: 999,
+        priceId: 'price_1RZKatH6ZlUYuIRpOIIT6VXy' // Bloom Bundle
+      },
+      garden: { 
+        seeds: 30, 
+        price: 1499,
+        priceId: 'price_1RZKbgH6ZlUYuIRpT3Tq3r6u' // Garden Pack
+      },
+      meadow: { 
+        seeds: 60, 
+        price: 2499,
+        priceId: 'price_1RZKcTH6ZlUYuIRpm2GbXREW' // Meadow Bundle
+      }
     };
     
     if (!validPackages[packageId]) {
@@ -135,20 +265,12 @@ exports.createCheckoutSession = [verifyToken, async (req, res) => {
       });
     }
     
-    // Create Stripe checkout session
+    // Create Stripe checkout session with Price ID
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
         {
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: `${seeds} Seeds - ${packageId.charAt(0).toUpperCase() + packageId.slice(1)} Pack`,
-              description: `Add ${seeds} seeds to your Wallflower account`,
-              images: ['https://wallflower.me/seed-icon.png'], // Add your seed icon URL
-            },
-            unit_amount: selectedPackage.price,
-          },
+          price: selectedPackage.priceId, // Use the Price ID
           quantity: 1,
         },
       ],
@@ -197,38 +319,103 @@ exports.handleStripeWebhook = async (req, res) => {
       const session = event.data.object;
       
       try {
-        // Extract metadata
-        const { userId, packageId, seeds } = session.metadata;
-        const seedCount = parseInt(seeds);
-        
-        // Update user's seed balance
-        const user = await User.findByIdAndUpdate(
-          userId,
-          { $inc: { 'seeds.available': seedCount } },
-          { new: true }
-        );
-        
-        if (!user) {
-          console.error('User not found for seed purchase:', userId);
-          return res.status(404).json({ error: 'User not found' });
+        if (session.mode === 'subscription') {
+          // Handle subscription creation
+          const subscription = await stripe.subscriptions.retrieve(session.subscription);
+          const userId = session.metadata.userId;
+          
+          await User.findByIdAndUpdate(userId, {
+            subscription: {
+              stripeSubscriptionId: subscription.id,
+              stripeCustomerId: subscription.customer,
+              status: subscription.status,
+              currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+              cancelAtPeriodEnd: subscription.cancel_at_period_end
+            }
+          });
+          
+          // Create transaction record
+          await SeedTransaction.create({
+            userId: userId,
+            type: 'purchased',
+            amount: 0, // Unlimited
+            change: 0,
+            balanceAfter: 999999, // Symbolic for unlimited
+            description: 'Unlimited membership activated',
+            stripeSessionId: session.id,
+            paymentAmount: session.amount_total / 100
+          });
+          
+          console.log(`Subscription activated for user ${userId}`);
+        } else {
+          // Handle one-time purchase (existing code)
+          const { userId, packageId, seeds } = session.metadata;
+          const seedCount = parseInt(seeds);
+          
+          const user = await User.findByIdAndUpdate(
+            userId,
+            { $inc: { 'seeds.available': seedCount } },
+            { new: true }
+          );
+          
+          if (!user) {
+            console.error('User not found for seed purchase:', userId);
+            return res.status(404).json({ error: 'User not found' });
+          }
+          
+          await SeedTransaction.create({
+            userId: userId,
+            type: 'purchased',
+            amount: seedCount,
+            change: seedCount,
+            balanceAfter: user.seeds.available,
+            description: `Purchased ${seedCount} seeds - ${packageId} pack`,
+            stripeSessionId: session.id,
+            paymentAmount: session.amount_total / 100
+          });
+          
+          console.log(`Successfully added ${seedCount} seeds to user ${userId}`);
         }
-        
-        // Create transaction record
-        await SeedTransaction.create({
-          userId: userId,
-          type: 'purchased',
-          amount: seedCount,
-          change: seedCount,
-          balanceAfter: user.seeds.available,
-          description: `Purchased ${seedCount} seeds - ${packageId} pack`,
-          stripeSessionId: session.id,
-          paymentAmount: session.amount_total / 100 // Convert from cents to dollars
-        });
-        
-        console.log(`Successfully added ${seedCount} seeds to user ${userId}`);
       } catch (error) {
         console.error('Error processing successful payment:', error);
         return res.status(500).json({ error: 'Failed to process payment' });
+      }
+      break;
+      
+    case 'customer.subscription.updated':
+      const subscription = event.data.object;
+      
+      try {
+        await User.findOneAndUpdate(
+          { stripeCustomerId: subscription.customer },
+          {
+            'subscription.status': subscription.status,
+            'subscription.currentPeriodEnd': new Date(subscription.current_period_end * 1000),
+            'subscription.cancelAtPeriodEnd': subscription.cancel_at_period_end
+          }
+        );
+        
+        console.log(`Subscription updated for customer ${subscription.customer}`);
+      } catch (error) {
+        console.error('Error updating subscription:', error);
+      }
+      break;
+      
+    case 'customer.subscription.deleted':
+      const deletedSubscription = event.data.object;
+      
+      try {
+        await User.findOneAndUpdate(
+          { stripeCustomerId: deletedSubscription.customer },
+          {
+            'subscription.status': 'cancelled',
+            'subscription.cancelledAt': new Date()
+          }
+        );
+        
+        console.log(`Subscription cancelled for customer ${deletedSubscription.customer}`);
+      } catch (error) {
+        console.error('Error handling subscription deletion:', error);
       }
       break;
       

@@ -8,11 +8,11 @@ const jwt = require('jsonwebtoken');
 // Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
-  
+
   if (!token) {
     return res.status(401).json({ success: false, message: 'No token provided' });
   }
-  
+
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.userId = decoded.userId;
@@ -22,30 +22,24 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-// Get profiles to browse
+// GET: Browse profiles
 exports.getBrowseProfiles = [verifyToken, async (req, res) => {
   try {
-    // Get current user to exclude from results
     const currentUser = await User.findById(req.userId);
-    
-    // Get users that:
-    // 1. Are not the current user
-    // 2. Have completed profiles (at least bio and interests)
-    // 3. Haven't been sent a seed by current user already
+
     const sentSeedUserIds = currentUser.seeds.sent.map(seed => seed.to);
-    
+
     const profiles = await User.find({
-      _id: { 
+      _id: {
         $ne: req.userId,
-        $nin: sentSeedUserIds 
+        $nin: sentSeedUserIds
       },
       'profile.bio': { $exists: true, $ne: '' },
       'profile.interests': { $exists: true, $ne: [] }
     })
-    .select('-password -email')
-    .limit(10);
-    
-    // Transform data to match frontend format
+      .select('-password -email')
+      .limit(10);
+
     const formattedProfiles = profiles.map(user => ({
       id: user._id,
       username: user.username,
@@ -60,11 +54,11 @@ exports.getBrowseProfiles = [verifyToken, async (req, res) => {
       personalityType: user.profile.personalityType || 'Not specified',
       prompts: user.profile.prompts || []
     }));
-    
-    res.json({ 
-      success: true, 
+
+    res.json({
+      success: true,
       profiles: formattedProfiles,
-      seedsRemaining: currentUser.seeds.available 
+      seedsRemaining: currentUser.seeds.available
     });
   } catch (error) {
     console.error('Browse profiles error:', error);
@@ -72,43 +66,50 @@ exports.getBrowseProfiles = [verifyToken, async (req, res) => {
   }
 }];
 
-// Send a seed to someone
+// POST: Send a seed to another user
 exports.sendSeed = [verifyToken, async (req, res) => {
   try {
     const { recipientId } = req.body;
-    
-    // Get sender
+
     const sender = await User.findById(req.userId);
-    
-    // Check if user has seeds available
-    if (sender.seeds.available <= 0) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'No seeds available' 
+
+    // Check if user has an active subscription
+    const hasActiveSubscription = sender.subscription &&
+      sender.subscription.status === 'active' &&
+      (!sender.subscription.cancelAtPeriodEnd || new Date(sender.subscription.currentPeriodEnd) > new Date());
+
+    // Check if user has seeds available (if not subscribed)
+    if (!hasActiveSubscription && sender.seeds.available <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No seeds available'
       });
     }
-    
-    // Check if seed already sent to this user
+
+    // Check if already sent a seed to this user
     const alreadySent = sender.seeds.sent.some(
       seed => seed.to.toString() === recipientId
     );
-    
+
     if (alreadySent) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Seed already sent to this user' 
+      return res.status(400).json({
+        success: false,
+        message: 'Seed already sent to this user'
       });
     }
-    
-    // Update sender: decrease available seeds, add to sent
-    sender.seeds.available -= 1;
+
+    // Update sender: decrease available seeds, add to sent list
+    if (!hasActiveSubscription) {
+      sender.seeds.available -= 1;
+    }
+
     sender.seeds.sent.push({
       to: recipientId,
       sentAt: new Date()
     });
     await sender.save();
-    
-    // Update recipient: add to received
+
+    // Update recipient: add to received list
     await User.findByIdAndUpdate(recipientId, {
       $push: {
         'seeds.received': {
@@ -117,11 +118,11 @@ exports.sendSeed = [verifyToken, async (req, res) => {
         }
       }
     });
-    
-    res.json({ 
-      success: true, 
+
+    res.json({
+      success: true,
       message: 'Seed sent successfully!',
-      seedsRemaining: sender.seeds.available 
+      seedsRemaining: sender.seeds.available
     });
   } catch (error) {
     console.error('Send seed error:', error);
@@ -129,17 +130,16 @@ exports.sendSeed = [verifyToken, async (req, res) => {
   }
 }];
 
-// Pass on a profile
+// POST: Pass on a profile
 exports.passProfile = [verifyToken, async (req, res) => {
   try {
     const { profileId } = req.body;
-    
-    // For now, just acknowledge the pass
-    // In the future, you might want to track passes to not show the profile again
-    
-    res.json({ 
-      success: true, 
-      message: 'Profile passed' 
+
+    // Optional: log the pass or store for future filtering
+
+    res.json({
+      success: true,
+      message: 'Profile passed'
     });
   } catch (error) {
     console.error('Pass profile error:', error);

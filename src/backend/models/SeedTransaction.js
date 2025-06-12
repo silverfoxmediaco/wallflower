@@ -14,7 +14,7 @@ const seedTransactionSchema = new mongoose.Schema({
   type: {
     type: String,
     required: true,
-    enum: ['purchased', 'sent', 'received', 'bonus', 'refund', 'expired', 'system'],
+    enum: ['purchased', 'sent', 'received', 'bonus', 'refund', 'expired', 'system', 'subscription'],
     index: true
   },
   amount: {
@@ -27,6 +27,7 @@ const seedTransactionSchema = new mongoose.Schema({
     required: true,
     // Positive for additions (purchased, received, bonus, refund)
     // Negative for deductions (sent, expired)
+    // 0 for subscription (unlimited)
   },
   balanceAfter: {
     type: Number,
@@ -51,10 +52,30 @@ const seedTransactionSchema = new mongoose.Schema({
     required: false,
     index: true
   },
+  stripeSubscriptionId: {
+    type: String,
+    required: false,
+    index: true,
+    // For subscription transactions
+  },
   paymentAmount: {
     type: Number,
     required: false,
     // Amount paid in dollars (not cents)
+  },
+  subscriptionDetails: {
+    type: {
+      String,
+      enum: ['monthly', 'yearly'],
+      required: false
+    },
+    status: {
+      type: String,
+      enum: ['started', 'renewed', 'cancelled', 'failed'],
+      required: false
+    },
+    periodStart: Date,
+    periodEnd: Date
   },
   // Admin tracking
   addedBy: {
@@ -82,6 +103,7 @@ const seedTransactionSchema = new mongoose.Schema({
 seedTransactionSchema.index({ userId: 1, createdAt: -1 });
 seedTransactionSchema.index({ userId: 1, type: 1 });
 seedTransactionSchema.index({ relatedUser: 1, type: 1 });
+seedTransactionSchema.index({ stripeSubscriptionId: 1 });
 
 // Static methods for common queries
 seedTransactionSchema.statics.getUserBalance = async function(userId) {
@@ -117,6 +139,28 @@ seedTransactionSchema.statics.getTotalSpent = async function(userId) {
   return result.length > 0 ? result[0].total : 0;
 };
 
+seedTransactionSchema.statics.getSubscriptionHistory = async function(userId) {
+  return await this.find({ 
+    userId, 
+    type: 'subscription' 
+  })
+  .sort({ createdAt: -1 })
+  .select('description subscriptionDetails paymentAmount createdAt');
+};
+
+seedTransactionSchema.statics.getTotalRevenue = async function(userId) {
+  const result = await this.aggregate([
+    { $match: { 
+      userId: mongoose.Types.ObjectId(userId), 
+      type: { $in: ['purchased', 'subscription'] },
+      paymentAmount: { $exists: true }
+    }},
+    { $group: { _id: null, total: { $sum: '$paymentAmount' } } }
+  ]);
+  
+  return result.length > 0 ? result[0].total : 0;
+};
+
 // Instance methods
 seedTransactionSchema.methods.getFormattedDate = function() {
   return this.createdAt.toLocaleDateString('en-US', {
@@ -128,9 +172,22 @@ seedTransactionSchema.methods.getFormattedDate = function() {
   });
 };
 
+seedTransactionSchema.methods.isSubscriptionActive = function() {
+  if (this.type !== 'subscription') return false;
+  return this.subscriptionDetails?.status === 'started' || 
+         this.subscriptionDetails?.status === 'renewed';
+};
+
 // Virtual for transaction direction
 seedTransactionSchema.virtual('direction').get(function() {
+  if (this.type === 'subscription') return 'subscription';
   return this.change > 0 ? 'credit' : 'debit';
+});
+
+// Virtual for display amount
+seedTransactionSchema.virtual('displayAmount').get(function() {
+  if (this.type === 'subscription') return 'Unlimited';
+  return this.amount;
 });
 
 // Ensure virtuals are included in JSON
