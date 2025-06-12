@@ -145,12 +145,6 @@ const ProfileView = () => {
           <div className="profile-header">
             <h1>{profile.username}, {profile.profile?.age || '??'}</h1>
             <p className="location">{profile.profile?.location || 'Location not set'}</p>
-            
-            {profile.profile?.personalityType && (
-              <span className="personality-badge">
-                {profile.profile.personalityType}
-              </span>
-            )}
           </div>
 
           <div className="profile-details">

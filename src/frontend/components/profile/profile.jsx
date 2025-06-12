@@ -21,7 +21,6 @@ const Profile = () => {
     location: '',
     bio: '',
     interests: [],
-    personalityType: '',
     lookingFor: '',
     photos: [],
     prompts: [
@@ -32,7 +31,6 @@ const Profile = () => {
   });
 
   const bodyTypes = ['Slim', 'Average', 'Athletic', 'Fit', 'Curvy', 'Full Figured', 'Prefer not to say'];
-  const personalityTypes = ['INTJ', 'INTP', 'INFJ', 'INFP', 'ISTJ', 'ISFJ', 'ISTP', 'ISFP'];
   const lookingForOptions = ['Long-term relationship', 'Something casual', 'Not sure yet', 'New friends'];
   
   const heightOptions = [];
@@ -93,7 +91,6 @@ const Profile = () => {
           location: profile.location || '',
           bio: profile.bio || '',
           interests: profile.interests || [],
-          personalityType: profile.personalityType || '',
           lookingFor: profile.lookingFor || '',
           photos: profile.photos || [],
           prompts: (profile.prompts && profile.prompts.length > 0) ? profile.prompts : [
@@ -305,7 +302,6 @@ const Profile = () => {
           location: profileData.location,
           bio: profileData.bio,
           interests: profileData.interests,
-          personalityType: profileData.personalityType,
           lookingFor: profileData.lookingFor,
           prompts: profileData.prompts.filter(p => p.question && p.answer)
         })
@@ -470,19 +466,6 @@ const Profile = () => {
                 onChange={(e) => handleInputChange('location', e.target.value)}
                 placeholder="City, State"
               />
-            </div>
-
-            <div className="form-group">
-              <label>Personality Type</label>
-              <select
-                value={profileData.personalityType}
-                onChange={(e) => handleInputChange('personalityType', e.target.value)}
-              >
-                <option value="">Select type (optional)</option>
-                {personalityTypes.map(type => (
-                  <option key={type} value={type}>{type}</option>
-                ))}
-              </select>
             </div>
           </div>
         </section>
@@ -677,10 +660,6 @@ const Profile = () => {
               <div className="preview-info">
                 <h3>{profileData.username || 'Username'}, {profileData.age || '??'}</h3>
                 <p className="preview-location">{profileData.location || 'Location not set'}</p>
-                
-                {profileData.personalityType && (
-                  <span className="preview-personality">{profileData.personalityType}</span>
-                )}
 
                 <div className="preview-details">
                   {profileData.height && <span>Height: {profileData.height}</span>}
