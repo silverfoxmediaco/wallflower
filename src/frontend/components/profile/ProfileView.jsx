@@ -97,9 +97,8 @@ const ProfileView = () => {
     );
   }
 
-  // Get current photo and its display mode
+  // Get current photo
   const currentPhoto = profile.profile?.photos?.[currentPhotoIndex];
-  const displayMode = currentPhoto?.displayMode || 'contain';
 
   return (
     <div className="profile-view-container">
@@ -109,13 +108,13 @@ const ProfileView = () => {
 
       <div className="profile-view-card">
         {/* Photo Section */}
-        <div className={`photo-section ${displayMode}`}>
+        <div className="photo-section">
           {currentPhoto ? (
             <>
               <img 
                 src={currentPhoto.url} 
                 alt={profile.username}
-                className={` ${displayMode}`}
+                className="profile-photo"
               />
               {profile.profile.photos.length > 1 && (
                 <>
