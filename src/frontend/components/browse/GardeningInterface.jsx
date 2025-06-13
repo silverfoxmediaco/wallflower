@@ -18,10 +18,10 @@ const GardeningInterface = () => {
   const navigate = useNavigate();
   const cardRef = useRef(null);
 
-  // Swipe thresholds
-  const swipeThreshold = 100;
-  const rotationMultiplier = 0.1;
-  const tapThreshold = 5; // Maximum movement to consider it a tap
+  // Swipe thresholds - adjusted for better mobile experience
+  const swipeThreshold = window.innerWidth * 0.25; // 25% of screen width
+  const rotationMultiplier = 0.15;
+  const tapThreshold = 10; // Increased for better tap detection
 
   useEffect(() => {
     fetchProfiles();
@@ -60,6 +60,7 @@ const GardeningInterface = () => {
 
   // Handle drag/swipe start
   const handleDragStart = (e) => {
+    e.preventDefault();
     const startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
     const startY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
     
@@ -81,8 +82,10 @@ const GardeningInterface = () => {
     if (cardRef.current) {
       const deltaX = currentX - dragStart.x;
       const rotation = deltaX * rotationMultiplier;
+      const opacity = 1 - Math.abs(deltaX) / (window.innerWidth * 0.5);
+      
       cardRef.current.style.transform = `translateX(${deltaX}px) rotate(${rotation}deg)`;
-      cardRef.current.style.opacity = 1 - Math.abs(deltaX) / (window.innerWidth / 2);
+      cardRef.current.style.opacity = Math.max(0.2, opacity);
     }
   };
 
@@ -91,26 +94,34 @@ const GardeningInterface = () => {
     if (!isDragging) return;
     
     const deltaX = dragCurrent.x - dragStart.x;
+    const deltaY = Math.abs(dragCurrent.y - dragStart.y);
+    
+    // Ignore if too much vertical movement (scrolling)
+    if (deltaY > 50) {
+      resetCardPosition();
+      return;
+    }
+    
     const isSwipeRight = deltaX > swipeThreshold;
     const isSwipeLeft = deltaX < -swipeThreshold;
     
     if (cardRef.current) {
-      if (isSwipeLeft && currentProfileIndex < profiles.length - 1) {
-        // Swipe left - show next profile
+      if (isSwipeLeft) {
+        // Pass
         cardRef.current.classList.add('swipe-left');
         setTimeout(() => {
-          moveToNextProfile();
+          handlePass();
+          resetCardPosition();
         }, 300);
-      } else if (isSwipeRight && currentProfileIndex > 0) {
-        // Swipe right - show previous profile
+      } else if (isSwipeRight) {
+        // Plant seed
         cardRef.current.classList.add('swipe-right');
         setTimeout(() => {
-          moveToPreviousProfile();
+          handlePlantSeed();
+          resetCardPosition();
         }, 300);
       } else {
-        // Return to center
-        cardRef.current.style.transform = '';
-        cardRef.current.style.opacity = '';
+        resetCardPosition();
       }
     }
     
@@ -119,8 +130,17 @@ const GardeningInterface = () => {
     setDragCurrent({ x: 0, y: 0 });
   };
 
+  const resetCardPosition = () => {
+    if (cardRef.current) {
+      cardRef.current.style.transform = '';
+      cardRef.current.style.opacity = '';
+      cardRef.current.classList.remove('swipe-left', 'swipe-right');
+    }
+  };
+
   const handlePlantSeed = async (e) => {
-    e.stopPropagation(); // Prevent drag events
+    if (e) e.stopPropagation();
+    
     if (seedsRemaining > 0 && profiles[currentProfileIndex]) {
       try {
         const token = localStorage.getItem('token');
@@ -141,8 +161,6 @@ const GardeningInterface = () => {
 
         if (data.success) {
           setSeedsRemaining(data.seedsRemaining);
-          
-          // Move to next profile
           moveToNextProfile();
         } else {
           alert(data.message);
@@ -157,7 +175,8 @@ const GardeningInterface = () => {
   };
 
   const handlePass = async (e) => {
-    e.stopPropagation(); // Prevent drag events
+    if (e) e.stopPropagation();
+    
     if (profiles[currentProfileIndex]) {
       try {
         const token = localStorage.getItem('token');
@@ -174,7 +193,6 @@ const GardeningInterface = () => {
           })
         });
 
-        // Move to next profile
         moveToNextProfile();
       } catch (error) {
         console.error('Pass profile error:', error);
@@ -183,41 +201,20 @@ const GardeningInterface = () => {
   };
 
   const handleMaybeLater = (e) => {
-    e.stopPropagation(); // Prevent drag events
-    // Move to next profile without any action
+    if (e) e.stopPropagation();
     moveToNextProfile();
   };
 
   const moveToNextProfile = () => {
     if (currentProfileIndex < profiles.length - 1) {
       setCurrentProfileIndex(prev => prev + 1);
-      // Reset card position
-      if (cardRef.current) {
-        cardRef.current.classList.remove('swipe-left', 'swipe-right');
-        cardRef.current.style.transform = '';
-        cardRef.current.style.opacity = '';
-      }
     } else {
-      // No more profiles
       setProfiles([]);
-    }
-  };
-
-  const moveToPreviousProfile = () => {
-    if (currentProfileIndex > 0) {
-      setCurrentProfileIndex(prev => prev - 1);
-      // Reset card position
-      if (cardRef.current) {
-        cardRef.current.classList.remove('swipe-left', 'swipe-right');
-        cardRef.current.style.transform = '';
-        cardRef.current.style.opacity = '';
-      }
     }
   };
 
   // Handle profile card click/tap
   const handleProfileClick = (e) => {
-    // Only navigate if it's a tap (not a drag)
     const moveDistance = Math.abs(dragCurrent.x - dragStart.x) + Math.abs(dragCurrent.y - dragStart.y);
     
     if (!isDragging && moveDistance < tapThreshold) {
@@ -233,7 +230,7 @@ const GardeningInterface = () => {
     return (
       <div className="gardening-container">
         <div className="loading-message">
-          <p>Finding your perfect garden matches... 🌸</p>
+          <p>Finding your perfect garden matches...</p>
         </div>
       </div>
     );
@@ -256,7 +253,7 @@ const GardeningInterface = () => {
     return (
       <div className="gardening-container">
         <div className="no-profiles-message">
-          <h2>No more profiles to browse! 🌻</h2>
+          <h2>No more profiles to browse!</h2>
           <p>Check back later for new members or browse your matches in your garden.</p>
           <button className="btn-primary" onClick={() => navigate('/garden')}>
             Visit My Garden
@@ -320,7 +317,7 @@ const GardeningInterface = () => {
             </div>
           </div>
           
-          {/* Action Buttons - Now inside the card */}
+          {/* Action Buttons */}
           <div className="action-buttons">
             <button 
               className="action-btn pass-btn" 
@@ -358,7 +355,7 @@ const GardeningInterface = () => {
           </div>
         </div>
 
-        {/* Preview of next profiles (stacked behind) */}
+        {/* Preview of next profiles */}
         {profiles[currentProfileIndex + 1] && (
           <div className="profile-card-simple" style={{ pointerEvents: 'none' }}>
             <div className="photo-container">
@@ -377,7 +374,7 @@ const GardeningInterface = () => {
       {/* Out of seeds message */}
       {seedsRemaining === 0 && (
         <div className="out-of-seeds-overlay">
-          <p>You're out of seeds! 🌱</p>
+          <p>You're out of seeds!</p>
           <button className="cta-btn" onClick={() => navigate('/profile')}>
             Get More Seeds
           </button>
