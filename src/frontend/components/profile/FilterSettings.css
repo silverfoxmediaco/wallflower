@@ -15,19 +15,63 @@
     margin-bottom: var(--space-sm);
   }
   
+  /* Match Preferences Header with Show/Hide button */
+  .match-preferences-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-md);
+  }
+  
+  .match-preferences-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: var(--color-text-primary);
+  }
+  
+  .match-preferences-toggle {
+    padding: var(--space-sm) var(--space-lg);
+  }
+  
   .filter-subtitle {
     color: var(--color-text-muted);
     font-size: 0.95rem;
     margin-bottom: var(--space-lg);
   }
   
-  /* Toggle button - hidden on desktop */
-  .toggle-button {
-    display: none;
+  /* Header section - always visible now */
+  .filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-md);
   }
   
-  /* Header section - hidden on desktop */
-  .filter-header {
+  .filter-header h2 {
+    margin: 0;
+  }
+  
+  /* Toggle button styling */
+  .toggle-button {
+    background: white;
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: 999px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: var(--font-primary);
+    font-size: 0.875rem;
+  }
+  
+  .toggle-button:hover {
+    background: var(--color-primary);
+    color: white;
+  }
+  
+  /* Desktop title - hide when header is present */
+  .filter-header ~ .filter-title {
     display: none;
   }
   
@@ -252,6 +296,14 @@
   
   /* Responsive Design */
   @media (max-width: 768px) {
+
+    /* Stack the header on mobile */
+  .match-preferences-header {
+    flex-direction: column;
+    gap: var(--space-md);
+    text-align: center;
+  }
+
     .filter-settings {
       padding: var(--space-lg);
     }

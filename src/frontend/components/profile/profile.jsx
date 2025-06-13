@@ -598,12 +598,11 @@ const Profile = () => {
 
         {/* Match Preferences Section */}
         <section className="profile-section">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-md)' }}>
-            <h2 style={{ margin: 0 }}>Match Preferences</h2>
+          <div className="match-preferences-header">
+            <h2>Match Preferences</h2>
             <button 
-              className="btn-secondary" 
+              className="btn-secondary match-preferences-toggle" 
               onClick={() => setShowFilters(!showFilters)}
-              style={{ padding: 'var(--space-sm) var(--space-lg)' }}
             >
               {showFilters ? 'Hide' : 'Show'} Preferences
             </button>
