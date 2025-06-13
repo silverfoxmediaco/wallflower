@@ -10,22 +10,22 @@
     "orientation": "portrait-primary",
     "icons": [
       {
-        "src": "/wffavicon.svg",
-        "sizes": "any",
-        "type": "image/svg+xml",
-        "purpose": "any maskable"
-      },
-      {
-        "src": "/assets/images/wallflowerlogotrans.png",
-        "sizes": "512x512",
+        "src": "/wffavicon.png",
+        "sizes": "64x64",
         "type": "image/png",
         "purpose": "any"
       },
       {
-        "src": "/assets/images/wallflowerlogotrans.png",
+        "src": "/assets/images/192wflogo.png",
         "sizes": "192x192",
         "type": "image/png",
-        "purpose": "maskable"
+        "purpose": "any maskable"
+      },
+      {
+        "src": "/assets/images/512wflogo.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "any maskable"
       }
     ]
   }
