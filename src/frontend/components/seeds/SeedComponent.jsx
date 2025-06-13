@@ -153,6 +153,35 @@ const SeedComponent = ({ isEmbedded = false }) => {
    }
  };
 
+ const handleCancelSubscription = async () => {
+   if (!window.confirm('Are you sure you want to cancel your subscription? You will keep access until the end of your billing period.')) {
+     return;
+   }
+
+   try {
+     const token = localStorage.getItem('token');
+     const response = await fetch('/api/seeds/cancel-subscription', {
+       method: 'POST',
+       headers: {
+         'Content-Type': 'application/json',
+         'Authorization': `Bearer ${token}`
+       }
+     });
+
+     const data = await response.json();
+     
+     if (data.success) {
+       alert(`Subscription cancelled. You have access until ${new Date(data.endsAt).toLocaleDateString()}`);
+       loadSeedData(); // Refresh the data
+     } else {
+       alert(data.message || 'Failed to cancel subscription');
+     }
+   } catch (error) {
+     console.error('Cancel subscription error:', error);
+     alert('Failed to cancel subscription');
+   }
+ };
+
  const formatDate = (dateString) => {
    const date = new Date(dateString);
    return date.toLocaleDateString('en-US', {
@@ -291,12 +320,41 @@ const SeedComponent = ({ isEmbedded = false }) => {
                  )}
                </button>
                {seedData.hasActiveSubscription && (
-                 <button 
-                   className="manage-subscription-link"
-                   onClick={() => window.location.href = '/profile/subscription'}
-                 >
-                   Manage Subscription
-                 </button>
+                 <>
+                   <button 
+                     className="manage-subscription-link"
+                     onClick={() => window.location.href = '/profile/subscription'}
+                   >
+                     Manage Subscription
+                   </button>
+                   <button 
+                     className="cancel-subscription-link"
+                     onClick={handleCancelSubscription}
+                     style={{ 
+                       marginTop: '8px', 
+                       width: '100%',
+                       background: 'transparent', 
+                       border: '1px solid #ff6b6b', 
+                       color: '#ff6b6b',
+                       padding: '8px 16px',
+                       borderRadius: '999px',
+                       fontSize: '0.875rem',
+                       cursor: 'pointer',
+                       transition: 'all 0.3s ease',
+                       fontFamily: 'var(--font-primary)'
+                     }}
+                     onMouseOver={(e) => {
+                       e.target.style.background = '#ff6b6b';
+                       e.target.style.color = 'white';
+                     }}
+                     onMouseOut={(e) => {
+                       e.target.style.background = 'transparent';
+                       e.target.style.color = '#ff6b6b';
+                     }}
+                   >
+                     Cancel Subscription
+                   </button>
+                 </>
                )}
              </div>
            </div>
