@@ -284,12 +284,15 @@ const GardeningInterface = () => {
         >
           <div className="photo-container">
             {profile.photos && profile.photos.length > 0 ? (
-              <img 
-                src={profile.photos[0].url || profile.photos[0]} 
-                alt={profile.username}
-                className="profile-photo"
-                draggable="false"
-              />
+              <>
+                <img 
+                  src={profile.photos[0].url || profile.photos[0]} 
+                  alt={profile.username}
+                  className="profile-photo"
+                  draggable="false"
+                />
+                <div className="photo-overlay" />
+              </>
             ) : (
               <div className="no-photo">
                 <span>🌸</span>
@@ -360,11 +363,14 @@ const GardeningInterface = () => {
           <div className="profile-card-simple" style={{ pointerEvents: 'none' }}>
             <div className="photo-container">
               {profiles[currentProfileIndex + 1].photos?.[0] && (
-                <img 
-                  src={profiles[currentProfileIndex + 1].photos[0].url || profiles[currentProfileIndex + 1].photos[0]} 
-                  alt="Next profile"
-                  className="profile-photo"
-                />
+                <>
+                  <img 
+                    src={profiles[currentProfileIndex + 1].photos[0].url || profiles[currentProfileIndex + 1].photos[0]} 
+                    alt="Next profile"
+                    className="profile-photo"
+                  />
+                  <div className="photo-overlay" />
+                </>
               )}
             </div>
           </div>
