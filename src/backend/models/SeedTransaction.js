@@ -65,14 +65,12 @@ const seedTransactionSchema = new mongoose.Schema({
   },
   subscriptionDetails: {
     type: {
-      String,
-      enum: ['monthly', 'yearly'],
-      required: false
+      type: String,
+      enum: ['monthly', 'yearly']
     },
     status: {
       type: String,
-      enum: ['started', 'renewed', 'cancelled', 'failed'],
-      required: false
+      enum: ['started', 'renewed', 'cancelled', 'failed']
     },
     periodStart: Date,
     periodEnd: Date
