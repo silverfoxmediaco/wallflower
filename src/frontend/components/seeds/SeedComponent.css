@@ -34,11 +34,6 @@
     font-size: 1.125rem;
   }
   
-  /* Mobile toggle header - hidden on desktop */
-.my-seeds-header {
-  display: none;
-}
-  
   .toggle-seeds-button {
     display: none;
   }
