@@ -6,7 +6,6 @@ const path = require('path');
 const { createServer } = require('http');
 const { Server } = require('socket.io');
 const fs = require('fs');
-const seedRoutes = require('./src/backend/routes/seedRoutes');
 
 // Load environment variables
 dotenv.config();
@@ -14,18 +13,21 @@ dotenv.config();
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
-  cors: {
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
-    credentials: true
-  }
+ cors: {
+   origin: process.env.CLIENT_URL || 'http://localhost:5173',
+   credentials: true
+ }
 });
 
 // Middleware
 app.use(cors());
 
-// IMPORTANT: Webhook route must come BEFORE body parser
-// This is because Stripe needs the raw body
-app.post('/api/seeds/webhook', express.raw({ type: 'application/json' }), require('./src/backend/controllers/seedController').handleStripeWebhook);
+// IMPORTANT: Handle webhook BEFORE body parser
+app.post(
+ '/api/seeds/webhook',
+ express.raw({ type: 'application/json' }),
+ require('./src/backend/controllers/seedController').handleStripeWebhook
+);
 
 // Now add body parser for all other routes
 app.use(express.json());
@@ -33,27 +35,27 @@ app.use(express.urlencoded({ extended: true }));
 
 // Debug route to check file structure
 app.get('/api/debug', (req, res) => {
-  const distPath = path.join(__dirname, 'dist');
-  const distExists = fs.existsSync(distPath);
-  let distContents = [];
-  
-  if (distExists) {
-    distContents = fs.readdirSync(distPath);
-  }
-  
-  res.json({
-    cwd: process.cwd(),
-    dirname: __dirname,
-    distPath: distPath,
-    distExists: distExists,
-    distContents: distContents,
-    nodeEnv: process.env.NODE_ENV
-  });
+ const distPath = path.join(__dirname, 'dist');
+ const distExists = fs.existsSync(distPath);
+ let distContents = [];
+ 
+ if (distExists) {
+   distContents = fs.readdirSync(distPath);
+ }
+ 
+ res.json({
+   cwd: process.cwd(),
+   dirname: __dirname,
+   distPath: distPath,
+   distExists: distExists,
+   distContents: distContents,
+   nodeEnv: process.env.NODE_ENV
+ });
 });
 
 // API Routes
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Wallflower API is running' });
+ res.json({ status: 'OK', message: 'Wallflower API is running' });
 });
 
 // Auth routes
@@ -66,82 +68,80 @@ app.use('/api/chat', require('./src/backend/routes/chatRoutes'));
 app.use('/api/admin', require('./src/backend/routes/adminRoutes'));
 app.use('/api/members', require('./src/backend/routes/membersRoutes'));
 app.use('/api/users', require('./src/backend/routes/usersRoutes'));
-
-// Add other seed routes (excluding webhook which is already added above)
-app.use('/api/seeds', seedRoutes);
+app.use('/api/seeds', require('./src/backend/routes/seedRoutes'));
 
 // Serve static files from the React app in production
 if (process.env.NODE_ENV === 'production') {
-  const staticPath = path.join(__dirname, 'dist');
-  
-  console.log('Production mode - serving static files from:', staticPath);
-  console.log('Directory exists:', fs.existsSync(staticPath));
-  
-  // Serve static files from the React build
-  app.use(express.static(staticPath));
+ const staticPath = path.join(__dirname, 'dist');
+ 
+ console.log('Production mode - serving static files from:', staticPath);
+ console.log('Directory exists:', fs.existsSync(staticPath));
+ 
+ // Serve static files from the React build
+ app.use(express.static(staticPath));
 
-  // The "catchall" handler: for any request that doesn't
-  // match one above, send back React's index.html file.
-  app.get('*', (req, res) => {
-    const indexPath = path.join(__dirname, 'dist', 'index.html');
-    console.log('Attempting to serve index.html from:', indexPath);
-    console.log('File exists:', fs.existsSync(indexPath));
-    
-    if (fs.existsSync(indexPath)) {
-      res.sendFile(indexPath);
-    } else {
-      res.status(404).json({ 
-        error: 'index.html not found', 
-        path: indexPath,
-        distContents: fs.existsSync(path.join(__dirname, 'dist')) 
-          ? fs.readdirSync(path.join(__dirname, 'dist')) 
-          : 'dist folder not found'
-      });
-    }
-  });
+ // The "catchall" handler: for any request that doesn't
+ // match one above, send back React's index.html file.
+ app.get('*', (req, res) => {
+   const indexPath = path.join(__dirname, 'dist', 'index.html');
+   console.log('Attempting to serve index.html from:', indexPath);
+   console.log('File exists:', fs.existsSync(indexPath));
+   
+   if (fs.existsSync(indexPath)) {
+     res.sendFile(indexPath);
+   } else {
+     res.status(404).json({ 
+       error: 'index.html not found', 
+       path: indexPath,
+       distContents: fs.existsSync(path.join(__dirname, 'dist')) 
+         ? fs.readdirSync(path.join(__dirname, 'dist')) 
+         : 'dist folder not found'
+     });
+   }
+ });
 }
 
 // MongoDB connection with better error handling
 const connectDB = async () => {
-  try {
-    const mongoUri = process.env.MONGODB_URI;
-    
-    if (!mongoUri) {
-      throw new Error('MONGODB_URI is not defined in environment variables');
-    }
-    
-    console.log('Attempting to connect to MongoDB...');
-    
-    await mongoose.connect(mongoUri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 5000,
-    });
-    
-    console.log('MongoDB connected successfully');
-  } catch (err) {
-    console.error('MongoDB connection error:', err.message);
-    
-    // Don't exit in production, let the app run without DB
-    if (process.env.NODE_ENV !== 'production') {
-      process.exit(1);
-    }
-  }
+ try {
+   const mongoUri = process.env.MONGODB_URI;
+   
+   if (!mongoUri) {
+     throw new Error('MONGODB_URI is not defined in environment variables');
+   }
+   
+   console.log('Attempting to connect to MongoDB...');
+   
+   await mongoose.connect(mongoUri, {
+     useNewUrlParser: true,
+     useUnifiedTopology: true,
+     serverSelectionTimeoutMS: 5000,
+   });
+   
+   console.log('MongoDB connected successfully');
+ } catch (err) {
+   console.error('MongoDB connection error:', err.message);
+   
+   // Don't exit in production, let the app run without DB
+   if (process.env.NODE_ENV !== 'production') {
+     process.exit(1);
+   }
+ }
 };
 
 connectDB();
 
 // Socket.io
 io.on('connection', (socket) => {
-  console.log('New client connected');
-  socket.on('disconnect', () => {
-    console.log('Client disconnected');
-  });
+ console.log('New client connected');
+ socket.on('disconnect', () => {
+   console.log('Client disconnected');
+ });
 });
 
 const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV}`);
-  console.log(`Current directory: ${process.cwd()}`);
+ console.log(`Server running on port ${PORT}`);
+ console.log(`Environment: ${process.env.NODE_ENV}`);
+ console.log(`Current directory: ${process.cwd()}`);
 });
