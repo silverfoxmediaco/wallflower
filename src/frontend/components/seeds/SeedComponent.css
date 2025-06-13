@@ -644,122 +644,140 @@
   }
   
   /* Responsive Design */
-  @media (max-width: 768px) {
-    .seed-component-container {
-      padding: var(--space-lg) var(--space-md);
-    }
-    .my-seeds-header {
-      flex-direction: column;
-      gap: var(--space-md);
-      text-align: center;
-    }
-   
-    .my-seeds-toggle {
-      width: 100%;
-    }
-  
-    .my-seeds-header h2 {
-      font-size: 1.5rem;
-      color: var(--color-primary);
-      margin: 0;
-    }
-  
-    .toggle-seeds-button {
-      display: block;
-      background: white;
-      color: var(--color-primary);
-      border: 2px solid var(--color-primary);
-      padding: var(--space-sm) var(--space-lg);
-      border-radius: 999px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-family: var(--font-primary);
-      font-size: 0.875rem;
-    }
-  
-    .toggle-seeds-button:hover {
-      background: var(--color-primary);
-      color: white;
-    }
-  
-    /* Hide desktop header when mobile header is shown */
-    .my-seeds-header + .seed-header {
-      display: none;
-    }
-  
-    /* Tab wrapper visibility on mobile */
-    .tabs-content-wrapper {
-      display: none;
-      animation: fadeIn 0.3s ease-out;
-    }
-  
-    .tabs-content-wrapper.visible {
-      display: block;
-    }
-  
-    .seed-header h2 {
-      font-size: 2rem;
-    }
-  
-    /* Stack layout for mobile */
-    .balance-section {
-      grid-template-columns: 1fr;
-      gap: var(--space-lg);
-    }
-  
-    .packages-grid {
-      grid-template-columns: 1fr;
-    }
-  
-    .package-card.popular {
-      transform: none;
-    }
-  
-    .balance-card {
-      flex-direction: column;
-      text-align: center;
-      width: 90%;
-    }
-  
-    .balance-icon {
-      width: 80px;
-      height: 80px;
-      font-size: 3rem;
-    }
-  
-    .balance-number {
-      font-size: 2.5rem;
-    }
-  
-    .seed-tabs {
-      flex-direction: column;
-      border-radius: 16px;
-      width: 90%;
-    }
-  
-    .tab-button {
-      border-radius: 12px;
-    }
-  
-    .membership-header {
-      flex-direction: column;
-      gap: var(--space-sm);
-      text-align: center;
-    }
-  
-    .membership-header h4 {
-      font-size: 1.25rem;
-    }
-  
-    .price-amount {
-      font-size: 2.5rem;
-    }
-  
-    .membership-benefits li {
-      font-size: 1rem;
-    }
+@media (max-width: 768px) {
+  .seed-component-container {
+    padding: var(--space-lg) var(--space-md);
   }
+  
+  .seed-component-container.embedded {
+    padding: 0 var(--space-sm);  /* Add side padding for embedded version */
+  }
+  
+  .my-seeds-header {
+    flex-direction: column;
+    gap: var(--space-md);
+    text-align: center;
+  }
+ 
+  .my-seeds-toggle {
+    width: 100%;
+  }
+
+  .my-seeds-header h2 {
+    font-size: 1.5rem;
+    color: var(--color-primary);
+    margin: 0;
+  }
+
+  .toggle-seeds-button {
+    display: block;
+    background: white;
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: 999px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: var(--font-primary);
+    font-size: 0.875rem;
+  }
+
+  .toggle-seeds-button:hover {
+    background: var(--color-primary);
+    color: white;
+  }
+
+  /* Hide desktop header when mobile header is shown */
+  .my-seeds-header + .seed-header {
+    display: none;
+  }
+
+  /* Tab wrapper visibility on mobile */
+  .tabs-content-wrapper {
+    display: none;
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .tabs-content-wrapper.visible {
+    display: block;
+  }
+
+  .seed-header h2 {
+    font-size: 2rem;
+  }
+
+  /* Stack layout for mobile */
+  .balance-section {
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+  }
+
+  .packages-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .package-card.popular {
+    transform: none;
+  }
+
+  /* Make all cards 90% width and centered */
+  .balance-card,
+  .balance-tips,
+  .purchase-section,
+  .membership-card,
+  .package-card,
+  .history-section {
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .balance-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .balance-icon {
+    width: 80px;
+    height: 80px;
+    font-size: 3rem;
+  }
+
+  .balance-number {
+    font-size: 2.5rem;
+  }
+
+  .seed-tabs {
+    flex-direction: column;
+    border-radius: 16px;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .tab-button {
+    border-radius: 12px;
+  }
+
+  .membership-header {
+    flex-direction: column;
+    gap: var(--space-sm);
+    text-align: center;
+  }
+
+  .membership-header h4 {
+    font-size: 1.25rem;
+  }
+
+  .price-amount {
+    font-size: 2.5rem;
+  }
+
+  .membership-benefits li {
+    font-size: 1rem;
+  }
+}
   
   @media (max-width: 480px) {
     .history-item {
