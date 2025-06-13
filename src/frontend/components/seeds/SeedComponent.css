@@ -182,7 +182,10 @@
   .purchase-section {
     background: white;
     border-radius: 20px;
-    padding: var(--space-xl);
+    padding-left: 10px ;
+    padding-right: 10px ;
+    padding-top: 40px;
+    padding-bottom: 40px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   }
   
