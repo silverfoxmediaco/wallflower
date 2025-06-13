@@ -111,13 +111,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(to bottom, 
-    transparent,
-    transparent 50%,
-    rgba(255, 248, 240, 0.3) 70%,
-    rgba(255, 248, 240, 0.6) 85%,
-    rgba(255, 248, 240, 0.9) 100%
-  );
+  background: white;
   pointer-events: none;
   z-index: 1;
 }
@@ -238,13 +232,6 @@
   height: clamp(3.5rem, 12vw, 4.5rem);
   position: relative;
   -webkit-tap-highlight-color: transparent;
-}
-
-.action-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 
-    0 4px 12px rgba(94, 53, 94, 0.15),
-    0 6px 20px rgba(200, 162, 200, 0.2);
 }
 
 .action-btn:active {
@@ -501,9 +488,6 @@
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
   }
   
-  .action-btn {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  }
 }
 
 /* Dark Mode Support */
@@ -518,13 +502,7 @@
   }
   
   .photo-overlay {
-    background: linear-gradient(to bottom, 
-      transparent,
-      transparent 50%,
-      rgba(26, 26, 26, 0.3) 70%,
-      rgba(26, 26, 26, 0.6) 85%,
-      rgba(26, 26, 26, 0.9) 100%
-    );
+    background: white;
   }
   
   .action-buttons {
@@ -532,8 +510,8 @@
   }
   
   .action-btn {
-    background: rgba(40, 40, 40, 0.95);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    background: #C8A2C8;
+
   }
   
   .out-of-seeds-overlay {
