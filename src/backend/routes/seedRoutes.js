@@ -8,7 +8,6 @@ const {
   getSeedData,
   createCheckoutSession,
   createSubscription,
-  handleStripeWebhook,
   addBonusSeeds,
   refundSeeds,
   getSeedHistory,
@@ -29,10 +28,6 @@ router.post('/create-subscription', createSubscription);
 
 // POST /api/seeds/cancel-subscription - Cancel active subscription
 router.post('/cancel-subscription', cancelSubscription);
-
-// POST /api/seeds/webhook - Handle Stripe webhook for successful payments
-// Note: This route should not use auth middleware as it's called by Stripe
-router.post('/webhook', express.raw({ type: 'application/json' }), handleStripeWebhook);
 
 // POST /api/seeds/bonus - Add bonus seeds (admin only)
 router.post('/bonus', addBonusSeeds);
