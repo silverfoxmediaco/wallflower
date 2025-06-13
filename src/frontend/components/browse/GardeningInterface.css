@@ -104,8 +104,6 @@
   pointer-events: none;
 }
 
-/* Soft overlay to ensure readability - using creamy white gradient */
-
 
 .no-photo {
   width: 100%;
@@ -166,7 +164,6 @@
   box-shadow: 0 2px 8px rgba(168, 203, 183, 0.3);
 }
 
-/* Profile Info Overlay - Soft and warm */
 .profile-info-overlay {
   position: absolute;
   bottom: 5.5rem;
@@ -175,6 +172,7 @@
   padding: 2rem 1.5rem 1rem;
   pointer-events: none;
   z-index: 2;
+  text-align: center; /* Add this to center the username */
 }
 
 .profile-username {
@@ -415,10 +413,6 @@
   .profile-stack {
     padding: 0.75rem;
   }
-  
-  .profile-info-overlay {
-    bottom: 5.5rem;
-  }
 }
 
 @media (max-width: 480px) {
@@ -436,11 +430,6 @@
   .action-buttons {
     padding: 1rem;
     padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0));
-  }
-  
-  .profile-info-overlay {
-    bottom: 5rem;
-    padding: 2rem 1.25rem 1.25rem;
   }
 }
 
@@ -465,11 +454,6 @@
   
   .btn-icon {
     font-size: 1.25rem;
-  }
-  
-  .profile-info-overlay {
-    bottom: 4.5rem;
-    padding: 2rem 1rem 1rem;
   }
 }
 
