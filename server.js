@@ -6,6 +6,7 @@ const path = require('path');
 const { createServer } = require('http');
 const { Server } = require('socket.io');
 const fs = require('fs');
+const seedRoutes = require('./src/backend/routes/seedRoutes');
 
 // Load environment variables
 dotenv.config();
@@ -21,6 +22,12 @@ const io = new Server(httpServer, {
 
 // Middleware
 app.use(cors());
+
+// IMPORTANT: Webhook route must come BEFORE body parser
+// This is because Stripe needs the raw body
+app.post('/api/seeds/webhook', express.raw({ type: 'application/json' }), require('./src/backend/controllers/seedController').handleStripeWebhook);
+
+// Now add body parser for all other routes
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -59,6 +66,9 @@ app.use('/api/chat', require('./src/backend/routes/chatRoutes'));
 app.use('/api/admin', require('./src/backend/routes/adminRoutes'));
 app.use('/api/members', require('./src/backend/routes/membersRoutes'));
 app.use('/api/users', require('./src/backend/routes/usersRoutes'));
+
+// Add other seed routes (excluding webhook which is already added above)
+app.use('/api/seeds', seedRoutes);
 
 // Serve static files from the React app in production
 if (process.env.NODE_ENV === 'production') {
