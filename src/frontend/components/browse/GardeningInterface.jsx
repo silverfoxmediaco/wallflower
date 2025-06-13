@@ -300,55 +300,61 @@ const GardeningInterface = () => {
               </div>
             )}
             
-            {/* All UI elements as direct children of photo-container */}
-            
             {/* Photo navigation indicator */}
             {profile.photos && profile.photos.length > 1 && (
-              <span className="photo-indicator">
-                1 / {profile.photos.length}
-              </span>
+              <div className="photo-navigation">
+                <span className="photo-indicator">
+                  1 / {profile.photos.length}
+                </span>
+              </div>
             )}
             
             {/* Recently active badge */}
-            <span className="active-badge">● Active recently</span>
+            <div className="profile-badges">
+              <span className="active-badge">● Active recently</span>
+            </div>
             
-            {/* Profile username */}
-            <h2 className="profile-username">{profile.username}</h2>
+            {/* Profile info overlay */}
+            <div className="profile-info-overlay">
+              <h2 className="profile-username">{profile.username}</h2>
+            </div>
             
-            {/* Action Buttons - individual buttons without wrapper */}
-            <button 
-              className="action-btn pass-btn" 
-              onClick={handlePass}
-              onMouseDown={(e) => e.stopPropagation()}
-              onTouchStart={(e) => e.stopPropagation()}
-              title="Pass"
-            >
-              <span className="btn-icon">🍂</span>
-              <span className="btn-text">Pass</span>
-            </button>
-            
-            <button 
-              className="action-btn plant-btn" 
-              onClick={handlePlantSeed}
-              onMouseDown={(e) => e.stopPropagation()}
-              onTouchStart={(e) => e.stopPropagation()}
-              disabled={seedsRemaining === 0}
-              title="Plant a seed"
-            >
-              <span className="btn-icon">🌱</span>
-              <span className="btn-text">Seed</span>
-            </button>
-            
-            <button 
-              className="action-btn save-btn"
-              onClick={handleMaybeLater}
-              onMouseDown={(e) => e.stopPropagation()}
-              onTouchStart={(e) => e.stopPropagation()}
-              title="Maybe later"
-            >
-              <span className="btn-icon">🌙</span>
-              <span className="btn-text">Later</span>
-            </button>
+            {/* Action Buttons - NOW INSIDE photo-container */}
+            <div className="action-buttons">
+              <button 
+                className="action-btn pass-btn" 
+                onClick={handlePass}
+                onMouseDown={(e) => e.stopPropagation()}
+                onTouchStart={(e) => e.stopPropagation()}
+                title="Pass"
+              >
+                <span className="btn-icon">🍂</span>
+                <span className="btn-text">Pass</span>
+              </button>
+              
+              <button 
+                className="action-btn plant-btn" 
+                onClick={handlePlantSeed}
+                onMouseDown={(e) => e.stopPropagation()}
+                onTouchStart={(e) => e.stopPropagation()}
+                disabled={seedsRemaining === 0}
+                title="Plant a seed"
+              >
+                <span className="btn-icon">🌱</span>
+                <span className="btn-text">Seed</span>
+              </button>
+              
+              <button 
+                className="action-btn save-btn"
+                onClick={handleMaybeLater}
+                onMouseDown={(e) => e.stopPropagation()}
+                onTouchStart={(e) => e.stopPropagation()}
+                title="Maybe later"
+              >
+                <span className="btn-icon">🌙</span>
+                <span className="btn-text">Later</span>
+              </button>
+            </div>
           </div>
         </div>
 
