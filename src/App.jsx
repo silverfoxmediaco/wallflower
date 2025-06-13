@@ -3,7 +3,7 @@
 // Purpose: Main application component with routing
 
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import './App.css';
 import Header from './frontend/components/Header';
 import Footer from './frontend/components/Footer';
@@ -60,10 +60,15 @@ const LandingPage = ({ onSignupClick }) => (
   </>
 );
 
-function App() {
+// Main App content that needs access to useLocation
+function AppContent() {
+  const location = useLocation();
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Check if we're on the browse page
+  const isBrowsePage = location.pathname === '/browse';
 
   useEffect(() => {
     // Check if user is logged in
@@ -79,71 +84,79 @@ function App() {
   };
 
   return (
+    <div className="App">
+      <Header 
+        onSignupClick={() => setShowSignupModal(true)}
+        onLoginClick={() => setShowLoginModal(true)}
+        isLoggedIn={isLoggedIn}
+        onLogout={handleLogout}
+      />
+      
+      <main className="main-content">
+        <Routes>
+          <Route path="/" element={
+            <LandingPage onSignupClick={() => setShowSignupModal(true)} />
+          } />
+          
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/profile/:userId" element={
+            <ProtectedRoute>
+              <ProfileView />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/browse" element={
+            <ProtectedRoute>
+              <GardeningInterface />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/garden" element={
+            <ProtectedRoute>
+              <Garden />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/admin/mock-profiles" element={
+            <ProtectedRoute>
+              <MockProfilesManager />
+            </ProtectedRoute>
+          } />
+          
+          {/* Footer Pages Routes */}
+          <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/community-guidelines" element={<CommunityGuidelines />} />
+          <Route path="/safety" element={<SafetyTips />} />
+        </Routes>
+      </main>
+      
+      {/* Conditionally render Footer - hide on browse page */}
+      {!isBrowsePage && <Footer />}
+      
+      <SignupModal 
+        isOpen={showSignupModal} 
+        onClose={() => setShowSignupModal(false)} 
+      />
+      
+      <LoginModal 
+        isOpen={showLoginModal} 
+        onClose={() => setShowLoginModal(false)} 
+      />
+    </div>
+  );
+}
+
+// Main App wrapper
+function App() {
+  return (
     <Router>
-      <div className="App">
-        <Header 
-          onSignupClick={() => setShowSignupModal(true)}
-          onLoginClick={() => setShowLoginModal(true)}
-          isLoggedIn={isLoggedIn}
-          onLogout={handleLogout}
-        />
-        
-        <main className="main-content">
-          <Routes>
-            <Route path="/" element={
-              <LandingPage onSignupClick={() => setShowSignupModal(true)} />
-            } />
-            
-            <Route path="/profile" element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/profile/:userId" element={
-              <ProtectedRoute>
-                <ProfileView />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/browse" element={
-              <ProtectedRoute>
-                <GardeningInterface />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/garden" element={
-              <ProtectedRoute>
-                <Garden />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/admin/mock-profiles" element={
-              <ProtectedRoute>
-                <MockProfilesManager />
-              </ProtectedRoute>
-            } />
-            
-            {/* Footer Pages Routes */}
-            <Route path="/terms" element={<TermsOfService />} />
-            <Route path="/privacy" element={<PrivacyPolicy />} />
-            <Route path="/community-guidelines" element={<CommunityGuidelines />} />
-            <Route path="/safety" element={<SafetyTips />} />
-          </Routes>
-        </main>
-        
-        <Footer />
-        
-        <SignupModal 
-          isOpen={showSignupModal} 
-          onClose={() => setShowSignupModal(false)} 
-        />
-        
-        <LoginModal 
-          isOpen={showLoginModal} 
-          onClose={() => setShowLoginModal(false)} 
-        />
-      </div>
+      <AppContent />
     </Router>
   );
 }
