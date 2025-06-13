@@ -102,8 +102,8 @@
   user-select: none;
   -webkit-user-drag: none;
   pointer-events: none;
+  display: block;
 }
-
 
 .no-photo {
   width: 100%;
@@ -164,6 +164,7 @@
   box-shadow: 0 2px 8px rgba(168, 203, 183, 0.3);
 }
 
+/* Profile Info Overlay */
 .profile-info-overlay {
   position: absolute;
   bottom: 5.5rem;
@@ -172,7 +173,7 @@
   padding: 2rem 1.5rem 1rem;
   pointer-events: none;
   z-index: 2;
-  text-align: center; 
+  text-align: center;
   margin-bottom: 12px;
 }
 
@@ -223,6 +224,13 @@
   height: clamp(3.5rem, 12vw, 4.5rem);
   position: relative;
   -webkit-tap-highlight-color: transparent;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 4px 12px rgba(94, 53, 94, 0.15),
+    0 6px 20px rgba(200, 162, 200, 0.2);
 }
 
 .action-btn:active {
@@ -415,6 +423,10 @@
   .profile-stack {
     padding: 0.75rem;
   }
+  
+  .profile-info-overlay {
+    bottom: 5.5rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -432,6 +444,11 @@
   .action-buttons {
     padding: 1rem;
     padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0));
+  }
+  
+  .profile-info-overlay {
+    bottom: 5rem;
+    padding: 2rem 1.25rem 1.25rem;
   }
 }
 
@@ -457,6 +474,11 @@
   .btn-icon {
     font-size: 1.25rem;
   }
+  
+  .profile-info-overlay {
+    bottom: 4.5rem;
+    padding: 2rem 1rem 1rem;
+  }
 }
 
 /* High Resolution Support */
@@ -465,6 +487,9 @@
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
   }
   
+  .action-btn {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  }
 }
 
 /* Dark Mode Support */
@@ -475,24 +500,25 @@
   }
   
   .profile-card-simple {
-    background: white;
-  }
-  
-  .photo-overlay {
-    background: white;
-  }
-  
-  .action-buttons {
-    background: transparent;
+    background: #1a1a1a;
   }
   
   .action-btn {
-    background: #C8A2C8;
-
+    background: rgba(40, 40, 40, 0.95);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  }
+  
+  .pass-btn:hover,
+  .save-btn:hover {
+    background: rgba(60, 60, 60, 0.95);
   }
   
   .out-of-seeds-overlay {
     background: #1a1a1a;
     color: white;
+  }
+  
+  .out-of-seeds-overlay p {
+    color: rgba(255, 255, 255, 0.8);
   }
 }
