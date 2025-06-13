@@ -84,6 +84,49 @@ const userSchema = new mongoose.Schema({
       receivedAt: Date,
     }],
   },
+  // ADD THESE FIELDS FOR STRIPE
+  stripeCustomerId: {
+    type: String,
+    default: null
+  },
+  subscription: {
+    stripeSubscriptionId: String,
+    status: {
+      type: String,
+      enum: ['active', 'cancelled', 'past_due', 'unpaid', null],
+      default: null
+    },
+    currentPeriodEnd: Date,
+    cancelAtPeriodEnd: {
+      type: Boolean,
+      default: false
+    },
+    cancelledAt: Date
+  },
+  // ADD THIS FOR FILTER PREFERENCES
+  filterPreferences: {
+    minAge: {
+      type: Number,
+      default: 18
+    },
+    maxAge: {
+      type: Number,
+      default: 100
+    },
+    distance: {
+      type: Number,
+      default: 50
+    },
+    interestedIn: {
+      type: String,
+      enum: ['men', 'women', 'everyone'],
+      default: 'everyone'
+    },
+    hasPhoto: {
+      type: Boolean,
+      default: false
+    }
+  },
   createdAt: {
     type: Date,
     default: Date.now,
