@@ -719,6 +719,7 @@
     .balance-card {
       flex-direction: column;
       text-align: center;
+      width: 90%;
     }
   
     .balance-icon {
@@ -734,6 +735,7 @@
     .seed-tabs {
       flex-direction: column;
       border-radius: 16px;
+      width: 90%;
     }
   
     .tab-button {
