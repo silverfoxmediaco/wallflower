@@ -6,7 +6,7 @@
   height: 100dvh; /* Dynamic viewport height for mobile */
   display: flex;
   flex-direction: column;
-  background: #FFF8F0; /* Creamy white from style guide */
+  background: #ffffff; 
   overflow: hidden;
   position: relative;
 }
@@ -442,7 +442,7 @@
 /* Dark Mode Support - respecting Wallflower's light aesthetic */
 @media (prefers-color-scheme: dark) {
   .gardening-container {
-    background: #2a2a2a;
+    background: white;
   }
   
   .profile-overlay {
