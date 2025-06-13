@@ -18,12 +18,12 @@
   }
   
   /* Header */
-  .seed-header {
+  .my-seeds-header {
     text-align: center;
     margin-bottom: var(--space-xl);
   }
   
-  .seed-header h2 {
+  .my-seeds-header h2 {
     font-size: 2.5rem;
     color: var(--color-primary);
     margin-bottom: var(--space-sm);
@@ -35,9 +35,9 @@
   }
   
   /* Mobile toggle header - hidden on desktop */
-  .seed-mobile-header {
-    display: none;
-  }
+.my-seeds-header {
+  display: none;
+}
   
   .toggle-seeds-button {
     display: none;
@@ -653,16 +653,17 @@
     .seed-component-container {
       padding: var(--space-lg) var(--space-md);
     }
-  
-    /* Show mobile header on mobile */
-    .seed-mobile-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: var(--space-lg);
+    .my-seeds-header {
+      flex-direction: column;
+      gap: var(--space-md);
+      text-align: center;
+    }
+   
+    .my-seeds-toggle {
+      width: 100%;
     }
   
-    .seed-mobile-header h2 {
+    .my-seeds-header h2 {
       font-size: 1.5rem;
       color: var(--color-primary);
       margin: 0;
@@ -688,7 +689,7 @@
     }
   
     /* Hide desktop header when mobile header is shown */
-    .seed-mobile-header + .seed-header {
+    .my-seeds-header + .seed-header {
       display: none;
     }
   

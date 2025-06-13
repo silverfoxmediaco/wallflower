@@ -618,16 +618,15 @@ const Profile = () => {
 
         {/* Seeds Section */}
         <section className="profile-section">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-md)' }}>
-            <h2 style={{ margin: 0 }}>My Seeds</h2>
-            <button 
-              className="btn-secondary" 
-              onClick={() => setShowSeeds(!showSeeds)}
-              style={{ padding: 'var(--space-sm) var(--space-lg)' }}
-            >
-              {showSeeds ? 'Hide' : 'Show'} Seeds
-            </button>
-          </div>
+        <div className="my-seeds-header">
+          <h2>My Seeds</h2>
+          <button 
+            className="btn-secondary my-seeds-toggle" 
+            onClick={() => setShowSeeds(!showSeeds)}
+          >
+            {showSeeds ? 'Hide' : 'Show'} Seeds
+          </button>
+        </div>
           
           {showSeeds && (
             <SeedComponent isEmbedded={true} />
