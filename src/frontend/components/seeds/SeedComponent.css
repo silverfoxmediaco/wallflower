@@ -34,6 +34,15 @@
     font-size: 1.125rem;
   }
   
+  /* Mobile toggle header - hidden on desktop */
+  .seed-mobile-header {
+    display: none;
+  }
+  
+  .toggle-seeds-button {
+    display: none;
+  }
+  
   /* Tab Navigation */
   .seed-tabs {
     display: flex;
@@ -43,6 +52,11 @@
     padding: var(--space-sm);
     border-radius: 999px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Tab wrapper - always visible on desktop */
+  .tabs-content-wrapper {
+    display: block !important;
   }
   
   .tab-button {
@@ -640,12 +654,62 @@
       padding: var(--space-lg) var(--space-md);
     }
   
+    /* Show mobile header on mobile */
+    .seed-mobile-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-lg);
+    }
+  
+    .seed-mobile-header h2 {
+      font-size: 1.5rem;
+      color: var(--color-primary);
+      margin: 0;
+    }
+  
+    .toggle-seeds-button {
+      display: block;
+      background: white;
+      color: var(--color-primary);
+      border: 2px solid var(--color-primary);
+      padding: var(--space-sm) var(--space-lg);
+      border-radius: 999px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: var(--font-primary);
+      font-size: 0.875rem;
+    }
+  
+    .toggle-seeds-button:hover {
+      background: var(--color-primary);
+      color: white;
+    }
+  
+    /* Hide desktop header when mobile header is shown */
+    .seed-mobile-header + .seed-header {
+      display: none;
+    }
+  
+    /* Tab wrapper visibility on mobile */
+    .tabs-content-wrapper {
+      display: none;
+      animation: fadeIn 0.3s ease-out;
+    }
+  
+    .tabs-content-wrapper.visible {
+      display: block;
+    }
+  
     .seed-header h2 {
       font-size: 2rem;
     }
   
+    /* Stack layout for mobile */
     .balance-section {
       grid-template-columns: 1fr;
+      gap: var(--space-lg);
     }
   
     .packages-grid {
@@ -679,6 +743,24 @@
     .tab-button {
       border-radius: 12px;
     }
+  
+    .membership-header {
+      flex-direction: column;
+      gap: var(--space-sm);
+      text-align: center;
+    }
+  
+    .membership-header h4 {
+      font-size: 1.25rem;
+    }
+  
+    .price-amount {
+      font-size: 2.5rem;
+    }
+  
+    .membership-benefits li {
+      font-size: 1rem;
+    }
   }
   
   @media (max-width: 480px) {
@@ -690,6 +772,22 @@
   
     .history-amount {
       text-align: center;
+    }
+  
+    .packages-grid {
+      gap: var(--space-md);
+    }
+  
+    .package-card {
+      padding: var(--space-md);
+    }
+  
+    .seed-count {
+      font-size: 2rem;
+    }
+  
+    .package-price {
+      font-size: 1.5rem;
     }
   }
   
