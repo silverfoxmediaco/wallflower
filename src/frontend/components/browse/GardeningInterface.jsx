@@ -318,43 +318,43 @@ const GardeningInterface = () => {
             <div className="profile-info-overlay">
               <h2 className="profile-username">{profile.username}</h2>
             </div>
-          </div>
-          
-          {/* Action Buttons */}
-          <div className="action-buttons">
-            <button 
-              className="action-btn pass-btn" 
-              onClick={handlePass}
-              onMouseDown={(e) => e.stopPropagation()}
-              onTouchStart={(e) => e.stopPropagation()}
-              title="Pass"
-            >
-              <span className="btn-icon">🍂</span>
-              <span className="btn-text">Pass</span>
-            </button>
             
-            <button 
-              className="action-btn plant-btn" 
-              onClick={handlePlantSeed}
-              onMouseDown={(e) => e.stopPropagation()}
-              onTouchStart={(e) => e.stopPropagation()}
-              disabled={seedsRemaining === 0}
-              title="Plant a seed"
-            >
-              <span className="btn-icon">🌱</span>
-              <span className="btn-text">Seed</span>
-            </button>
-            
-            <button 
-              className="action-btn save-btn"
-              onClick={handleMaybeLater}
-              onMouseDown={(e) => e.stopPropagation()}
-              onTouchStart={(e) => e.stopPropagation()}
-              title="Maybe later"
-            >
-              <span className="btn-icon">🌙</span>
-              <span className="btn-text">Later</span>
-            </button>
+            {/* Action Buttons - NOW INSIDE photo-container */}
+            <div className="action-buttons">
+              <button 
+                className="action-btn pass-btn" 
+                onClick={handlePass}
+                onMouseDown={(e) => e.stopPropagation()}
+                onTouchStart={(e) => e.stopPropagation()}
+                title="Pass"
+              >
+                <span className="btn-icon">🍂</span>
+                <span className="btn-text">Pass</span>
+              </button>
+              
+              <button 
+                className="action-btn plant-btn" 
+                onClick={handlePlantSeed}
+                onMouseDown={(e) => e.stopPropagation()}
+                onTouchStart={(e) => e.stopPropagation()}
+                disabled={seedsRemaining === 0}
+                title="Plant a seed"
+              >
+                <span className="btn-icon">🌱</span>
+                <span className="btn-text">Seed</span>
+              </button>
+              
+              <button 
+                className="action-btn save-btn"
+                onClick={handleMaybeLater}
+                onMouseDown={(e) => e.stopPropagation()}
+                onTouchStart={(e) => e.stopPropagation()}
+                title="Maybe later"
+              >
+                <span className="btn-icon">🌙</span>
+                <span className="btn-text">Later</span>
+              </button>
+            </div>
           </div>
         </div>
 
