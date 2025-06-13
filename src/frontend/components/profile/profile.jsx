@@ -627,11 +627,11 @@ const Profile = () => {
             {showSeeds ? 'Hide' : 'Show'} Seeds
           </button>
         </div>
-          
-          {showSeeds && (
-            <SeedComponent isEmbedded={true} />
-          )}
-        </section>
+        
+        {showSeeds && (
+          <SeedComponent isEmbedded={true} />
+        )}
+      </section>
 
         {/* Action Buttons */}
         <div className="profile-actions">
