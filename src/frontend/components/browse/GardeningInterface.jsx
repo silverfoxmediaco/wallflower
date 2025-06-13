@@ -281,99 +281,120 @@ const GardeningInterface = () => {
           onTouchStart={handleDragStart}
           onTouchMove={handleDragMove}
           onTouchEnd={handleDragEnd}
+          style={{
+            backgroundImage: profile.photos && profile.photos.length > 0 
+              ? `url(${profile.photos[0].url || profile.photos[0]})`
+              : 'none',
+            backgroundColor: profile.photos && profile.photos.length > 0 
+              ? 'transparent' 
+              : '#C8A2C8'
+          }}
         >
-          <div className="photo-container">
-            {profile.photos && profile.photos.length > 0 ? (
-              <>
-                <img 
-                  src={profile.photos[0].url || profile.photos[0]} 
-                  alt={profile.username}
-                  className="profile-photo"
-                  draggable="false"
-                />
-                <div className="photo-overlay" />
-              </>
-            ) : (
-              <div className="no-photo">
-                <span>🌸</span>
-                <p>No photo yet</p>
-              </div>
-            )}
-            
-            {/* Photo navigation indicator */}
-            {profile.photos && profile.photos.length > 1 && (
-              <div className="photo-navigation">
+          {/* Gradient overlay for better text readability */}
+          <div className="profile-overlay">
+            {/* Top section - badges and photo navigation */}
+            <div className="profile-top-section">
+              {/* Recently active badge */}
+              <span className="active-badge">● Active recently</span>
+              
+              {/* Photo navigation indicator */}
+              {profile.photos && profile.photos.length > 1 && (
                 <span className="photo-indicator">
                   1 / {profile.photos.length}
                 </span>
+              )}
+            </div>
+
+            {/* Middle section - spacer */}
+            <div className="profile-middle-section">
+              {/* Empty space for viewing the photo */}
+              {(!profile.photos || profile.photos.length === 0) && (
+                <div className="no-photo-icon">
+                  <span>🌸</span>
+                  <p>No photo yet</p>
+                </div>
+              )}
+            </div>
+
+            {/* Bottom section - profile info and actions */}
+            <div className="profile-bottom-section">
+              {/* Profile info */}
+              <div className="profile-info">
+                <h2 className="profile-username">{profile.username}</h2>
               </div>
-            )}
-            
-            {/* Recently active badge */}
-            <div className="profile-badges">
-              <span className="active-badge">● Active recently</span>
-            </div>
-            
-            {/* Profile info overlay */}
-            <div className="profile-info-overlay">
-              <h2 className="profile-username">{profile.username}</h2>
-            </div>
-            
-            {/* Action Buttons - NOW INSIDE photo-container */}
-            <div className="action-buttons">
-              <button 
-                className="action-btn pass-btn" 
-                onClick={handlePass}
-                onMouseDown={(e) => e.stopPropagation()}
-                onTouchStart={(e) => e.stopPropagation()}
-                title="Pass"
-              >
-                <span className="btn-icon">🍂</span>
-                <span className="btn-text">Pass</span>
-              </button>
               
-              <button 
-                className="action-btn plant-btn" 
-                onClick={handlePlantSeed}
-                onMouseDown={(e) => e.stopPropagation()}
-                onTouchStart={(e) => e.stopPropagation()}
-                disabled={seedsRemaining === 0}
-                title="Plant a seed"
-              >
-                <span className="btn-icon">🌱</span>
-                <span className="btn-text">Seed</span>
-              </button>
-              
-              <button 
-                className="action-btn save-btn"
-                onClick={handleMaybeLater}
-                onMouseDown={(e) => e.stopPropagation()}
-                onTouchStart={(e) => e.stopPropagation()}
-                title="Maybe later"
-              >
-                <span className="btn-icon">🌙</span>
-                <span className="btn-text">Later</span>
-              </button>
+              {/* Action Buttons */}
+              <div className="action-buttons">
+                <button 
+                  className="action-btn pass-btn" 
+                  onClick={handlePass}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onTouchStart={(e) => e.stopPropagation()}
+                  title="Pass Gently"
+                  aria-label="Pass on this profile"
+                >
+                  <span className="btn-icon">🍂</span>
+                  <span className="btn-text">Pass</span>
+                </button>
+                
+                <button 
+                  className="action-btn plant-btn" 
+                  onClick={handlePlantSeed}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onTouchStart={(e) => e.stopPropagation()}
+                  disabled={seedsRemaining === 0}
+                  title="Plant a Seed"
+                  aria-label="Send a seed to show interest"
+                >
+                  <span className="btn-icon">🌱</span>
+                  <span className="btn-text">Seed</span>
+                </button>
+                
+                <button 
+                  className="action-btn save-btn"
+                  onClick={handleMaybeLater}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onTouchStart={(e) => e.stopPropagation()}
+                  title="Maybe Later"
+                  aria-label="Save for later"
+                >
+                  <span className="btn-icon">🌙</span>
+                  <span className="btn-text">Later</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Preview of next profiles */}
         {profiles[currentProfileIndex + 1] && (
-          <div className="profile-card-simple" style={{ pointerEvents: 'none' }}>
-            <div className="photo-container">
-              {profiles[currentProfileIndex + 1].photos?.[0] && (
-                <>
-                  <img 
-                    src={profiles[currentProfileIndex + 1].photos[0].url || profiles[currentProfileIndex + 1].photos[0]} 
-                    alt="Next profile"
-                    className="profile-photo"
-                  />
-                  <div className="photo-overlay" />
-                </>
-              )}
-            </div>
-          </div>
+          <div 
+            className="profile-card-simple preview-card" 
+            style={{ 
+              pointerEvents: 'none',
+              backgroundImage: profiles[currentProfileIndex + 1].photos?.[0] 
+                ? `url(${profiles[currentProfileIndex + 1].photos[0].url || profiles[currentProfileIndex + 1].photos[0]})`
+                : 'none',
+              backgroundColor: profiles[currentProfileIndex + 1].photos?.[0] 
+                ? 'transparent' 
+                : '#A8CBB7'
+            }}
+          />
+        )}
+
+        {profiles[currentProfileIndex + 2] && (
+          <div 
+            className="profile-card-simple preview-card-2" 
+            style={{ 
+              pointerEvents: 'none',
+              backgroundImage: profiles[currentProfileIndex + 2].photos?.[0] 
+                ? `url(${profiles[currentProfileIndex + 2].photos[0].url || profiles[currentProfileIndex + 2].photos[0]})`
+                : 'none',
+              backgroundColor: profiles[currentProfileIndex + 2].photos?.[0] 
+                ? 'transparent' 
+                : '#E0AED0'
+            }}
+          />
         )}
       </div>
 

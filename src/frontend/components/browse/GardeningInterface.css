@@ -6,38 +6,9 @@
   height: 100dvh; /* Dynamic viewport height for mobile */
   display: flex;
   flex-direction: column;
-  background: var(--color-background);
+  background: #FFF8F0; /* Creamy white from style guide */
   overflow: hidden;
   position: relative;
-}
-
-/* Filter Button - Top Right */
-.filter-button {
-  position: absolute;
-  top: env(safe-area-inset-top, var(--space-md));
-  right: env(safe-area-inset-right, var(--space-md));
-  z-index: 100;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border: none;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
-.filter-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-}
-
-.filter-icon {
-  font-size: 1.25rem;
 }
 
 /* Profile Card Stack */
@@ -53,7 +24,7 @@
   margin: 0 auto;
 }
 
-/* Profile Card */
+/* Profile Card - Now with background image */
 .profile-card-simple {
   position: absolute;
   width: calc(100% - 2rem);
@@ -61,10 +32,9 @@
   height: calc(100vh - 8rem);
   height: calc(100dvh - 8rem);
   max-height: 700px;
-  background: white;
   border-radius: 24px;
   overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 32px rgba(94, 53, 94, 0.12); /* Deep plum shadow */
   cursor: grab;
   transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
               opacity 0.3s ease-out;
@@ -72,6 +42,11 @@
   user-select: none;
   -webkit-user-select: none;
   touch-action: pan-y;
+  
+  /* Background image properties */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .profile-card-simple:active {
@@ -82,127 +57,103 @@
   transition: none;
 }
 
-/* Photo Container - Full card coverage */
-.photo-container {
+/* Overlay container for all UI elements */
+.profile-overlay {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
-.profile-photo {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: top;
-  user-select: none;
-  -webkit-user-drag: none;
-  pointer-events: none;
-  display: block;
-}
-
-
-.no-photo {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #C8A2C8 0%, #A8CBB7 100%);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: white;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.3) 0%,
+    transparent 30%,
+    transparent 60%,
+    rgba(0, 0, 0, 0.6) 100%
+  );
 }
 
-.no-photo span {
-  font-size: clamp(3rem, 8vw, 4rem);
-  margin-bottom: var(--space-md);
-}
-
-.no-photo p {
-  font-size: clamp(1rem, 3vw, 1.125rem);
-  opacity: 0.9;
-}
-
-/* Photo Navigation */
-.photo-navigation {
-  position: absolute;
-  top: var(--space-md);
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(255, 248, 240, 0.9);
-  color: #5E355E;
-  padding: 0.375rem 1rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  backdrop-filter: blur(8px);
-  pointer-events: none;
-  z-index: 2;
-  box-shadow: 0 2px 8px rgba(94, 53, 94, 0.1);
-}
-
-/* Profile Badges */
-.profile-badges {
-  position: absolute;
-  top: var(--space-md);
-  left: var(--space-md);
-  pointer-events: none;
-  z-index: 2;
+/* Top section - badges and indicators */
+.profile-top-section {
+  padding: var(--space-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
 }
 
 .active-badge {
-  background: linear-gradient(135deg, #A8CBB7 0%, #C8A2C8 100%);
+  background: rgba(168, 203, 183, 0.9); /* Sage green with opacity */
   backdrop-filter: blur(8px);
   padding: 0.375rem 0.75rem;
   border-radius: 999px;
   font-size: 0.75rem;
   font-weight: 500;
   color: white;
-  display: inline-block;
-  box-shadow: 0 2px 8px rgba(168, 203, 183, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.profile-info-overlay {
-  position: absolute;
-  bottom: 5.5rem;
-  left: 0;
-  right: 0;
-  padding: 2rem 1.5rem 1rem;
-  pointer-events: none;
-  z-index: 2;
-  text-align: center; 
-  margin-bottom: 12px;
+.photo-indicator {
+  background: rgba(255, 248, 240, 0.9); /* Creamy white with opacity */
+  color: #5E355E; /* Deep plum */
+  padding: 0.375rem 1rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Middle section - spacer */
+.profile-middle-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-photo-icon {
+  text-align: center;
+  color: white;
+}
+
+.no-photo-icon span {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.no-photo-icon p {
+  font-size: 1.125rem;
+  font-weight: 300;
+}
+
+/* Bottom section - profile info and actions */
+.profile-bottom-section {
+  padding: var(--space-lg);
+  padding-bottom: calc(var(--space-xl) + env(safe-area-inset-bottom, 0));
+}
+
+.profile-info {
+  text-align: center;
+  margin-bottom: var(--space-lg);
 }
 
 .profile-username {
-  color: var(--color-text-primary);
-  font-size: clamp(1.5rem, 4vw, 1.75rem);
+  color: white;
+  font-size: clamp(1.75rem, 5vw, 2rem);
   font-weight: 600;
-  margin-bottom: 18px;
-  text-shadow: 
-    0 1px 2px rgba(255, 248, 240, 0.8),
-    0 2px 8px rgba(255, 248, 240, 0.6),
-    0 0 20px rgba(255, 248, 240, 0.8);
+  margin: 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* Action Buttons Container */
+/* Action Buttons */
 .action-buttons {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin-bottom: 12px;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: clamp(1.5rem, 4vw, 2.5rem);
-  padding: 1.25rem;
-  padding-bottom: calc(2.5rem + env(safe-area-inset-bottom, 0));
-  min-height: 5rem;
-  z-index: 3;
 }
 
 .action-btn {
@@ -217,13 +168,16 @@
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 
-    0 2px 8px rgba(94, 53, 94, 0.1),
-    0 4px 16px rgba(200, 162, 200, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   width: clamp(3.5rem, 12vw, 4.5rem);
   height: clamp(3.5rem, 12vw, 4.5rem);
   position: relative;
   -webkit-tap-highlight-color: transparent;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
 .action-btn:active {
@@ -250,40 +204,41 @@
   pointer-events: none;
 }
 
+/* Specific button styles */
 .pass-btn {
-  background: rgba(255, 248, 240, 0.95);
+  background: rgba(255, 216, 194, 0.95); /* Peach tint */
 }
 
 .pass-btn:hover {
-  background: rgba(250, 218, 221, 0.95);
+  background: #FFD8C2;
 }
 
 .plant-btn {
   background: linear-gradient(135deg, #C8A2C8 0%, #A8CBB7 100%);
   color: white;
   transform: scale(1.1);
-  box-shadow: 
-    0 4px 12px rgba(200, 162, 200, 0.3),
-    0 6px 20px rgba(168, 203, 183, 0.2);
+  box-shadow: 0 4px 16px rgba(200, 162, 200, 0.4);
 }
 
 .plant-btn:hover {
   transform: scale(1.15) translateY(-2px);
-  box-shadow: 
-    0 6px 16px rgba(200, 162, 200, 0.4),
-    0 8px 24px rgba(168, 203, 183, 0.3);
+  box-shadow: 0 6px 20px rgba(200, 162, 200, 0.5);
 }
 
 .plant-btn:active {
   transform: scale(1.05);
 }
 
+.plant-btn .btn-text {
+  color: white;
+}
+
 .save-btn {
-  background: rgba(255, 248, 240, 0.95);
+  background: rgba(250, 218, 221, 0.95); /* Soft blush pink tint */
 }
 
 .save-btn:hover {
-  background: rgba(255, 216, 194, 0.95);
+  background: #FADADD;
 }
 
 /* Swipe Animation Classes */
@@ -297,21 +252,21 @@
   opacity: 0;
 }
 
-/* Stack effect for cards */
+/* Stack effect for preview cards */
 .profile-card-simple:nth-child(1) {
   z-index: 3;
 }
 
-.profile-card-simple:nth-child(2) {
+.preview-card {
   z-index: 2;
   transform: scale(0.92) translateY(0.5rem);
-  opacity: 0.5;
+  opacity: 0.8;
 }
 
-.profile-card-simple:nth-child(3) {
+.preview-card-2 {
   z-index: 1;
   transform: scale(0.84) translateY(1rem);
-  opacity: 0.3;
+  opacity: 0.6;
 }
 
 /* Loading and State Messages */
@@ -332,55 +287,64 @@
 .loading-message p,
 .error-message p {
   font-size: clamp(1rem, 3vw, 1.25rem);
-  color: var(--color-text-muted);
+  color: #777777;
   margin-bottom: var(--space-lg);
+  font-weight: 300;
 }
 
 .no-profiles-message h2 {
   font-size: clamp(1.5rem, 4vw, 2rem);
-  color: var(--color-text-primary);
+  color: #333333;
   margin-bottom: var(--space-md);
+  font-weight: 600;
 }
 
 .no-profiles-message p {
-  color: var(--color-text-muted);
+  color: #777777;
   margin-bottom: var(--space-lg);
   font-size: clamp(1rem, 3vw, 1.125rem);
+  font-weight: 300;
 }
 
 /* Out of Seeds Message */
 .out-of-seeds-overlay {
   position: fixed;
-  bottom: calc(7rem + env(safe-area-inset-bottom, 0));
+  bottom: calc(2rem + env(safe-area-inset-bottom, 0));
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
   padding: 1.25rem 1.5rem;
   background: white;
   border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 32px rgba(94, 53, 94, 0.12);
   max-width: 90%;
   width: 300px;
   z-index: 50;
 }
 
 .out-of-seeds-overlay p {
-  color: var(--color-text-muted);
+  color: #777777;
   margin-bottom: var(--space-md);
   font-size: 0.875rem;
+  font-weight: 300;
 }
 
 .cta-btn {
-  background: var(--gradient-primary);
+  background: linear-gradient(135deg, #C8A2C8 0%, #E0AED0 100%);
   color: white;
   padding: 0.625rem 1.5rem;
   border-radius: 999px;
-  font-weight: 600;
+  font-weight: 500;
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 0.875rem;
   -webkit-tap-highlight-color: transparent;
+}
+
+.cta-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(200, 162, 200, 0.3);
 }
 
 .cta-btn:active {
@@ -388,17 +352,22 @@
 }
 
 .btn-primary {
-  background: var(--gradient-primary);
+  background: linear-gradient(135deg, #C8A2C8 0%, #E0AED0 100%);
   color: white;
   padding: 0.75rem 1.5rem;
   border-radius: 999px;
-  font-weight: 600;
+  font-weight: 500;
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
   text-decoration: none;
   display: inline-block;
   -webkit-tap-highlight-color: transparent;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(200, 162, 200, 0.3);
 }
 
 .btn-primary:active {
@@ -416,6 +385,11 @@
   .profile-stack {
     padding: 0.75rem;
   }
+  
+  .profile-top-section,
+  .profile-bottom-section {
+    padding: var(--space-md);
+  }
 }
 
 @media (max-width: 480px) {
@@ -431,8 +405,7 @@
   }
   
   .action-buttons {
-    padding: 1rem;
-    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0));
+    gap: 1.25rem;
   }
 }
 
@@ -444,10 +417,9 @@
     max-height: none;
   }
   
-  .action-buttons {
-    padding: 0.75rem;
-    padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0));
-    min-height: 4rem;
+  .profile-bottom-section {
+    padding: var(--space-md);
+    padding-bottom: calc(var(--space-lg) + env(safe-area-inset-bottom, 0));
   }
   
   .action-btn {
@@ -463,37 +435,32 @@
 /* High Resolution Support */
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
   .profile-card-simple {
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 32px rgba(94, 53, 94, 0.08);
   }
-  
 }
 
-/* Dark Mode Support */
+/* Dark Mode Support - respecting Wallflower's light aesthetic */
 @media (prefers-color-scheme: dark) {
-  .filter-button {
-    background: rgba(30, 30, 30, 0.95);
-    color: white;
+  .gardening-container {
+    background: #2a2a2a;
   }
   
-  .profile-card-simple {
-    background: white;
-  }
-  
-  .photo-overlay {
-    background: white;
-  }
-  
-  .action-buttons {
-    background: transparent;
-  }
-  
-  .action-btn {
-    background: #C8A2C8;
-
+  .profile-overlay {
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.5) 0%,
+      transparent 30%,
+      transparent 60%,
+      rgba(0, 0, 0, 0.8) 100%
+    );
   }
   
   .out-of-seeds-overlay {
-    background: #1a1a1a;
+    background: #333333;
     color: white;
+  }
+  
+  .out-of-seeds-overlay p {
+    color: #cccccc;
   }
 }
