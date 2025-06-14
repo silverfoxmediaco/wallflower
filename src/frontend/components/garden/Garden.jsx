@@ -132,38 +132,56 @@ const Garden = () => {
         {activeTab === 'received' && (
           <div className="seeds-grid">
             {gardenData.seedsReceived.length > 0 ? (
-              gardenData.seedsReceived.map(seed => (
-                <div key={seed._id} className="seed-card">
-                  <div className="seed-photo">
-                    {seed.profile?.photos?.[0] ? (
-                      <img 
-                        src={seed.profile.photos[0].thumbnailUrl || seed.profile.photos[0].url} 
-                        alt={seed.username} 
-                      />
-                    ) : (
-                      <div className="no-photo">🌸</div>
-                    )}
+              gardenData.seedsReceived.map(seed => {
+                // Check if we already sent a seed back to this person
+                const alreadySentBack = gardenData.seedsSent.some(
+                  sentSeed => sentSeed._id === seed._id
+                ) || gardenData.matches.some(
+                  match => match._id === seed._id
+                );
+                
+                return (
+                  <div key={seed._id} className="seed-card">
+                    <div className="seed-photo">
+                      {seed.profile?.photos?.[0] ? (
+                        <img 
+                          src={seed.profile.photos[0].thumbnailUrl || seed.profile.photos[0].url} 
+                          alt={seed.username} 
+                        />
+                      ) : (
+                        <div className="no-photo">🌸</div>
+                      )}
+                    </div>
+                    <div className="seed-info">
+                      <h3>{seed.username}</h3>
+                      <p className="seed-details">
+                        {seed.profile?.age || '??'} • {seed.profile?.location || 'Location not set'}
+                      </p>
+                      <button 
+                        className="view-profile-btn"
+                        onClick={() => handleViewProfile(seed._id)}
+                      >
+                        View Profile
+                      </button>
+                      {alreadySentBack ? (
+                        <button 
+                          className="seed-sent-btn"
+                          disabled
+                        >
+                          Seed Sent ✓
+                        </button>
+                      ) : (
+                        <button 
+                          className="send-seed-btn"
+                          onClick={() => handleSendSeedBack(seed._id)}
+                        >
+                          Send Seed Back
+                        </button>
+                      )}
+                    </div>
                   </div>
-                  <div className="seed-info">
-                    <h3>{seed.username}</h3>
-                    <p className="seed-details">
-                      {seed.profile?.age || '??'} • {seed.profile?.location || 'Location not set'}
-                    </p>
-                    <button 
-                      className="view-profile-btn"
-                      onClick={() => handleViewProfile(seed._id)}
-                    >
-                      View Profile
-                    </button>
-                    <button 
-                      className="send-seed-btn"
-                      onClick={() => handleSendSeedBack(seed._id)}
-                    >
-                      Send Seed Back
-                    </button>
-                  </div>
-                </div>
-              ))
+                );
+              })
             ) : (
               <div className="empty-state">
                 <span className="empty-icon">🌱</span>
@@ -241,7 +259,7 @@ const Garden = () => {
                     </button>
                     <button 
                       className="message-btn"
-                      onClick={() => alert('Messaging coming soon! 💌')}
+                      onClick={() => window.location.href = `/messages/${match._id}`}
                     >
                       Send Message
                     </button>
