@@ -84,10 +84,7 @@ const Messages = () => {
 
   // Load conversations on mount
   useEffect(() => {
-    // Temporarily disable socket.io to focus on getting matches working
-    // loadConversations();
-    setLoading(false);  // Set loading to false since we're not loading conversations
-    loadNewMatches([]);  // Pass empty array since we have no conversations yet
+    loadConversations();
     loadUserSeeds();
   }, []);
 
