@@ -53,7 +53,9 @@ const MeetSomeWallflowers = ({ onSignupClick }) => {
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          setMembers(data.members);
+          // Shuffle the members array to show in random order
+          const shuffledMembers = [...data.members].sort(() => Math.random() - 0.5);
+          setMembers(shuffledMembers);
         }
         setLoading(false);
       })
