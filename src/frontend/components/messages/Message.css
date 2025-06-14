@@ -686,20 +686,20 @@
   /* Mobile Responsive */
   @media (max-width: 768px) {
     .messages-container {
-      height: 100vh;
+      height: calc(100vh - 80px); /* Account for header */
       padding: 0;
     }
   
     .messages-layout {
       border-radius: 0;
-      height: 100vh;
-      max-height: 100vh;
+      height: 100%;
+      max-height: 100%;
       overflow: hidden;
     }
   
     .conversations-sidebar {
       width: 100%;
-      height: 100vh;
+      height: 100%;
     }
   
     .conversations-sidebar.mobile-hidden {
@@ -711,19 +711,24 @@
     }
   
     .chat-view {
-      position: absolute;
-      top: 0;
+      position: fixed;
+      top: 80px; /* Account for header height */
       left: 0;
       right: 0;
       bottom: 0;
       background: white;
-      height: 100vh;
+      height: calc(100vh - 80px);
       display: flex;
       flex-direction: column;
+      z-index: 999;
     }
     
     .chat-header {
       flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: white;
     }
     
     .messages-area {
@@ -731,6 +736,7 @@
       min-height: 0;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
+      padding-bottom: 20px;
     }
     
     .message-input-area {
@@ -738,6 +744,7 @@
       position: sticky;
       bottom: 0;
       background: white;
+      z-index: 10;
     }
   
     .message-bubble {
@@ -751,13 +758,6 @@
   
     .no-chat-selected {
       display: none;
-    }
-    
-    /* Show no-chat-selected on desktop when conversations exist */
-    @media (min-width: 769px) {
-      .no-chat-selected {
-        display: flex;
-      }
     }
   }
   
