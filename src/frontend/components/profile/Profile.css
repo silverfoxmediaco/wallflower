@@ -99,7 +99,7 @@
     position: relative;
     z-index: 2;
     margin-bottom: var(--space-md);
-    width: 100%;
+    max-width: 600px;
   }
   
   .photo-slot {
@@ -640,6 +640,7 @@
     
     .photo-grid {
       grid-template-columns: repeat(2, 1fr);
+      max-width: 400px;
     }
     
     .form-grid {
