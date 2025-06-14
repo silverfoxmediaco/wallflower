@@ -99,7 +99,7 @@
     position: relative;
     z-index: 2;
     margin-bottom: var(--space-md);
-    max-width: 750px;
+    max-width: 600px;
     margin: 0 auto;
   }
   
@@ -641,7 +641,7 @@
     
     .photo-grid {
       grid-template-columns: repeat(2, 1fr);
-      max-width: 400px;
+      max-width: 350px;
       margin: 0 auto;
     }
     
