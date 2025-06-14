@@ -81,7 +81,6 @@ const Messages = () => {
   // Load conversations on mount
   useEffect(() => {
     loadConversations();
-    loadNewMatches();
     loadUserSeeds();
   }, []);
 
@@ -184,7 +183,6 @@ const Messages = () => {
 
   const updateConversationList = () => {
     loadConversations();
-    loadNewMatches();
   };
 
   const selectConversation = async (user) => {
