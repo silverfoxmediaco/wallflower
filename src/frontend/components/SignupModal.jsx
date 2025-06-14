@@ -166,7 +166,7 @@ const SignupModal = ({ isOpen, onClose }) => {
         
         <div className="modal-header">
           <h2 className="modal-title">
-            {step === 1 && "Welcome to Your Garden 🌱"}
+            {step === 1 && "Welcome to Wallflower 🌱"}
             {step === 2 && "Choose Your Garden Name 🌸"}
             {step === 3 && "Almost There! 🌻"}
           </h2>
