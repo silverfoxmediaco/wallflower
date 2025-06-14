@@ -434,10 +434,6 @@ const Messages = () => {
         <div className={`conversations-sidebar ${selectedUser ? 'mobile-hidden' : ''}`}>
           <div className="conversations-header">
             <h2>Messages</h2>
-            {/* Debug info - remove this later */}
-            <small style={{fontSize: '10px', color: '#999'}}>
-              Matches: {newMatches.length}, Convos: {conversations.length}
-            </small>
           </div>
           
           {/* New Matches Section - Always show if there are matches */}
