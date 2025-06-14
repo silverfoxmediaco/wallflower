@@ -85,10 +85,30 @@ const Messages = () => {
   // Load conversations on mount
   useEffect(() => {
     console.log('Messages component mounted');
-    // Skip loading conversations since it's throwing 500 error
-    // Just load matches directly
     setLoading(false);
-    loadNewMatches([]);
+    
+    // Directly fetch matches here to ensure it runs
+    const fetchMatches = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/garden', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const data = await response.json();
+        console.log('Direct garden fetch:', data);
+        
+        if (data.success && data.garden && data.garden.matches) {
+          console.log('Setting matches:', data.garden.matches);
+          setNewMatches(data.garden.matches);
+        }
+      } catch (error) {
+        console.error('Error fetching matches:', error);
+      }
+    };
+    
+    fetchMatches();
     loadUserSeeds();
   }, []);
 
