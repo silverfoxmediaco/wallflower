@@ -377,7 +377,7 @@
 .gardening-container {
   width: 100%;
   height: 100vh;
-  height: 100dvh;
+  height: 95dvh;
   display: flex;
   flex-direction: column;
   background: var(--color-background);
