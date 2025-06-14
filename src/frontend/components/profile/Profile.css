@@ -99,7 +99,7 @@
     position: relative;
     z-index: 2;
     margin-bottom: var(--space-md);
-    max-width: 600px;
+    max-width: 750px;
     align-items: center;
     justify-items: center;
   }
