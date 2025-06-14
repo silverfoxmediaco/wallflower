@@ -16,6 +16,7 @@ import ProfileView from './frontend/components/profile/ProfileView';
 import GardeningInterface from './frontend/components/browse/GardeningInterface';
 import Garden from './frontend/components/garden/Garden';
 import MockProfilesManager from './frontend/components/admin/MockProfilesManager';
+import Messages from './frontend/components/messages/Messages';
 
 // Import new pages
 import TermsOfService from './frontend/pages/TermsOfService';
@@ -119,6 +120,18 @@ function AppContent() {
           <Route path="/garden" element={
             <ProtectedRoute>
               <Garden />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/messages" element={
+            <ProtectedRoute>
+              <Messages />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/messages/:userId" element={
+            <ProtectedRoute>
+              <Messages />
             </ProtectedRoute>
           } />
           

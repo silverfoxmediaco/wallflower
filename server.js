@@ -20,7 +20,10 @@ const io = new Server(httpServer, {
 });
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  credentials: true
+}));
 
 // IMPORTANT: Handle webhook BEFORE body parser
 app.post(
@@ -69,6 +72,7 @@ app.use('/api/admin', require('./src/backend/routes/adminRoutes'));
 app.use('/api/members', require('./src/backend/routes/membersRoutes'));
 app.use('/api/users', require('./src/backend/routes/usersRoutes'));
 app.use('/api/seeds', require('./src/backend/routes/seedRoutes'));
+app.use('/api/messages', require('./src/backend/routes/messageRoutes'));
 
 // Serve static files from the React app in production
 if (process.env.NODE_ENV === 'production') {
@@ -134,10 +138,27 @@ connectDB();
 // Socket.io
 io.on('connection', (socket) => {
  console.log('New client connected');
+ 
+ // Join user-specific room for direct messaging
+ socket.on('join_user_room', (userId) => {
+   socket.join(userId);
+   console.log(`User ${userId} joined their room`);
+ });
+ 
+ // Handle typing indicators
+ socket.on('typing', (data) => {
+   socket.to(data.recipientId).emit('user_typing', {
+     userId: data.userId
+   });
+ });
+ 
  socket.on('disconnect', () => {
    console.log('Client disconnected');
  });
 });
+
+// Make io accessible to routes
+app.set('io', io);
 
 const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, () => {
