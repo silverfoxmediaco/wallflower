@@ -71,6 +71,7 @@ const Header = ({ onSignupClick, onLoginClick, isLoggedIn, onLogout }) => {
                 >
                   How it Works
                 </a>
+                {/* Temp deactivate
                 <a 
                   href="#features" 
                   className="nav-link"
@@ -84,7 +85,7 @@ const Header = ({ onSignupClick, onLoginClick, isLoggedIn, onLogout }) => {
                   onClick={(e) => handleNavClick(e, 'about')}
                 >
                   About
-                </a>
+                </a>*/}
                 <a 
                   href="#login" 
                   className="nav-link"
