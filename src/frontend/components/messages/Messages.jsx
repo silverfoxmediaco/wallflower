@@ -34,7 +34,11 @@ const Messages = () => {
   // Initialize socket connection
   useEffect(() => {
     const token = localStorage.getItem('token');
-    const newSocket = io(process.env.REACT_APP_SERVER_URL || 'http://localhost:5000', {
+    const serverUrl = window.location.hostname === 'localhost' 
+      ? 'http://localhost:5000' 
+      : 'https://www.wallflower.me';
+    
+    const newSocket = io(serverUrl, {
       auth: { token }
     });
 
@@ -80,7 +84,9 @@ const Messages = () => {
 
   // Load conversations on mount
   useEffect(() => {
-    loadConversations();
+    // Temporarily disable socket.io to focus on getting matches working
+    // loadConversations();
+    loadNewMatches([]);  // Pass empty array since we have no conversations yet
     loadUserSeeds();
   }, []);
 
