@@ -17,6 +17,7 @@ import GardeningInterface from './frontend/components/browse/GardeningInterface'
 import Garden from './frontend/components/garden/Garden';
 import MockProfilesManager from './frontend/components/admin/MockProfilesManager';
 import Messages from './frontend/components/messages/Messages';
+import Contact from './frontend/components/Contact';
 
 // Import new pages
 import TermsOfService from './frontend/pages/TermsOfService';
@@ -140,6 +141,9 @@ function AppContent() {
               <MockProfilesManager />
             </ProtectedRoute>
           } />
+          
+          {/* Contact Page Route */}
+          <Route path="/contact" element={<Contact />} />
           
           {/* Footer Pages Routes */}
           <Route path="/terms" element={<TermsOfService />} />
