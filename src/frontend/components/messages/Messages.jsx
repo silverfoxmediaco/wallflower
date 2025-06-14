@@ -84,6 +84,7 @@ const Messages = () => {
 
   // Load conversations on mount
   useEffect(() => {
+    console.log('Messages component mounted');
     // Skip loading conversations since it's throwing 500 error
     // Just load matches directly
     setLoading(false);
@@ -413,9 +414,13 @@ const Messages = () => {
         <div className={`conversations-sidebar ${selectedUser ? 'mobile-hidden' : ''}`}>
           <div className="conversations-header">
             <h2>Messages</h2>
+            {/* Debug info - remove this later */}
+            <small style={{fontSize: '10px', color: '#999'}}>
+              Matches: {newMatches.length}, Convos: {conversations.length}
+            </small>
           </div>
           
-          {/* New Matches Section */}
+          {/* New Matches Section - Always show if there are matches */}
           {newMatches.length > 0 && (
             <div className="new-matches-section">
               <h3 className="new-matches-title">New Matches</h3>
@@ -445,6 +450,7 @@ const Messages = () => {
             </div>
           )}
           
+          {/* Show empty state only if no matches and no conversations */}
           {conversations.length === 0 && newMatches.length === 0 ? (
             <div className="empty-conversations">
               <div className="empty-icon">💬</div>
