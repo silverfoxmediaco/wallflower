@@ -12,6 +12,7 @@ const Messages = () => {
   const { userId: urlUserId } = useParams();
   const [socket, setSocket] = useState(null);
   const [conversations, setConversations] = useState([]);
+  const [newMatches, setNewMatches] = useState([]);
   const [messages, setMessages] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [messageInput, setMessageInput] = useState('');
@@ -80,18 +81,26 @@ const Messages = () => {
   // Load conversations on mount
   useEffect(() => {
     loadConversations();
+    loadNewMatches();
     loadUserSeeds();
   }, []);
 
   // If userId is in URL, load that conversation
   useEffect(() => {
-    if (urlUserId && conversations.length > 0) {
-      const user = conversations.find(conv => conv.otherUser._id === urlUserId);
-      if (user) {
-        selectConversation(user.otherUser);
+    if (urlUserId) {
+      // Check conversations first
+      const conversation = conversations.find(conv => conv.otherUser._id === urlUserId);
+      if (conversation) {
+        selectConversation(conversation.otherUser);
+      } else {
+        // Check new matches
+        const match = newMatches.find(m => m._id === urlUserId);
+        if (match) {
+          selectConversation(match);
+        }
       }
     }
-  }, [urlUserId, conversations]);
+  }, [urlUserId, conversations, newMatches]);
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
@@ -147,8 +156,35 @@ const Messages = () => {
     }
   };
 
+  const loadNewMatches = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/garden', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+      if (data.success && data.matches) {
+        // Get user IDs from existing conversations
+        const conversationUserIds = conversations.map(conv => conv.otherUser._id);
+        
+        // Filter matches to only show those without conversations
+        const matchesWithoutConversations = data.matches.filter(match => 
+          !conversationUserIds.includes(match._id)
+        );
+        
+        setNewMatches(matchesWithoutConversations);
+      }
+    } catch (error) {
+      console.error('Error loading new matches:', error);
+    }
+  };
+
   const updateConversationList = () => {
     loadConversations();
+    loadNewMatches();
   };
 
   const selectConversation = async (user) => {
@@ -374,7 +410,37 @@ const Messages = () => {
             <h2>Messages</h2>
           </div>
           
-          {conversations.length === 0 ? (
+          {/* New Matches Section */}
+          {newMatches.length > 0 && (
+            <div className="new-matches-section">
+              <h3 className="new-matches-title">New Matches</h3>
+              <div className="new-matches-list">
+                {newMatches.map(match => (
+                  <div
+                    key={match._id}
+                    className="new-match-item"
+                    onClick={() => selectConversation(match)}
+                  >
+                    <div className="match-avatar">
+                      {match.profile?.photos?.[0] ? (
+                        <img 
+                          src={match.profile.photos[0].thumbnailUrl || match.profile.photos[0].url} 
+                          alt={match.username} 
+                        />
+                      ) : (
+                        <div className="avatar-placeholder">
+                          {match.username[0].toUpperCase()}
+                        </div>
+                      )}
+                    </div>
+                    <span className="match-name">{match.username}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {conversations.length === 0 && newMatches.length === 0 ? (
             <div className="empty-conversations">
               <div className="empty-icon">💬</div>
               <p>No conversations yet</p>
