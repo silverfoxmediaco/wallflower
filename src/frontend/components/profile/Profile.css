@@ -100,8 +100,7 @@
     z-index: 2;
     margin-bottom: var(--space-md);
     max-width: 750px;
-    align-items: center;
-    justify-items: center;
+    margin: 0 auto;
   }
   
   .photo-slot {
@@ -643,8 +642,7 @@
     .photo-grid {
       grid-template-columns: repeat(2, 1fr);
       max-width: 400px;
-      align-items: center;
-      justify-items: center;
+      margin: 0 auto;
     }
     
     .form-grid {
