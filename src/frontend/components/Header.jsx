@@ -163,14 +163,14 @@ const Header = ({ onSignupClick, onLoginClick, isLoggedIn, onLogout }) => {
                 onClick={(e) => handleNavClick(e, 'about')}
               >
                 About
-              </a>
+              </a>*/}
               <a 
                 href="#login" 
                 className="nav-link"
                 onClick={(e) => handleNavClick(e, 'login')}
               >
                 Login
-              </a>*/}
+              </a>
               <button 
                 className="nav-button mobile"
                 onClick={(e) => handleNavClick(e, 'signup')}
