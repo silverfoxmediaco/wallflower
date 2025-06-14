@@ -142,10 +142,11 @@ const SignupModal = ({ isOpen, onClose }) => {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         
-        alert(`Welcome to Wallflower, ${data.user.username}! You have 5 seeds to start connecting!`);
+        alert(`Welcome to Wallflower, ${data.user.username}! Let's set up your profile so you can start connecting!`);
         
         handleClose();
-        window.location.reload();
+        // Redirect to profile page instead of reloading
+        window.location.href = '/profile';
       } else {
         setErrors({ general: data.message || 'Registration failed' });
       }

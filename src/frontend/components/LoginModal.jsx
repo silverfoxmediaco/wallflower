@@ -86,7 +86,7 @@ const LoginModal = ({ isOpen, onClose }) => {
         
         handleClose();
         // Redirect to dashboard or reload
-        window.location.href = '/garden';
+        window.location.href = '/browse';
       } else {
         setErrors({ general: data.message || 'Login failed' });
       }
