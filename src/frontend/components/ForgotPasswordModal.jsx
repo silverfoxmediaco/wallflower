@@ -95,10 +95,10 @@ const ForgotPasswordModal = ({ isOpen, onClose, onBackToLogin }) => {
             )}
             
             <div className="form-group">
-              <label htmlFor="email">Email Address</label>
+              <label htmlFor="forgot-email">Email Address</label>
               <input
                 type="email"
-                id="email"
+                id="forgot-email"
                 name="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
