@@ -15,14 +15,20 @@ const GardeningInterface = () => {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [dragCurrent, setDragCurrent] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
-  const [passedProfiles, setPassedProfiles] = useState(new Set()); // Track passed profiles
+  const [passedProfiles, setPassedProfiles] = useState(new Set());
+  const [isAnimating, setIsAnimating] = useState(false);
   const navigate = useNavigate();
   const cardRef = useRef(null);
 
-  // Swipe thresholds - adjusted for better mobile experience
-  const swipeThreshold = window.innerWidth * 0.25; // 25% of screen width
-  const rotationMultiplier = 0.15;
-  const tapThreshold = 10; // Increased for better tap detection
+  // Improved swipe thresholds
+  const swipeThreshold = window.innerWidth * 0.2; // 20% of screen width for easier swiping
+  const velocityThreshold = 0.5; // Velocity in px/ms
+  const rotationMultiplier = 0.2;
+  const tapThreshold = 5; // Reduced for better tap detection
+  const maxRotation = 30; // Maximum rotation in degrees
+
+  // Track time for velocity calculation
+  const [dragStartTime, setDragStartTime] = useState(0);
 
   useEffect(() => {
     fetchProfiles();
@@ -61,67 +67,106 @@ const GardeningInterface = () => {
 
   // Handle drag/swipe start
   const handleDragStart = (e) => {
+    if (isAnimating) return;
+    
     e.preventDefault();
     const startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
     const startY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
     
     setDragStart({ x: startX, y: startY });
     setDragCurrent({ x: startX, y: startY });
+    setDragStartTime(Date.now());
     setIsDragging(true);
+
+    // Add transition class
+    if (cardRef.current) {
+      cardRef.current.style.transition = 'none';
+    }
   };
 
   // Handle drag/swipe move
   const handleDragMove = (e) => {
-    if (!isDragging) return;
+    if (!isDragging || isAnimating) return;
     
     const currentX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
     const currentY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
     
     setDragCurrent({ x: currentX, y: currentY });
     
-    // Apply transform to card
+    // Apply transform to card with improved physics
     if (cardRef.current) {
       const deltaX = currentX - dragStart.x;
-      const rotation = deltaX * rotationMultiplier;
-      const opacity = 1 - Math.abs(deltaX) / (window.innerWidth * 0.5);
+      const deltaY = currentY - dragStart.y;
       
-      cardRef.current.style.transform = `translateX(${deltaX}px) rotate(${rotation}deg)`;
-      cardRef.current.style.opacity = Math.max(0.2, opacity);
+      // Calculate rotation based on horizontal movement
+      let rotation = deltaX * rotationMultiplier;
+      rotation = Math.max(-maxRotation, Math.min(maxRotation, rotation));
+      
+      // Calculate opacity based on distance
+      const distance = Math.abs(deltaX);
+      const opacity = Math.max(0.5, 1 - distance / (window.innerWidth * 0.5));
+      
+      // Apply slight vertical movement for more natural feel
+      const translateY = Math.abs(deltaX) * 0.02;
+      
+      cardRef.current.style.transform = `translate(${deltaX}px, ${translateY}px) rotate(${rotation}deg)`;
+      cardRef.current.style.opacity = opacity;
+
+      // Show visual feedback for swipe direction
+      const feedbackThreshold = swipeThreshold * 0.5;
+      if (deltaX > feedbackThreshold) {
+        cardRef.current.classList.add('will-browse');
+        cardRef.current.classList.remove('will-pass');
+      } else if (deltaX < -feedbackThreshold) {
+        cardRef.current.classList.add('will-pass');
+        cardRef.current.classList.remove('will-browse');
+      } else {
+        cardRef.current.classList.remove('will-browse', 'will-pass');
+      }
     }
   };
 
   // Handle drag/swipe end
-  const handleDragEnd = () => {
-    if (!isDragging) return;
+  const handleDragEnd = (e) => {
+    if (!isDragging || isAnimating) return;
     
     const deltaX = dragCurrent.x - dragStart.x;
     const deltaY = Math.abs(dragCurrent.y - dragStart.y);
     
+    // Calculate velocity
+    const dragEndTime = Date.now();
+    const dragDuration = dragEndTime - dragStartTime;
+    const velocity = Math.abs(deltaX) / dragDuration;
+    
+    // Determine if it's a swipe based on distance OR velocity
+    const isSwipeRight = deltaX > swipeThreshold || (deltaX > 50 && velocity > velocityThreshold);
+    const isSwipeLeft = deltaX < -swipeThreshold || (deltaX < -50 && velocity > velocityThreshold);
+    
     // Ignore if too much vertical movement (scrolling)
-    if (deltaY > 50) {
+    if (deltaY > 100) {
       resetCardPosition();
+      setIsDragging(false);
       return;
     }
     
-    const isSwipeRight = deltaX > swipeThreshold;
-    const isSwipeLeft = deltaX < -swipeThreshold;
-    
     if (cardRef.current) {
-      if (isSwipeLeft) {
-        // Pass
-        cardRef.current.classList.add('swipe-left');
+      cardRef.current.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+      cardRef.current.classList.remove('will-browse', 'will-pass');
+      
+      if (isSwipeLeft || isSwipeRight) {
+        // Both left and right swipes just browse to next profile
+        setIsAnimating(true);
+        const direction = isSwipeLeft ? -1 : 1;
+        cardRef.current.style.transform = `translateX(${direction * window.innerWidth * 1.5}px) rotate(${direction * 30}deg)`;
+        cardRef.current.style.opacity = '0';
+        
         setTimeout(() => {
-          handlePass();
+          moveToNextProfile();
           resetCardPosition();
-        }, 300);
-      } else if (isSwipeRight) {
-        // Plant seed
-        cardRef.current.classList.add('swipe-right');
-        setTimeout(() => {
-          handlePlantSeed();
-          resetCardPosition();
+          setIsAnimating(false);
         }, 300);
       } else {
+        // Snap back animation
         resetCardPosition();
       }
     }
@@ -133,14 +178,18 @@ const GardeningInterface = () => {
 
   const resetCardPosition = () => {
     if (cardRef.current) {
-      cardRef.current.style.transform = '';
-      cardRef.current.style.opacity = '';
-      cardRef.current.classList.remove('swipe-left', 'swipe-right');
+      cardRef.current.style.transition = 'transform 0.2s ease-out, opacity 0.2s ease-out';
+      cardRef.current.style.transform = 'translate(0, 0) rotate(0deg)';
+      cardRef.current.style.opacity = '1';
+      cardRef.current.classList.remove('swipe-left', 'swipe-right', 'will-browse', 'will-pass');
     }
   };
 
   const handlePlantSeed = async (e) => {
-    if (e) e.stopPropagation();
+    // Prevent event bubbling if called from button click
+    if (e && e.stopPropagation) {
+      e.stopPropagation();
+    }
     
     if (seedsRemaining > 0 && profiles[currentProfileIndex]) {
       try {
@@ -176,41 +225,30 @@ const GardeningInterface = () => {
   };
 
   const handlePass = async (e) => {
-    if (e) e.stopPropagation();
-    
-    if (profiles[currentProfileIndex]) {
-      try {
-        const token = localStorage.getItem('token');
-        const currentProfile = profiles[currentProfileIndex];
-
-        // Add to passed profiles set
-        setPassedProfiles(prev => new Set([...prev, currentProfile.id]));
-
-        await fetch('/api/match/pass', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            profileId: currentProfile.id
-          })
-        });
-
-        moveToNextProfile();
-      } catch (error) {
-        console.error('Pass profile error:', error);
-      }
+    // Remove from interface but don't track as "passed"
+    if (e && e.stopPropagation) {
+      e.stopPropagation();
     }
+    
+    moveToNextProfile();
   };
 
   const handleMaybeLater = (e) => {
-    if (e) e.stopPropagation();
+    if (e && e.stopPropagation) {
+      e.stopPropagation();
+    }
     moveToNextProfile();
   };
 
   const moveToNextProfile = () => {
     if (profiles.length === 0) return;
+    
+    // Reset card styles before moving to next
+    if (cardRef.current) {
+      cardRef.current.style.transition = 'none';
+      cardRef.current.style.transform = 'translate(0, 0) rotate(0deg)';
+      cardRef.current.style.opacity = '1';
+    }
     
     // If we're at the end of the list
     if (currentProfileIndex >= profiles.length - 1) {
@@ -221,9 +259,6 @@ const GardeningInterface = () => {
       } else {
         // Loop back to the beginning
         setCurrentProfileIndex(0);
-        
-        // Optional: Show a subtle notification that we're starting over
-        // You could add a state for this and show a toast message
       }
     } else {
       // Move to next profile
@@ -241,7 +276,7 @@ const GardeningInterface = () => {
   const handleProfileClick = (e) => {
     const moveDistance = Math.abs(dragCurrent.x - dragStart.x) + Math.abs(dragCurrent.y - dragStart.y);
     
-    if (!isDragging && moveDistance < tapThreshold) {
+    if (!isDragging && !isAnimating && moveDistance < tapThreshold) {
       e.stopPropagation();
       const currentProfile = profiles[currentProfileIndex];
       if (currentProfile && currentProfile.id) {
@@ -249,6 +284,21 @@ const GardeningInterface = () => {
       }
     }
   };
+
+  // Prevent default touch behavior on mobile
+  useEffect(() => {
+    const preventDefaultTouch = (e) => {
+      if (e.target.closest('.profile-card-simple')) {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener('touchmove', preventDefaultTouch, { passive: false });
+    
+    return () => {
+      document.removeEventListener('touchmove', preventDefaultTouch);
+    };
+  }, []);
 
   if (loading) {
     return (
@@ -294,11 +344,17 @@ const GardeningInterface = () => {
 
   return (
     <div className="gardening-container">
+      {/* Seeds remaining indicator */}
+      <div className="seeds-indicator">
+        <span className="seed-icon">🌱</span>
+        <span className="seed-count">{seedsRemaining}</span>
+      </div>
+
       {/* Profile Stack */}
       <div className="profile-stack">
         {/* Current Profile Card */}
         <div 
-          className={`profile-card-simple ${isDragging ? 'dragging' : ''}`}
+          className={`profile-card-simple ${isDragging ? 'dragging' : ''} ${isAnimating ? 'animating' : ''}`}
           ref={cardRef}
           onClick={handleProfileClick}
           onMouseDown={handleDragStart}
@@ -314,7 +370,8 @@ const GardeningInterface = () => {
               : 'none',
             backgroundColor: profile.photos && profile.photos.length > 0 
               ? 'transparent' 
-              : '#C8A2C8'
+              : '#C8A2C8',
+            touchAction: 'none' // Prevent default touch scrolling
           }}
         >
           {/* Gradient overlay for better text readability */}
@@ -358,11 +415,27 @@ const GardeningInterface = () => {
               <div className="action-buttons">
                 <button 
                   className="action-btn pass-btn" 
-                  onClick={handlePass}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (!isAnimating) {
+                      setIsAnimating(true);
+                      if (cardRef.current) {
+                        cardRef.current.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+                        cardRef.current.style.transform = `translateX(-${window.innerWidth * 1.5}px) rotate(-30deg)`;
+                        cardRef.current.style.opacity = '0';
+                      }
+                      setTimeout(() => {
+                        handlePass();
+                        resetCardPosition();
+                        setIsAnimating(false);
+                      }, 300);
+                    }
+                  }}
                   onMouseDown={(e) => e.stopPropagation()}
                   onTouchStart={(e) => e.stopPropagation()}
                   title="Pass Gently"
                   aria-label="Pass on this profile"
+                  disabled={isAnimating}
                 >
                   <span className="btn-icon">🍂</span>
                   <span className="btn-text">Pass</span>
@@ -370,10 +443,25 @@ const GardeningInterface = () => {
                 
                 <button 
                   className="action-btn plant-btn" 
-                  onClick={handlePlantSeed}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (!isAnimating && seedsRemaining > 0) {
+                      setIsAnimating(true);
+                      if (cardRef.current) {
+                        cardRef.current.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+                        cardRef.current.style.transform = `translateX(${window.innerWidth * 1.5}px) rotate(30deg)`;
+                        cardRef.current.style.opacity = '0';
+                      }
+                      setTimeout(() => {
+                        handlePlantSeed();
+                        resetCardPosition();
+                        setIsAnimating(false);
+                      }, 300);
+                    }
+                  }}
                   onMouseDown={(e) => e.stopPropagation()}
                   onTouchStart={(e) => e.stopPropagation()}
-                  disabled={seedsRemaining === 0}
+                  disabled={seedsRemaining === 0 || isAnimating}
                   title="Plant a Seed"
                   aria-label="Send a seed to show interest"
                 >
@@ -383,11 +471,15 @@ const GardeningInterface = () => {
                 
                 <button 
                   className="action-btn save-btn"
-                  onClick={handleMaybeLater}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleMaybeLater(e);
+                  }}
                   onMouseDown={(e) => e.stopPropagation()}
                   onTouchStart={(e) => e.stopPropagation()}
                   title="Maybe Later"
                   aria-label="Save for later"
+                  disabled={isAnimating}
                 >
                   <span className="btn-icon">🌙</span>
                   <span className="btn-text">Later</span>
