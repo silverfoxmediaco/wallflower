@@ -6,23 +6,23 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './HelpCenter.css';
 
-// Import all images
-import IMG_4355 from '../../assets/IMG_4355-portrait.png';
-import IMG_4356 from '../../assets/IMG_4356.png';
-import IMG_4367 from '../../assets/IMG_4367.png';
-import IMG_4369 from '../../assets/IMG_4369.png';
-import IMG_4370 from '../../assets/IMG_4370.png';
-import IMG_4372 from '../../assets/IMG_4372.png';
-import IMG_4373 from '../../assets/IMG_4373.png';
-import IMG_4374 from '../../assets/IMG_4374.png';
-import IMG_4377 from '../../assets/IMG_4377.png';
-import IMG_4378 from '../../assets/IMG_4378.png';
-import IMG_4379 from '../../assets/IMG_4379.png';
-import IMG_4381 from '../../assets/IMG_4381.png';
-import IMG_4382 from '../../assets/IMG_4382.png';
-import IMG_4384 from '../../assets/IMG_4384.png';
-import IMG_4385 from '../../assets/IMG_4385.png';
-import IMG_4386 from '../../assets/IMG_4386.png';
+// Import all images - adjust path based on your project structure
+import IMG_4355 from '../../../assets/IMG_4355-portrait.png';
+import IMG_4356 from '../../../assets/IMG_4356.png';
+import IMG_4367 from '../../../assets/IMG_4367.png';
+import IMG_4369 from '../../../assets/IMG_4369.png';
+import IMG_4370 from '../../../assets/IMG_4370.png';
+import IMG_4372 from '../../../assets/IMG_4372.png';
+import IMG_4373 from '../../../assets/IMG_4373.png';
+import IMG_4374 from '../../../assets/IMG_4374.png';
+import IMG_4377 from '../../../assets/IMG_4377.png';
+import IMG_4378 from '../../../assets/IMG_4378.png';
+import IMG_4379 from '../../../assets/IMG_4379.png';
+import IMG_4381 from '../../../assets/IMG_4381.png';
+import IMG_4382 from '../../../assets/IMG_4382.png';
+import IMG_4384 from '../../../assets/IMG_4384.png';
+import IMG_4385 from '../../../assets/IMG_4385.png';
+import IMG_4386 from '../../../assets/IMG_4386.png';
 
 const HelpCenter = () => {
   const navigate = useNavigate();
