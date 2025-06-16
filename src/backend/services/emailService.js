@@ -2,12 +2,27 @@
 // Path: src/backend/services/emailService.js
 // Purpose: Handle all email sending functionality
 
-const nodemailer = require('nodemailer');
+// Debug nodemailer import
+console.log('Loading nodemailer...');
+let nodemailer;
+try {
+  nodemailer = require('nodemailer');
+  console.log('Nodemailer loaded successfully');
+  console.log('Nodemailer type:', typeof nodemailer);
+  console.log('Nodemailer keys:', Object.keys(nodemailer || {}));
+} catch (error) {
+  console.error('Failed to load nodemailer:', error);
+}
 
 // Create reusable transporter
 const createTransporter = () => {
-  // For Gmail (requires app-specific password)
-  if (process.env.EMAIL_SERVICE === 'gmail') {
+  console.log('Creating transporter...');
+  console.log('EMAIL_SERVICE:', process.env.EMAIL_SERVICE);
+  console.log('EMAIL_USER exists:', !!process.env.EMAIL_USER);
+  
+  // For Gmail (requires app-specific password) - also use as default
+  if (process.env.EMAIL_SERVICE === 'gmail' || !process.env.EMAIL_SERVICE) {
+    console.log('Using Gmail configuration');
     return nodemailer.createTransporter({
       service: 'gmail',
       auth: {
@@ -30,7 +45,7 @@ const createTransporter = () => {
   }
   
   // For development/testing with Mailtrap
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === 'development' && process.env.MAILTRAP_USER) {
     return nodemailer.createTransporter({
       host: 'smtp.mailtrap.io',
       port: 2525,
@@ -42,8 +57,9 @@ const createTransporter = () => {
   }
   
   // Default SMTP configuration
+  console.log('Using default SMTP configuration');
   return nodemailer.createTransporter({
-    host: process.env.EMAIL_HOST,
+    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
     port: process.env.EMAIL_PORT || 587,
     secure: process.env.EMAIL_SECURE === 'true', // true for 465, false for other ports
     auth: {
@@ -264,10 +280,18 @@ const emailTemplates = {
 // Main email sending function
 const sendEmail = async (options) => {
   try {
+    console.log('sendEmail called with options:', { to: options.to, subject: options.subject });
+    
+    if (!nodemailer) {
+      throw new Error('Nodemailer is not loaded');
+    }
+    
     const transporter = createTransporter();
     
     // Verify transporter configuration
+    console.log('Verifying transporter...');
     await transporter.verify();
+    console.log('Transporter verified successfully');
     
     // Email options
     const mailOptions = {
@@ -279,6 +303,7 @@ const sendEmail = async (options) => {
     };
     
     // Send email
+    console.log('Sending email...');
     const info = await transporter.sendMail(mailOptions);
     
     console.log('Email sent successfully:', info.messageId);
