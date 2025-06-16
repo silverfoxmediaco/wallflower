@@ -6,7 +6,7 @@ import React, { useState, useEffect } from 'react';
 import ForgotPasswordModal from './ForgotPasswordModal';
 import './SignupModal.css';
 
-const LoginModal = ({ isOpen, onClose }) => {
+const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -48,6 +48,15 @@ const LoginModal = ({ isOpen, onClose }) => {
       });
       setErrors({});
     }, 300);
+  };
+
+  const handleSwitchToSignup = (e) => {
+    e.preventDefault();
+    handleClose();
+    // Wait for close animation to complete
+    setTimeout(() => {
+      onSwitchToSignup();
+    }, 350);
   };
 
   const handleSubmit = async (e) => {
@@ -176,11 +185,7 @@ const LoginModal = ({ isOpen, onClose }) => {
             </form>
 
             <div className="modal-footer">
-              <p>New to Wallflower? <a href="#signup" className="login-link" onClick={(e) => {
-                e.preventDefault();
-                handleClose();
-                // You'll need to trigger the signup modal from App.jsx
-              }}>Create an account</a></p>
+              <p>New to Wallflower? <a href="#signup" className="login-link" onClick={handleSwitchToSignup}>Create an account</a></p>
             </div>
           </div>
         </div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './SignupModal.css';
 
-const SignupModal = ({ isOpen, onClose }) => {
+const SignupModal = ({ isOpen, onClose, onSwitchToLogin }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -92,6 +92,15 @@ const SignupModal = ({ isOpen, onClose }) => {
       });
       setErrors({});
     }, 300);
+  };
+
+  const handleSwitchToLogin = (e) => {
+    e.preventDefault();
+    handleClose();
+    // Wait for close animation to complete
+    setTimeout(() => {
+      onSwitchToLogin();
+    }, 350);
   };
 
   const handleSubmit = async () => {
@@ -332,7 +341,7 @@ const SignupModal = ({ isOpen, onClose }) => {
         </div>
 
         <div className="modal-footer">
-          <p>Already have a garden? <a href="#login" className="login-link">Sign in</a></p>
+          <p>Already have a garden? <a href="#login" className="login-link" onClick={handleSwitchToLogin}>Sign in</a></p>
         </div>
       </div>
     </div>

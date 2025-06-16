@@ -87,6 +87,18 @@ function AppContent() {
     window.location.href = '/';
   };
 
+  // Handle switching from Login to Signup
+  const handleSwitchToSignup = () => {
+    setShowLoginModal(false);
+    setShowSignupModal(true);
+  };
+
+  // Handle switching from Signup to Login
+  const handleSwitchToLogin = () => {
+    setShowSignupModal(false);
+    setShowLoginModal(true);
+  };
+
   return (
     <div className="App">
       <Header 
@@ -166,12 +178,14 @@ function AppContent() {
       
       <SignupModal 
         isOpen={showSignupModal} 
-        onClose={() => setShowSignupModal(false)} 
+        onClose={() => setShowSignupModal(false)}
+        onSwitchToLogin={handleSwitchToLogin}
       />
       
       <LoginModal 
         isOpen={showLoginModal} 
-        onClose={() => setShowLoginModal(false)} 
+        onClose={() => setShowLoginModal(false)}
+        onSwitchToSignup={handleSwitchToSignup}
       />
     </div>
   );
