@@ -6,6 +6,7 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
+const { sendPasswordResetEmail, sendWelcomeEmail } = require('../services/emailService');
 
 // Generate JWT token
 const generateToken = (userId) => {
@@ -46,6 +47,11 @@ exports.register = async (req, res) => {
 
     // Generate token
     const token = generateToken(user._id);
+    
+    // Send welcome email (optional - don't let it block registration)
+    sendWelcomeEmail(user.email, user.username).catch(err => {
+      console.error('Welcome email error:', err);
+    });
 
     res.status(201).json({
       success: true,
@@ -134,29 +140,22 @@ exports.forgotPassword = async (req, res) => {
     // Create reset URL
     const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
 
-    // TODO: Send email with reset link
-    // For now, we'll just return the token (remove this in production!)
-    console.log('Password reset URL:', resetUrl);
-
-    // In production, you would send an email here
-    // await sendEmail({
-    //   to: user.email,
-    //   subject: 'Wallflower Password Reset',
-    //   html: `
-    //     <h2>Password Reset Request</h2>
-    //     <p>Click the link below to reset your password:</p>
-    //     <a href="${resetUrl}">Reset Password</a>
-    //     <p>This link will expire in 1 hour.</p>
-    //     <p>If you didn't request this, please ignore this email.</p>
-    //   `
-    // });
+    // Send password reset email
+    const emailResult = await sendPasswordResetEmail(user.email, resetUrl, user.username);
+    
+    if (!emailResult.success) {
+      console.error('Failed to send password reset email:', emailResult.error);
+      // Continue anyway - user might still have the token from logs
+    }
 
     res.json({
       success: true,
       message: 'If an account exists with this email, a password reset link has been sent.',
-      // Remove this in production - only for testing
-      resetToken: resetToken,
-      resetUrl: resetUrl
+      // Remove these in production - only for development/testing
+      ...(process.env.NODE_ENV === 'development' && {
+        resetToken: resetToken,
+        resetUrl: resetUrl
+      })
     });
   } catch (error) {
     console.error('Forgot password error:', error);
