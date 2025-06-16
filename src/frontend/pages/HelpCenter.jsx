@@ -78,12 +78,12 @@ const HelpCenter = () => {
         {
           title: 'Sign Up with Email',
           content: 'Tap "Start Your Garden" and enter your email address.',
-          screenshot: '/src/assets/IMG_4384.png'
+          screenshot: 'src/frontend/assets/IMG_4355-portrait.png'
         },
         {
           title: 'Create Your Profile',
           content: 'Add your name, birthday, and a bit about yourself.',
-          screenshot: '/src/assets/IMG_4381.png'
+          screenshot: 'src/frontend/assets/IMG_4348-portrait.png'
         }
       ]
     },
@@ -94,7 +94,7 @@ const HelpCenter = () => {
       description: 'Learn about our unique way of showing interest',
       readTime: '2 min',
       content: `Seeds are Wallflower's gentle way of expressing interest. When you send someone a seed, you're saying "I'd like to get to know you" without any pressure. You start with 5 free seeds!`,
-      screenshot: '/src/assets/IMG_4373.png'
+      screenshot: 'src/frontend/assets/IMG_4349-portrait.png'
     },
     
     // Your Garden
@@ -108,7 +108,7 @@ const HelpCenter = () => {
         {
           title: 'Browse Profiles',
           content: 'Swipe through profiles in the Garden view.',
-          screenshot: '/src/assets/IMG_4385.png'
+          screenshot: 'src/frontend/assets/IMG_4347-portrait.png'
         },
         {
           title: 'Find Someone Interesting',
