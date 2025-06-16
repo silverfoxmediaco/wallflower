@@ -73,17 +73,17 @@ const HelpCenter = () => {
         {
           title: 'Download and Open Wallflower',
           content: 'Start by downloading Wallflower from the App Store or visiting our website.',
-          screenshot: '/help/screenshots/welcome-screen.png'
+          screenshot: '/src/assets/IMG_4369.png'
         },
         {
           title: 'Sign Up with Email',
           content: 'Tap "Start Your Garden" and enter your email address.',
-          screenshot: '/help/screenshots/signup-email.png'
+          screenshot: '/src/assets/IMG_4384.png'
         },
         {
           title: 'Create Your Profile',
           content: 'Add your name, birthday, and a bit about yourself.',
-          screenshot: '/help/screenshots/create-profile.png'
+          screenshot: '/src/assets/IMG_4381.png'
         }
       ]
     },
@@ -94,7 +94,7 @@ const HelpCenter = () => {
       description: 'Learn about our unique way of showing interest',
       readTime: '2 min',
       content: `Seeds are Wallflower's gentle way of expressing interest. When you send someone a seed, you're saying "I'd like to get to know you" without any pressure. You start with 5 free seeds!`,
-      screenshot: '/help/screenshots/seeds-explained.png'
+      screenshot: '/src/assets/IMG_4373.png'
     },
     
     // Your Garden
@@ -108,17 +108,17 @@ const HelpCenter = () => {
         {
           title: 'Browse Profiles',
           content: 'Swipe through profiles in the Garden view.',
-          screenshot: '/help/screenshots/browse-garden.png'
+          screenshot: '/src/assets/IMG_4385.png'
         },
         {
           title: 'Find Someone Interesting',
           content: 'When you find someone you like, tap their profile for more details.',
-          screenshot: '/help/screenshots/profile-view.png'
+          screenshot: '/src/assets/IMG_4367.png'
         },
         {
           title: 'Send a Seed',
           content: 'Tap the seed button at the bottom of their profile. That\'s it!',
-          screenshot: '/help/screenshots/send-seed.png',
+          screenshot: '/src/assets/IMG_4386.png',
           highlight: { x: 195, y: 600, width: 80, height: 80 }
         }
       ]
@@ -130,7 +130,7 @@ const HelpCenter = () => {
       description: 'What happens when interest is mutual',
       readTime: '2 min',
       content: 'When you and another person have sent each other seeds, it\'s a match! You\'ll both be notified and can start chatting.',
-      screenshot: '/help/screenshots/its-a-match.png'
+      screenshot: '/src/assets/IMG_4372.png'
     },
     
     // Messages
@@ -146,7 +146,7 @@ const HelpCenter = () => {
         'Be genuine and authentic',
         'Keep it light and friendly'
       ],
-      screenshot: '/help/screenshots/first-message.png'
+      screenshot: '/src/assets/IMG_4356.png'
     },
     {
       id: 'message-features',
@@ -159,7 +159,7 @@ const HelpCenter = () => {
         { icon: '🎤', title: 'Voice Notes', desc: 'Add a personal touch' },
         { icon: '😊', title: 'Reactions', desc: 'React to messages with emojis' }
       ],
-      screenshot: '/help/screenshots/message-features.png'
+      screenshot: '/src/assets/IMG_4370.png'
     },
     
     // Profile & Photos
@@ -173,17 +173,17 @@ const HelpCenter = () => {
         {
           title: 'Choose Great Photos',
           content: 'Use recent photos that show your genuine smile. Include a mix of close-ups and full body shots.',
-          screenshot: '/help/screenshots/photo-tips.png'
+          screenshot: '/src/assets/IMG_4379.png'
         },
         {
           title: 'Write a Compelling Bio',
           content: 'Share your interests, what makes you unique, and what you\'re looking for.',
-          screenshot: '/help/screenshots/bio-example.png'
+          screenshot: '/src/assets/IMG_4378.png'
         },
         {
           title: 'Add Your Interests',
           content: 'Select interests that truly represent you. This helps find compatible matches.',
-          screenshot: '/help/screenshots/interests.png'
+          screenshot: '/src/assets/IMG_4382.png'
         }
       ]
     },
@@ -213,12 +213,12 @@ const HelpCenter = () => {
         {
           title: 'Access User Options',
           content: 'Tap the three dots on their profile or in chat.',
-          screenshot: '/help/screenshots/user-options.png'
+          screenshot: '/src/assets/IMG_4381.png'
         },
         {
           title: 'Choose Action',
           content: 'Select "Block User" or "Report" from the menu.',
-          screenshot: '/help/screenshots/block-report-menu.png'
+          screenshot: '/src/assets/IMG_4377.png'
         }
       ]
     },
@@ -236,7 +236,7 @@ const HelpCenter = () => {
         { icon: '🔄', title: 'Unlimited Rewinds', desc: 'Go back to profiles you passed' },
         { icon: '🌟', title: 'Priority Support', desc: 'Get help faster' }
       ],
-      screenshot: '/help/screenshots/subscription.png'
+      screenshot: '/src/assets/IMG_4374.png'
     }
   ];
 
