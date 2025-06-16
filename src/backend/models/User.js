@@ -1,3 +1,7 @@
+// Updated User Model
+// Path: src/backend/models/User.js
+// Add these fields to your existing User model
+
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
@@ -11,6 +15,7 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
+    select: false, // Don't include password in queries by default
   },
   username: {
     type: String,
@@ -20,6 +25,23 @@ const userSchema = new mongoose.Schema({
   dateOfBirth: {
     type: Date,
     required: true,
+  },
+  // Password reset fields - ADD THESE
+  passwordResetToken: {
+    type: String,
+    select: false,
+  },
+  passwordResetExpires: {
+    type: Date,
+    select: false,
+  },
+  emailVerified: {
+    type: Boolean,
+    default: false,
+  },
+  emailVerificationToken: {
+    type: String,
+    select: false,
   },
   profile: {
     age: Number,
@@ -84,7 +106,6 @@ const userSchema = new mongoose.Schema({
       receivedAt: Date,
     }],
   },
-  // ADD THESE FIELDS FOR STRIPE
   stripeCustomerId: {
     type: String,
     default: null
@@ -103,7 +124,6 @@ const userSchema = new mongoose.Schema({
     },
     cancelledAt: Date
   },
-  // ADD THIS FOR FILTER PREFERENCES
   filterPreferences: {
     minAge: {
       type: Number,

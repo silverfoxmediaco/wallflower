@@ -18,6 +18,7 @@ import Garden from './frontend/components/garden/Garden';
 import MockProfilesManager from './frontend/components/admin/MockProfilesManager';
 import Messages from './frontend/components/messages/Messages';
 import Contact from './frontend/components/Contact';
+import ResetPassword from './frontend/components/ResetPassword';
 
 // Import new pages
 import TermsOfService from './frontend/pages/TermsOfService';
@@ -144,6 +145,9 @@ function AppContent() {
           
           {/* Contact Page Route */}
           <Route path="/contact" element={<Contact />} />
+          
+          {/* Password Reset Route */}
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
           
           {/* Footer Pages Routes */}
           <Route path="/terms" element={<TermsOfService />} />

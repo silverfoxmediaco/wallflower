@@ -1,14 +1,16 @@
-// LoginModal Component
+// Updated LoginModal Component
 // Path: src/frontend/components/LoginModal.jsx
-// Purpose: Modal for user authentication/login
+// Purpose: Modal for user authentication with forgot password link
 
 import React, { useState, useEffect } from 'react';
-import './SignupModal.css'; // Reuse the same styles
+import ForgotPasswordModal from './ForgotPasswordModal';
+import './SignupModal.css';
 
 const LoginModal = ({ isOpen, onClose }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -101,73 +103,101 @@ const LoginModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className={`modal-overlay ${isVisible ? 'active' : ''}`} onClick={handleClose}>
-      <div className={`modal-content ${isVisible ? 'active' : ''}`} onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close" onClick={handleClose}>×</button>
-        
-        <div className="modal-header">
-          <h2 className="modal-title">Welcome Back 🌸</h2>
-          <p className="modal-subtitle">Sign in to your garden</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="signup-form">
-          {errors.general && (
-            <div className="error-message general-error">
-              {errors.general}
-            </div>
-          )}
+    <>
+      <div className={`modal-overlay ${isVisible ? 'active' : ''}`} onClick={handleClose}>
+        <div className={`modal-content ${isVisible ? 'active' : ''}`} onClick={(e) => e.stopPropagation()}>
+          <button className="modal-close" onClick={handleClose}>×</button>
           
-          <div className="form-group">
-            <label htmlFor="email">Email Address</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              placeholder="your@email.com"
-              className={errors.email ? 'error' : ''}
-            />
-            {errors.email && <span className="error-message">{errors.email}</span>}
+          <div className="modal-header">
+            <h2 className="modal-title">Welcome Back 🌸</h2>
+            <p className="modal-subtitle">Sign in to your garden</p>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              placeholder="Enter your password"
-              className={errors.password ? 'error' : ''}
-            />
-            {errors.password && <span className="error-message">{errors.password}</span>}
-          </div>
+          <form onSubmit={handleSubmit} className="signup-form">
+            {errors.general && (
+              <div className="error-message general-error">
+                {errors.general}
+              </div>
+            )}
+            
+            <div className="form-group">
+              <label htmlFor="email">Email Address</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                placeholder="your@email.com"
+                className={errors.email ? 'error' : ''}
+              />
+              {errors.email && <span className="error-message">{errors.email}</span>}
+            </div>
 
-          <div className="form-actions">
-            <button type="button" className="btn-secondary" onClick={handleClose}>
-              Cancel
-            </button>
-            <button 
-              type="submit" 
-              className="btn-primary"
-              disabled={loading}
-            >
-              {loading ? 'Signing in...' : 'Sign In'}
-            </button>
-          </div>
-        </form>
+            <div className="form-group">
+              <label htmlFor="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                placeholder="Enter your password"
+                className={errors.password ? 'error' : ''}
+              />
+              {errors.password && <span className="error-message">{errors.password}</span>}
+              
+              {/* Forgot Password Link */}
+              <a 
+                href="#forgot" 
+                className="forgot-password-link"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setShowForgotPassword(true);
+                  handleClose();
+                }}
+              >
+                Forgot your password?
+              </a>
+            </div>
 
-        <div className="modal-footer">
-          <p>New to Wallflower? <a href="#signup" className="login-link" onClick={(e) => {
-            e.preventDefault();
-            handleClose();
-            // You'll need to trigger the signup modal from App.jsx
-          }}>Create an account</a></p>
+            <div className="form-actions">
+              <button type="button" className="btn-secondary" onClick={handleClose}>
+                Cancel
+              </button>
+              <button 
+                type="submit" 
+                className="btn-primary"
+                disabled={loading}
+              >
+                {loading ? 'Signing in...' : 'Sign In'}
+              </button>
+            </div>
+          </form>
+
+          <div className="modal-footer">
+            <p>New to Wallflower? <a href="#signup" className="login-link" onClick={(e) => {
+              e.preventDefault();
+              handleClose();
+              // You'll need to trigger the signup modal from App.jsx
+            }}>Create an account</a></p>
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Forgot Password Modal */}
+      <ForgotPasswordModal
+        isOpen={showForgotPassword}
+        onClose={() => setShowForgotPassword(false)}
+        onBackToLogin={() => {
+          setShowForgotPassword(false);
+          // Small delay to allow forgot password modal to close
+          setTimeout(() => {
+            setIsVisible(true);
+          }, 300);
+        }}
+      />
+    </>
   );
 };
 
