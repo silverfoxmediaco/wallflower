@@ -91,7 +91,8 @@ const ResetPassword = () => {
         },
         body: JSON.stringify({
           token: token,
-          newPassword: formData.newPassword
+          newPassword: formData.newPassword,
+          confirmPassword: formData.confirmPassword  // ADDED THIS LINE - NOW SENDING BOTH PASSWORDS
         }),
       });
 
