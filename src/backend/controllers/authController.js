@@ -194,7 +194,9 @@ exports.resetPassword = async (req, res) => {
     user.password = newPassword;
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
-    await user.save();
+    
+    // IMPORTANT: Use validateModifiedOnly to avoid photo validation issues
+    await user.save({ validateModifiedOnly: true });
 
     // Generate new auth token
     const authToken = generateToken(user._id);
