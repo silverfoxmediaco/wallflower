@@ -1,5 +1,5 @@
 // HelpCenter Component
-// Path: src/frontend/components/HelpCenter.jsx
+// Path: src/frontend/pages/HelpCenter.jsx
 // Purpose: Comprehensive help center with categories, search, and mobile screenshots
 
 import React, { useState, useEffect } from 'react';
