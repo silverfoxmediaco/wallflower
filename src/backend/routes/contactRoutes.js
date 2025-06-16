@@ -4,7 +4,7 @@
 
 const express = require('express');
 const router = express.Router();
-const nodemailer = require('nodemailer');
+const { sendEmail } = require('../services/emailService');
 
 // POST /api/contact - Submit contact form
 router.post('/', async (req, res) => {
@@ -28,18 +28,8 @@ router.post('/', async (req, res) => {
       });
     }
     
-    // Create email transporter
-    const transporter = nodemailer.createTransport({
-      service: 'gmail', // or your email service
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-      }
-    });
-    
-    // Email to support team
-    const supportMailOptions = {
-      from: process.env.EMAIL_USER,
+    // Send email to support team
+    const supportEmailResult = await sendEmail({
       to: process.env.SUPPORT_EMAIL || process.env.EMAIL_USER,
       subject: `[Wallflower Contact] ${subject}`,
       html: `
@@ -51,12 +41,12 @@ router.post('/', async (req, res) => {
         <p>${message.replace(/\n/g, '<br>')}</p>
         <hr>
         <p><small>Submitted on ${new Date().toLocaleString()}</small></p>
-      `
-    };
+      `,
+      text: `New Contact Form Submission\n\nFrom: ${name}\nEmail: ${email}\nSubject: ${subject}\n\nMessage:\n${message}\n\nSubmitted on ${new Date().toLocaleString()}`
+    });
     
-    // Confirmation email to user
-    const userMailOptions = {
-      from: process.env.EMAIL_USER,
+    // Send confirmation email to user
+    const userEmailResult = await sendEmail({
       to: email,
       subject: 'We received your message - Wallflower',
       html: `
@@ -82,12 +72,14 @@ router.post('/', async (req, res) => {
           <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
           <p style="font-size: 12px; color: #666;">This is an automated response to confirm we received your message. Please do not reply to this email.</p>
         </div>
-      `
-    };
+      `,
+      text: `Hi ${name},\n\nThank you for reaching out to Wallflower! We've received your message and will get back to you within 24-48 hours.\n\nYour Message:\nSubject: ${subject}\nMessage:\n${message}\n\nIn the meantime, you might find helpful information in our:\n- Frequently Asked Questions: ${process.env.CLIENT_URL}/faq\n- Community Guidelines: ${process.env.CLIENT_URL}/community-guidelines\n- Safety Tips: ${process.env.CLIENT_URL}/safety\n\nWarm regards,\nThe Wallflower Team\n\nThis is an automated response to confirm we received your message. Please do not reply to this email.`
+    });
     
-    // Send emails
-    await transporter.sendMail(supportMailOptions);
-    await transporter.sendMail(userMailOptions);
+    // Check if both emails were sent successfully
+    if (!supportEmailResult.success || !userEmailResult.success) {
+      throw new Error('Failed to send one or more emails');
+    }
     
     // Optionally, save to database for tracking
     // const Contact = require('../models/Contact');
