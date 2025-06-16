@@ -15,6 +15,7 @@ const GardeningInterface = () => {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [dragCurrent, setDragCurrent] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
+  const [passedProfiles, setPassedProfiles] = useState(new Set()); // Track passed profiles
   const navigate = useNavigate();
   const cardRef = useRef(null);
 
@@ -182,6 +183,9 @@ const GardeningInterface = () => {
         const token = localStorage.getItem('token');
         const currentProfile = profiles[currentProfileIndex];
 
+        // Add to passed profiles set
+        setPassedProfiles(prev => new Set([...prev, currentProfile.id]));
+
         await fetch('/api/match/pass', {
           method: 'POST',
           headers: {
@@ -206,11 +210,31 @@ const GardeningInterface = () => {
   };
 
   const moveToNextProfile = () => {
-    if (currentProfileIndex < profiles.length - 1) {
-      setCurrentProfileIndex(prev => prev + 1);
+    if (profiles.length === 0) return;
+    
+    // If we're at the end of the list
+    if (currentProfileIndex >= profiles.length - 1) {
+      // Check if all profiles have been passed
+      if (passedProfiles.size >= profiles.length) {
+        // Show a message that all profiles have been passed
+        setProfiles([]);
+      } else {
+        // Loop back to the beginning
+        setCurrentProfileIndex(0);
+        
+        // Optional: Show a subtle notification that we're starting over
+        // You could add a state for this and show a toast message
+      }
     } else {
-      setProfiles([]);
+      // Move to next profile
+      setCurrentProfileIndex(prev => prev + 1);
     }
+  };
+
+  // Get the next profile indices for preview cards (with looping)
+  const getNextProfileIndex = (offset) => {
+    if (profiles.length === 0) return null;
+    return (currentProfileIndex + offset) % profiles.length;
   };
 
   // Handle profile card click/tap
@@ -249,11 +273,12 @@ const GardeningInterface = () => {
     );
   }
 
-  if (profiles.length === 0 || !profiles[currentProfileIndex]) {
+  // Only show "no profiles" if we've passed all profiles
+  if (profiles.length === 0 || (passedProfiles.size >= profiles.length && profiles.length > 0)) {
     return (
       <div className="gardening-container">
         <div className="no-profiles-message">
-          <h2>No more profiles to browse!</h2>
+          <h2>You've seen all profiles!</h2>
           <p>Check back later for new members or browse your matches in your garden.</p>
           <button className="btn-primary" onClick={() => navigate('/garden')}>
             Visit My Garden
@@ -264,6 +289,8 @@ const GardeningInterface = () => {
   }
 
   const profile = profiles[currentProfileIndex];
+  const nextProfile1 = profiles[getNextProfileIndex(1)];
+  const nextProfile2 = profiles[getNextProfileIndex(2)];
 
   return (
     <div className="gardening-container">
@@ -321,6 +348,10 @@ const GardeningInterface = () => {
               {/* Profile info */}
               <div className="profile-info">
                 <h2 className="profile-username">{profile.username}</h2>
+                {/* Optional: Show if this is a profile you've seen before */}
+                {passedProfiles.has(profile.id) && (
+                  <span className="seen-before-badge">Seen before</span>
+                )}
               </div>
               
               {/* Action Buttons */}
@@ -367,30 +398,30 @@ const GardeningInterface = () => {
         </div>
 
         {/* Preview of next profiles */}
-        {profiles[currentProfileIndex + 1] && (
+        {nextProfile1 && (
           <div 
             className="profile-card-simple preview-card" 
             style={{ 
               pointerEvents: 'none',
-              backgroundImage: profiles[currentProfileIndex + 1].photos?.[0] 
-                ? `url(${profiles[currentProfileIndex + 1].photos[0].url || profiles[currentProfileIndex + 1].photos[0]})`
+              backgroundImage: nextProfile1.photos?.[0] 
+                ? `url(${nextProfile1.photos[0].url || nextProfile1.photos[0]})`
                 : 'none',
-              backgroundColor: profiles[currentProfileIndex + 1].photos?.[0] 
+              backgroundColor: nextProfile1.photos?.[0] 
                 ? 'transparent' 
                 : '#A8CBB7'
             }}
           />
         )}
 
-        {profiles[currentProfileIndex + 2] && (
+        {nextProfile2 && (
           <div 
             className="profile-card-simple preview-card-2" 
             style={{ 
               pointerEvents: 'none',
-              backgroundImage: profiles[currentProfileIndex + 2].photos?.[0] 
-                ? `url(${profiles[currentProfileIndex + 2].photos[0].url || profiles[currentProfileIndex + 2].photos[0]})`
+              backgroundImage: nextProfile2.photos?.[0] 
+                ? `url(${nextProfile2.photos[0].url || nextProfile2.photos[0]})`
                 : 'none',
-              backgroundColor: profiles[currentProfileIndex + 2].photos?.[0] 
+              backgroundColor: nextProfile2.photos?.[0] 
                 ? 'transparent' 
                 : '#E0AED0'
             }}
