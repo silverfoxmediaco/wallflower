@@ -5,6 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Header.css';
+import wallflowerLogo from '../assets/images/wallflowerlogotrans.png';
 
 const Header = ({ onSignupClick, onLoginClick, isLoggedIn, onLogout }) => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -53,7 +54,7 @@ const Header = ({ onSignupClick, onLoginClick, isLoggedIn, onLogout }) => {
           {/* Logo */}
           <Link to="/" className="logo-link">
             <img 
-              src="/assets/images/wallflowerlogotrans.png" 
+              src={wallflowerLogo} 
               alt="Wallflower" 
               className="logo-image"
             />

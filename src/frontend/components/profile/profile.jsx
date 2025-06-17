@@ -1,5 +1,5 @@
 // Profile Component
-// Path: src/frontend/components/profile/Profile.jsx
+// Path: src/frontend/components/profile/profile.jsx
 // Purpose: User profile creation and editing with photo display modes
 
 import React, { useState, useEffect } from 'react';

@@ -1,6 +1,5 @@
 // SignupModal Component
-// Path: src/frontend/components/auth/SignupModal.jsx
-// Purpose: Multi-step registration modal for new users
+// Path: src/frontend/components/SignupModal.jsx// Purpose: Multi-step registration modal for new users
 
 import React, { useState, useEffect } from 'react';
 import './SignupModal.css';
