@@ -418,7 +418,7 @@ const GardeningInterface = () => {
                   aria-label="View previous profile"
                   disabled={currentProfileIndex === 0 && profiles.length > 0}
                 >
-                  <span className="btn-icon">⬅️</span>
+                  <span className="btn-icon">🍂</span>
                   <span className="btn-text">Previous</span>
                 </button>
                 
@@ -444,7 +444,7 @@ const GardeningInterface = () => {
                   aria-label="View next profile"
                   disabled={isAnimating}
                 >
-                  <span className="btn-icon">➡️</span>
+                  <span className="btn-icon">🌿</span>
                   <span className="btn-text">Next</span>
                 </button>
               </div>
