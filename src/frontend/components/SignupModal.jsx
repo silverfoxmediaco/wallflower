@@ -1,3 +1,7 @@
+// SignupModal Component
+// Path: src/frontend/components/auth/SignupModal.jsx
+// Purpose: Multi-step registration modal for new users
+
 import React, { useState, useEffect } from 'react';
 import './SignupModal.css';
 
@@ -140,6 +144,7 @@ const SignupModal = ({ isOpen, onClose, onSwitchToLogin }) => {
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
+          confirmPassword: formData.confirmPassword,  // Include confirmPassword
           username: formData.username,
           dateOfBirth: formData.dateOfBirth,
         }),
