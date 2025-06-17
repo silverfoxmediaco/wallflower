@@ -1,180 +1,234 @@
-/* Settings Page Styles */
-/* Path: src/frontend/pages/Settings.css */
+/* Notification Settings Styles */
+/* Path: src/frontend/components/settings/NotificationSettings.css */
 
-.settings-page {
-    min-height: 100vh;
-    background-color: var(--color-background);
-    padding: var(--space-xl) 0;
-  }
-  
-  .settings-container {
-    max-width: 1000px;
+.notification-settings {
+    max-width: 600px;
     margin: 0 auto;
-    padding: 0 var(--space-lg);
-  }
-  
-  /* Settings Header */
-  .settings-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--space-xl);
-  }
-  
-  .settings-header h1 {
-    color: var(--color-primary);
-    margin: 0;
-  }
-  
-  .back-button {
-    background: none;
-    border: none;
-    color: var(--color-primary);
-    font-size: 1rem;
-    cursor: pointer;
-    padding: var(--space-sm) var(--space-md);
-    border-radius: 8px;
-    transition: all 0.3s ease;
-  }
-  
-  .back-button:hover {
-    background-color: rgba(147, 125, 194, 0.1);
-  }
-  
-  /* Settings Content */
-  .settings-content {
-    display: grid;
-    grid-template-columns: 250px 1fr;
-    gap: var(--space-xl);
-    align-items: start;
-  }
-  
-  /* Settings Tabs */
-  .settings-tabs {
+    padding: var(--space-xl);
     background-color: white;
     border-radius: 16px;
-    padding: var(--space-md);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    position: sticky;
-    top: var(--space-xl);
   }
   
-  .tab-button {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: var(--space-md);
-    padding: var(--space-md) var(--space-lg);
-    background: none;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-align: left;
-    font-size: 1rem;
-    color: var(--color-text-primary);
+  .notification-settings h2 {
+    color: var(--color-primary);
     margin-bottom: var(--space-sm);
   }
   
-  .tab-button:last-child {
-    margin-bottom: 0;
+  .settings-subtitle {
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-xl);
   }
   
-  .tab-button:hover {
+  /* Master Toggle Section */
+  .master-toggle-section {
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-lg);
+    border-bottom: 2px solid #f0f0f0;
+  }
+  
+  .master-toggle {
     background-color: var(--color-background);
+    padding: var(--space-lg);
+    border-radius: 12px;
   }
   
-  .tab-button.active {
-    background-color: var(--color-primary);
-    color: white;
+  /* Individual Settings */
+  .individual-settings {
+    transition: opacity 0.3s ease;
   }
   
-  .tab-icon {
-    font-size: 1.25rem;
-    width: 24px;
-    text-align: center;
+  .individual-settings.disabled {
+    opacity: 0.5;
+    pointer-events: none;
   }
   
-  .tab-label {
-    font-weight: 500;
-  }
-  
-  /* Tab Content */
-  .tab-content {
-    animation: fadeIn 0.3s ease;
-  }
-  
-  /* Settings Section */
-  .settings-section {
-    background-color: white;
-    border-radius: 16px;
-    padding: var(--space-xl);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  }
-  
-  .settings-section h2 {
-    color: var(--color-primary);
+  .individual-settings h3 {
+    font-size: 1.1rem;
+    color: var(--color-text-primary);
     margin-bottom: var(--space-lg);
   }
   
-  /* Account Actions */
-  .account-actions {
+  /* Setting Items */
+  .setting-item {
     display: flex;
-    gap: var(--space-lg);
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-lg) 0;
+    border-bottom: 1px solid #f5f5f5;
+  }
+  
+  .setting-item:last-child {
+    border-bottom: none;
+  }
+  
+  .setting-info {
+    flex: 1;
+    padding-right: var(--space-lg);
+  }
+  
+  .setting-info h3,
+  .setting-info h4 {
+    margin-bottom: var(--space-xs);
+    font-size: 1rem;
+    color: var(--color-text-primary);
+  }
+  
+  .setting-info p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+  
+  /* Toggle Switch */
+  .toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 56px;
+    height: 32px;
+  }
+  
+  .toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #E0E0E0;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border-radius: 34px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 24px;
+    width: 24px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+  
+  .toggle-switch input:checked + .slider {
+    background: linear-gradient(135deg, #937DC2 0%, #E0AED0 100%);
+    box-shadow: inset 0 2px 4px rgba(147, 125, 194, 0.2);
+  }
+  
+  .toggle-switch input:focus + .slider {
+    box-shadow: 0 0 0 4px rgba(147, 125, 194, 0.15);
+  }
+  
+  .toggle-switch input:checked + .slider:before {
+    transform: translateX(24px);
+    box-shadow: 0 2px 8px rgba(147, 125, 194, 0.3);
+  }
+  
+  .toggle-switch input:disabled + .slider {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #F5F5F5;
+  }
+  
+  /* Hover effect when not disabled */
+  .toggle-switch:not(:has(input:disabled)):hover .slider {
+    box-shadow: 0 0 8px rgba(147, 125, 194, 0.2);
+  }
+  
+  .toggle-switch:not(:has(input:disabled)):hover input:checked + .slider {
+    box-shadow: 0 0 12px rgba(147, 125, 194, 0.4);
+  }
+  
+  /* Settings Actions */
+  .settings-actions {
     margin-top: var(--space-xl);
+    text-align: center;
   }
   
-  .btn-danger {
-    background-color: #e57373;
-    color: white;
+  .save-button {
+    min-width: 200px;
   }
   
-  .btn-danger:hover {
-    background-color: #d32f2f;
+  .save-message {
+    margin-bottom: var(--space-lg);
+    padding: var(--space-md);
+    border-radius: 8px;
+    font-weight: 500;
+    animation: fadeIn 0.3s ease;
   }
   
-  /* Responsive Design */
+  .save-message.success {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #81c784;
+  }
+  
+  .save-message.error {
+    background-color: #ffebee;
+    color: #c62828;
+    border: 1px solid #ef5350;
+  }
+  
+  /* Settings Note */
+  .settings-note {
+    margin-top: var(--space-xl);
+    padding: var(--space-lg);
+    background-color: var(--color-background);
+    border-radius: 8px;
+    text-align: center;
+  }
+  
+  .settings-note p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+  
+  /* Loading State */
+  .loading-message {
+    text-align: center;
+    padding: var(--space-xl);
+    color: var(--color-text-muted);
+  }
+  
+  /* Responsive */
   @media (max-width: 768px) {
-    .settings-content {
-      grid-template-columns: 1fr;
+    .notification-settings {
+      padding: var(--space-lg);
+      border-radius: 0;
+      box-shadow: none;
     }
   
-    .settings-tabs {
-      display: flex;
-      overflow-x: auto;
-      padding: var(--space-sm);
-      margin-bottom: var(--space-lg);
-      position: static;
-      gap: var(--space-sm);
-    }
-  
-    .tab-button {
-      flex: 0 0 auto;
-      margin-bottom: 0;
-      padding: var(--space-sm) var(--space-md);
-      white-space: nowrap;
-    }
-  
-    .tab-label {
-      font-size: 0.875rem;
-    }
-  
-    .settings-header {
+    .setting-item {
       flex-direction: column;
       align-items: flex-start;
       gap: var(--space-md);
     }
   
-    .account-actions {
-      flex-direction: column;
+    .setting-info {
+      padding-right: 0;
+    }
+  
+    .toggle-switch {
+      align-self: flex-end;
     }
   }
   
-  /* Animation */
+  /* Animations */
   @keyframes fadeIn {
     from {
       opacity: 0;
-      transform: translateY(10px);
+      transform: translateY(-10px);
     }
     to {
       opacity: 1;
