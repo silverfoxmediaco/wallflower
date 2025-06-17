@@ -1,9 +1,10 @@
-// Match Controller
+// Updated Match Controller with Notifications
 // Path: src/backend/controllers/matchController.js
-// Purpose: Handle matching/browsing functionality
+// Purpose: Handle matching/browsing functionality with email notifications
 
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const notificationService = require('../services/notificationService');
 
 // Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
@@ -98,8 +99,13 @@ exports.sendSeed = [verifyToken, async (req, res) => {
       });
     }
 
-    // Method 1: Use atomic update operations instead of save()
-    // This avoids validation issues with existing data
+    // Check if recipient already sent a seed to sender (for match detection)
+    const recipient = await User.findById(recipientId);
+    const recipientSentToSender = recipient.seeds.sent.some(
+      seed => seed.to.toString() === req.userId
+    );
+
+    // Update sender
     const updateData = {
       $push: {
         'seeds.sent': {
@@ -131,10 +137,28 @@ exports.sendSeed = [verifyToken, async (req, res) => {
       }
     });
 
+    // Send notifications
+    if (recipientSentToSender) {
+      // It's a match! Send match notifications to both users
+      await notificationService.sendMatchNotification(req.userId, recipientId);
+    } else {
+      // Just send seed received notification to recipient
+      await notificationService.sendSeedReceivedNotification(req.userId, recipientId);
+    }
+
+    // Check if sender's balance is now low and send notification if needed
+    if (!hasActiveSubscription) {
+      await notificationService.checkAndSendLowBalanceNotification(
+        req.userId, 
+        updatedSender.seeds.available
+      );
+    }
+
     res.json({
       success: true,
-      message: 'Seed sent successfully!',
-      seedsRemaining: updatedSender.seeds.available
+      message: recipientSentToSender ? 'It\'s a match! 🌸' : 'Seed sent successfully!',
+      seedsRemaining: updatedSender.seeds.available,
+      isMatch: recipientSentToSender
     });
   } catch (error) {
     console.error('Send seed error:', error);

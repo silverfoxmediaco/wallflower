@@ -1,12 +1,13 @@
-// Message Controller
+// Updated Message Controller with Notifications
 // Path: src/backend/controllers/messageController.js
-// Purpose: Handle message-related operations
+// Purpose: Handle message-related operations with email notifications
 
 const Message = require('../models/Messages');
 const User = require('../models/User');
 const SeedTransaction = require('../models/SeedTransaction');
 const cloudinary = require('../config/cloudinary');
 const upload = require('../middleware/uploadMiddleware');
+const notificationService = require('../services/notificationService');
 
 // Get all conversations for the logged-in user
 exports.getConversations = async (req, res) => {
@@ -165,6 +166,9 @@ exports.sendMessage = async (req, res) => {
     // Populate sender info
     await message.populate('sender', 'username profile.photos');
     
+    // Send email notification to recipient
+    await notificationService.sendNewMessageNotification(senderId, receiverId, content.trim());
+    
     // Emit socket event for real-time messaging
     const io = req.app.get('io');
     if (io) {
@@ -282,6 +286,12 @@ exports.sendImage = [
           description: `Sent image to ${receiver.username}`,
           relatedUser: receiverId
         });
+        
+        // Check if balance is now low and send notification if needed
+        await notificationService.checkAndSendLowBalanceNotification(
+          senderId, 
+          sender.seeds.available
+        );
       }
       
       // Create conversation ID
@@ -302,6 +312,9 @@ exports.sendImage = [
       
       // Populate sender info
       await message.populate('sender', 'username profile.photos');
+      
+      // Send email notification to recipient
+      await notificationService.sendNewMessageNotification(senderId, receiverId, '📷 Sent you an image');
       
       // Emit socket event for real-time messaging
       const io = req.app.get('io');

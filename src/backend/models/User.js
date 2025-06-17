@@ -1,6 +1,6 @@
-// Updated User Model
+// Updated User Model with Notification Preferences
 // Path: src/backend/models/User.js
-// Add these fields to your existing User model
+// Purpose: Add notification preferences and tracking fields
 
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    select: false, // Don't include password in queries by default
+    select: false,
   },
   username: {
     type: String,
@@ -26,7 +26,6 @@ const userSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-  // Password reset fields - ADD THESE
   passwordResetToken: {
     type: String,
     select: false,
@@ -85,6 +84,38 @@ const userSchema = new mongoose.Schema({
       question: String,
       answer: String,
     }],
+    // Notification preferences
+    notifications: {
+      emailEnabled: {
+        type: Boolean,
+        default: true
+      },
+      seedReceived: {
+        type: Boolean,
+        default: true
+      },
+      newMessage: {
+        type: Boolean,
+        default: true
+      },
+      newMatch: {
+        type: Boolean,
+        default: true
+      },
+      lowSeedBalance: {
+        type: Boolean,
+        default: true
+      },
+      marketing: {
+        type: Boolean,
+        default: false
+      }
+    },
+    // Notification tracking
+    lastLowBalanceNotification: {
+      type: Date,
+      default: null
+    }
   },
   seeds: {
     available: {

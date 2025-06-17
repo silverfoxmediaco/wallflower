@@ -116,6 +116,9 @@ const Header = ({ onSignupClick, onLoginClick, isLoggedIn, onLogout }) => {
                 <Link to="/profile" className="nav-link">
                   Profile
                 </Link>
+                <Link to="/settings" className="nav-link">
+                  Settings
+                </Link>
                 <button 
                   className="nav-button"
                   onClick={handleLogoutClick}
@@ -193,6 +196,9 @@ const Header = ({ onSignupClick, onLoginClick, isLoggedIn, onLogout }) => {
               </Link>
               <Link to="/profile" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
                 Profile
+              </Link>
+              <Link to="/settings" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
+                Settings
               </Link>
               <button 
                 className="nav-button mobile"

@@ -20,6 +20,7 @@ import Messages from './components/messages/Messages';
 import Contact from './components/Contact';
 import ResetPassword from './components/ResetPassword';
 import HelpCenter from './pages/HelpCenter';
+import Settings from './pages/Settings';
 
 // Import new pages
 import TermsOfService from './pages/TermsOfService';
@@ -156,10 +157,23 @@ function AppContent() {
             </ProtectedRoute>
           } />
           
+          {/* Settings Route */}
+          <Route path="/settings" element={
+            <ProtectedRoute>
+              <Settings />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/settings/notifications" element={
+            <ProtectedRoute>
+              <Settings />
+            </ProtectedRoute>
+          } />
+          
           {/* Contact Page Route */}
           <Route path="/contact" element={<Contact />} />
           
-          {/* Help Center Route - Added */}
+          {/* Help Center Route */}
           <Route path="/help" element={<HelpCenter />} />
           
           {/* Password Reset Route */}
