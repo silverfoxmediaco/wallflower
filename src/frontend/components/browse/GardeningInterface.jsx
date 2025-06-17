@@ -252,16 +252,10 @@ const GardeningInterface = () => {
     
     // If we're at the end of the list
     if (currentProfileIndex >= profiles.length - 1) {
-      // Check if all profiles have been passed
-      if (passedProfiles.size >= profiles.length) {
-        // Show a message that all profiles have been passed
-        setProfiles([]);
-      } else {
-        // Shuffle profiles and loop back to the beginning
-        const shuffled = [...profiles].sort(() => Math.random() - 0.5);
-        setProfiles(shuffled);
-        setCurrentProfileIndex(0);
-      }
+      // Shuffle profiles and loop back to the beginning
+      const shuffled = [...profiles].sort(() => Math.random() - 0.5);
+      setProfiles(shuffled);
+      setCurrentProfileIndex(0);
     } else {
       // Move to next profile
       setCurrentProfileIndex(prev => prev + 1);
@@ -325,13 +319,13 @@ const GardeningInterface = () => {
     );
   }
 
-  // Only show "no profiles" if we've passed all profiles
-  if (profiles.length === 0 || (passedProfiles.size >= profiles.length && profiles.length > 0)) {
+  // Only show "no profiles" if we truly have no profiles
+  if (profiles.length === 0) {
     return (
       <div className="gardening-container">
         <div className="no-profiles-message">
-          <h2>You've seen all profiles!</h2>
-          <p>Check back later for new members or browse your matches in your garden.</p>
+          <h2>No profiles available</h2>
+          <p>Check back later for new members.</p>
           <button className="btn-primary" onClick={() => navigate('/garden')}>
             Visit My Garden
           </button>
