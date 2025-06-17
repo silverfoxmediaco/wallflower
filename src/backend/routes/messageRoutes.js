@@ -13,6 +13,7 @@ const {
   sendImage,
   getUnreadCount
 } = require('../controllers/messageController');
+const { handleMulterError } = require('../middleware/uploadMiddleware');
 
 // Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
@@ -42,7 +43,8 @@ router.get('/:userId', verifyToken, getMessages);
 router.post('/send', verifyToken, sendMessage);
 
 // POST /api/messages/send-image - Send an image message (costs 1 seed)
-router.post('/send-image', verifyToken, sendImage);
+// Note: verifyToken must come BEFORE the upload middleware
+router.post('/send-image', verifyToken, sendImage, handleMulterError);
 
 // PUT /api/messages/read/:conversationId - Mark messages as read
 router.put('/read/:conversationId', verifyToken, markAsRead);

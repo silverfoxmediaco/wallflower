@@ -188,135 +188,155 @@ exports.sendMessage = async (req, res) => {
 };
 
 // Send an image message (costs 1 seed)
-exports.sendImage = [upload.single('image'), async (req, res) => {
-  try {
-    const { receiverId } = req.body;
-    const senderId = req.userId;
-    
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: 'No image provided'
-      });
-    }
-    
-    // Check if users are matched
-    const sender = await User.findById(senderId);
-    const receiver = await User.findById(receiverId);
-    
-    if (!sender || !receiver) {
-      // Clean up uploaded image
-      if (req.file.filename) {
-        await cloudinary.uploader.destroy(req.file.filename);
-      }
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
-    }
-    
-    const senderSentSeed = sender.seeds.sent.some(
-      seed => seed.to.toString() === receiverId
-    );
-    const receiverSentSeed = receiver.seeds.sent.some(
-      seed => seed.to.toString() === senderId
-    );
-    
-    if (!senderSentSeed || !receiverSentSeed) {
-      // Clean up uploaded image
-      if (req.file.filename) {
-        await cloudinary.uploader.destroy(req.file.filename);
-      }
-      return res.status(403).json({
-        success: false,
-        message: 'You can only message users you are matched with'
-      });
-    }
-    
-    // Check if user has subscription or enough seeds
-    const hasActiveSubscription = sender.subscription && 
-      sender.subscription.status === 'active' && 
-      (!sender.subscription.cancelAtPeriodEnd || new Date(sender.subscription.currentPeriodEnd) > new Date());
-    
-    if (!hasActiveSubscription && sender.seeds.available < 1) {
-      // Clean up uploaded image
-      if (req.file.filename) {
-        await cloudinary.uploader.destroy(req.file.filename);
-      }
-      return res.status(400).json({
-        success: false,
-        message: 'Insufficient seeds. You need 1 seed to send an image.'
-      });
-    }
-    
-    // Deduct seed if no active subscription
-    if (!hasActiveSubscription) {
-      sender.seeds.available -= 1;
-      await sender.save();
+exports.sendImage = [
+  upload.single('image'), 
+  async (req, res) => {
+    try {
+      const { receiverId } = req.body;
+      const senderId = req.userId;
       
-      // Create seed transaction
-      await SeedTransaction.create({
-        userId: senderId,
-        type: 'spent',
-        amount: 1,
-        change: -1,
-        balanceAfter: sender.seeds.available,
-        description: `Sent image to ${receiver.username}`,
-        relatedUser: receiverId
+      console.log('Send image request:', {
+        receiverId,
+        senderId,
+        file: req.file ? 'File uploaded' : 'No file',
+        fileDetails: req.file
       });
-    }
-    
-    // Create conversation ID
-    const conversationId = Message.getConversationId(senderId, receiverId);
-    
-    // Create message
-    const message = new Message({
-      conversationId: conversationId,
-      sender: senderId,
-      receiver: receiverId,
-      messageType: 'image',
-      imageUrl: req.file.path,
-      imagePublicId: req.file.filename,
-      seedCost: 1
-    });
-    
-    await message.save();
-    
-    // Populate sender info
-    await message.populate('sender', 'username profile.photos');
-    
-    // Emit socket event for real-time messaging
-    const io = req.app.get('io');
-    if (io) {
-      io.to(receiverId).emit('new_message', {
-        message: message,
-        conversationId: conversationId
-      });
-    }
-    
-    res.json({
-      success: true,
-      message: message,
-      remainingSeeds: sender.seeds.available
-    });
-  } catch (error) {
-    console.error('Send image error:', error);
-    
-    // Clean up uploaded image on error
-    if (req.file && req.file.filename) {
-      try {
-        await cloudinary.uploader.destroy(req.file.filename);
-      } catch (deleteError) {
-        console.error('Error deleting uploaded image:', deleteError);
+      
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          message: 'No image provided'
+        });
       }
+      
+      // Check if users are matched
+      const sender = await User.findById(senderId);
+      const receiver = await User.findById(receiverId);
+      
+      if (!sender || !receiver) {
+        // Clean up uploaded image
+        if (req.file.filename) {
+          await cloudinary.uploader.destroy(req.file.filename);
+        }
+        return res.status(404).json({
+          success: false,
+          message: 'User not found'
+        });
+      }
+      
+      const senderSentSeed = sender.seeds.sent.some(
+        seed => seed.to.toString() === receiverId
+      );
+      const receiverSentSeed = receiver.seeds.sent.some(
+        seed => seed.to.toString() === senderId
+      );
+      
+      if (!senderSentSeed || !receiverSentSeed) {
+        // Clean up uploaded image
+        if (req.file.filename) {
+          await cloudinary.uploader.destroy(req.file.filename);
+        }
+        return res.status(403).json({
+          success: false,
+          message: 'You can only message users you are matched with'
+        });
+      }
+      
+      // Check if user has subscription or enough seeds
+      const hasActiveSubscription = sender.subscription && 
+        sender.subscription.status === 'active' && 
+        (!sender.subscription.cancelAtPeriodEnd || new Date(sender.subscription.currentPeriodEnd) > new Date());
+      
+      if (!hasActiveSubscription && sender.seeds.available < 1) {
+        // Clean up uploaded image
+        if (req.file.filename) {
+          await cloudinary.uploader.destroy(req.file.filename);
+        }
+        return res.status(400).json({
+          success: false,
+          message: 'Insufficient seeds. You need 1 seed to send an image.'
+        });
+      }
+      
+      // Get the Cloudinary URL from the uploaded file
+      const imageUrl = req.file.path || req.file.secure_url;
+      const imagePublicId = req.file.filename || req.file.public_id;
+      
+      console.log('Cloudinary upload result:', {
+        imageUrl,
+        imagePublicId
+      });
+      
+      // Deduct seed if no active subscription
+      if (!hasActiveSubscription) {
+        sender.seeds.available -= 1;
+        await sender.save();
+        
+        // Create seed transaction
+        await SeedTransaction.create({
+          userId: senderId,
+          type: 'spent',
+          amount: 1,
+          change: -1,
+          balanceAfter: sender.seeds.available,
+          description: `Sent image to ${receiver.username}`,
+          relatedUser: receiverId
+        });
+      }
+      
+      // Create conversation ID
+      const conversationId = Message.getConversationId(senderId, receiverId);
+      
+      // Create message
+      const message = new Message({
+        conversationId: conversationId,
+        sender: senderId,
+        receiver: receiverId,
+        messageType: 'image',
+        imageUrl: imageUrl,
+        imagePublicId: imagePublicId,
+        seedCost: hasActiveSubscription ? 0 : 1
+      });
+      
+      await message.save();
+      
+      // Populate sender info
+      await message.populate('sender', 'username profile.photos');
+      
+      // Emit socket event for real-time messaging
+      const io = req.app.get('io');
+      if (io) {
+        io.to(receiverId).emit('new_message', {
+          message: message,
+          conversationId: conversationId
+        });
+      }
+      
+      res.json({
+        success: true,
+        message: message,
+        remainingSeeds: sender.seeds.available
+      });
+    } catch (error) {
+      console.error('Send image error:', error);
+      
+      // Clean up uploaded image on error
+      if (req.file && (req.file.filename || req.file.public_id)) {
+        try {
+          await cloudinary.uploader.destroy(req.file.filename || req.file.public_id);
+        } catch (deleteError) {
+          console.error('Error deleting uploaded image:', deleteError);
+        }
+      }
+      
+      res.status(500).json({
+        success: false,
+        message: 'Failed to send image',
+        error: error.message
+      });
     }
-    
-    res.status(500).json({
-      success: false,
-      message: 'Failed to send image'
-    });
   }
-}];
+];
 
 // Mark messages as read
 exports.markAsRead = async (req, res) => {

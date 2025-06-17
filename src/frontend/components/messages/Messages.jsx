@@ -350,16 +350,22 @@ const Messages = () => {
       formData.append('image', selectedImage);
       formData.append('receiverId', selectedUser._id);
 
+      console.log('Sending image to:', selectedUser._id);
+      console.log('Image file:', selectedImage);
+
       const token = localStorage.getItem('token');
       const response = await fetch('/api/messages/send-image', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
+          // Don't set Content-Type header - let browser set it with boundary for multipart/form-data
         },
         body: formData
       });
 
       const data = await response.json();
+      console.log('Image send response:', data);
+      
       if (data.success) {
         setMessages(prev => [...prev, data.message]);
         setUserSeeds(data.remainingSeeds);
@@ -368,11 +374,11 @@ const Messages = () => {
         setSelectedImage(null);
         setImagePreview('');
       } else {
-        alert(data.message);
+        alert(data.message || 'Failed to send image');
       }
     } catch (error) {
       console.error('Error sending image:', error);
-      alert('Failed to send image');
+      alert('Failed to send image. Please try again.');
     } finally {
       setImageUploading(false);
     }
