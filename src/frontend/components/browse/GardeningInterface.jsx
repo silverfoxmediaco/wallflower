@@ -257,7 +257,9 @@ const GardeningInterface = () => {
         // Show a message that all profiles have been passed
         setProfiles([]);
       } else {
-        // Loop back to the beginning
+        // Shuffle profiles and loop back to the beginning
+        const shuffled = [...profiles].sort(() => Math.random() - 0.5);
+        setProfiles(shuffled);
         setCurrentProfileIndex(0);
       }
     } else {
