@@ -185,6 +185,22 @@ const GardeningInterface = () => {
     }
   };
 
+  const handlePrevious = (e) => {
+    if (e) e.stopPropagation();
+    
+    if (currentProfileIndex > 0) {
+      setCurrentProfileIndex(prev => prev - 1);
+    } else {
+      // If at the beginning, loop to the end
+      setCurrentProfileIndex(profiles.length - 1);
+    }
+  };
+
+  const handleNext = (e) => {
+    if (e) e.stopPropagation();
+    moveToNextProfile();
+  };
+
   const handlePlantSeed = async (e) => {
     // Prevent event bubbling if called from button click
     if (e && e.stopPropagation) {
@@ -222,22 +238,6 @@ const GardeningInterface = () => {
     } else if (seedsRemaining === 0) {
       alert('You\'re out of seeds! Visit your profile to get more.');
     }
-  };
-
-  const handlePass = async (e) => {
-    // Remove from interface but don't track as "passed"
-    if (e && e.stopPropagation) {
-      e.stopPropagation();
-    }
-    
-    moveToNextProfile();
-  };
-
-  const handleMaybeLater = (e) => {
-    if (e && e.stopPropagation) {
-      e.stopPropagation();
-    }
-    moveToNextProfile();
   };
 
   const moveToNextProfile = () => {
@@ -411,74 +411,41 @@ const GardeningInterface = () => {
               <div className="action-buttons">
                 <button 
                   className="action-btn pass-btn" 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (!isAnimating) {
-                      setIsAnimating(true);
-                      if (cardRef.current) {
-                        cardRef.current.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
-                        cardRef.current.style.transform = `translateX(-${window.innerWidth * 1.5}px) rotate(-30deg)`;
-                        cardRef.current.style.opacity = '0';
-                      }
-                      setTimeout(() => {
-                        handlePass();
-                        resetCardPosition();
-                        setIsAnimating(false);
-                      }, 300);
-                    }
-                  }}
+                  onClick={handlePrevious}
                   onMouseDown={(e) => e.stopPropagation()}
                   onTouchStart={(e) => e.stopPropagation()}
-                  title="Pass Gently"
-                  aria-label="Pass on this profile"
-                  disabled={isAnimating}
+                  title="Go to Previous Profile"
+                  aria-label="View previous profile"
+                  disabled={currentProfileIndex === 0 && profiles.length > 0}
                 >
-                  <span className="btn-icon">🍂</span>
-                  <span className="btn-text">Pass</span>
+                  <span className="btn-icon">⬅️</span>
+                  <span className="btn-text">Previous</span>
                 </button>
                 
                 <button 
                   className="action-btn plant-btn" 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (!isAnimating && seedsRemaining > 0) {
-                      setIsAnimating(true);
-                      if (cardRef.current) {
-                        cardRef.current.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
-                        cardRef.current.style.transform = `translateX(${window.innerWidth * 1.5}px) rotate(30deg)`;
-                        cardRef.current.style.opacity = '0';
-                      }
-                      setTimeout(() => {
-                        handlePlantSeed();
-                        resetCardPosition();
-                        setIsAnimating(false);
-                      }, 300);
-                    }
-                  }}
+                  onClick={handlePlantSeed}
                   onMouseDown={(e) => e.stopPropagation()}
                   onTouchStart={(e) => e.stopPropagation()}
                   disabled={seedsRemaining === 0 || isAnimating}
-                  title="Plant a Seed"
+                  title="Send a Seed"
                   aria-label="Send a seed to show interest"
                 >
                   <span className="btn-icon">🌱</span>
-                  <span className="btn-text">Seed</span>
+                  <span className="btn-text">Send Seed</span>
                 </button>
                 
                 <button 
                   className="action-btn save-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleMaybeLater(e);
-                  }}
+                  onClick={handleNext}
                   onMouseDown={(e) => e.stopPropagation()}
                   onTouchStart={(e) => e.stopPropagation()}
-                  title="Maybe Later"
-                  aria-label="Save for later"
+                  title="Go to Next Profile"
+                  aria-label="View next profile"
                   disabled={isAnimating}
                 >
-                  <span className="btn-icon">🌙</span>
-                  <span className="btn-text">Later</span>
+                  <span className="btn-icon">➡️</span>
+                  <span className="btn-text">Next</span>
                 </button>
               </div>
             </div>
