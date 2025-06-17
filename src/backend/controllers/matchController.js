@@ -98,16 +98,28 @@ exports.sendSeed = [verifyToken, async (req, res) => {
       });
     }
 
-    // Update sender: decrease available seeds, add to sent list
+    // Method 1: Use atomic update operations instead of save()
+    // This avoids validation issues with existing data
+    const updateData = {
+      $push: {
+        'seeds.sent': {
+          to: recipientId,
+          sentAt: new Date()
+        }
+      }
+    };
+
+    // Only decrement seeds if not subscribed
     if (!hasActiveSubscription) {
-      sender.seeds.available -= 1;
+      updateData.$inc = { 'seeds.available': -1 };
     }
 
-    sender.seeds.sent.push({
-      to: recipientId,
-      sentAt: new Date()
-    });
-    await sender.save();
+    // Update sender atomically
+    const updatedSender = await User.findByIdAndUpdate(
+      req.userId,
+      updateData,
+      { new: true }
+    );
 
     // Update recipient: add to received list
     await User.findByIdAndUpdate(recipientId, {
@@ -122,7 +134,7 @@ exports.sendSeed = [verifyToken, async (req, res) => {
     res.json({
       success: true,
       message: 'Seed sent successfully!',
-      seedsRemaining: sender.seeds.available
+      seedsRemaining: updatedSender.seeds.available
     });
   } catch (error) {
     console.error('Send seed error:', error);
