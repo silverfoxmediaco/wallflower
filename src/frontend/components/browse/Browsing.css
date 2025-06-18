@@ -1,30 +1,29 @@
-/* Browsing Component Styles */
+/* Browsing Component Styles - UPDATED */
 /* Path: src/frontend/components/browse/Browsing.css */
 /* Purpose: Styles for vertical scroll browsing interface */
 
 .browsing-container {
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     background-color: var(--color-background);
-    overflow: hidden;
+    padding-top: 60px; /* Account for main site header */
   }
   
   /* Header */
   .browsing-header {
     position: fixed;
-    top: 0;
+    top: 60px; /* Position below main navigation */
     left: 0;
     right: 0;
     background-color: white;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    padding: var(--space-md) var(--space-lg);
+    padding: var(--space-sm) var(--space-lg);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    z-index: 100;
-    backdrop-filter: blur(10px);
-    background-color: rgba(255, 255, 255, 0.95);
+    z-index: 90; /* Below main nav */
+    height: 60px;
   }
   
   .seeds-counter {
@@ -32,30 +31,32 @@
     align-items: center;
     gap: var(--space-sm);
     background-color: var(--color-accent-2);
-    padding: var(--space-sm) var(--space-md);
+    padding: var(--space-xs) var(--space-md);
     border-radius: 999px;
     font-weight: 500;
+    font-size: 0.9rem; /* Smaller, more reasonable size */
   }
   
   .seed-icon {
-    font-size: 1.2rem;
+    font-size: 1rem;
   }
   
   .seed-count {
     color: var(--color-text-primary);
+    font-size: 0.9rem;
   }
   
   .garden-link {
     background-color: var(--color-primary);
     color: white;
-    padding: var(--space-sm) var(--space-lg);
+    padding: var(--space-xs) var(--space-md);
     border-radius: 999px;
     font-weight: 500;
     text-decoration: none;
     transition: all 0.3s ease;
     border: none;
     cursor: pointer;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
   }
   
   .garden-link:hover {
@@ -67,7 +68,7 @@
   .profiles-scroll-container {
     flex: 1;
     overflow-y: auto;
-    padding-top: 80px; /* Account for fixed header */
+    padding-top: 70px; /* Account for both headers */
     padding-bottom: var(--space-xl);
     scroll-behavior: smooth;
   }
@@ -382,7 +383,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    height: calc(100vh - 120px); /* Account for headers */
     text-align: center;
     padding: var(--space-xl);
   }
@@ -403,7 +404,26 @@
   /* Mobile responsiveness */
   @media (max-width: 768px) {
     .browsing-header {
-      padding: var(--space-sm) var(--space-md);
+      padding: var(--space-xs) var(--space-sm);
+      top: 50px; /* Adjust for mobile header height */
+    }
+  
+    .browsing-container {
+      padding-top: 50px;
+    }
+  
+    .profiles-scroll-container {
+      padding-top: 60px;
+    }
+  
+    .seeds-counter {
+      font-size: 0.85rem;
+      padding: var(--space-xs) var(--space-sm);
+    }
+  
+    .garden-link {
+      font-size: 0.85rem;
+      padding: var(--space-xs) var(--space-sm);
     }
   
     .profile-card-scroll {
