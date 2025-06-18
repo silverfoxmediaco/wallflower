@@ -13,7 +13,7 @@ import SignupModal from './components/SignupModal';
 import LoginModal from './components/LoginModal';
 import Profile from './components/profile/profile';
 import ProfileView from './components/profile/ProfileView';
-import GardeningInterface from './components/browse/GardeningInterface';
+import Browsing from './components/browse/Browsing';
 import Garden from './components/garden/Garden';
 import MockProfilesManager from './components/admin/MockProfilesManager';
 import Messages from './components/messages/Messages';
@@ -129,7 +129,7 @@ function AppContent() {
           
           <Route path="/browse" element={
             <ProtectedRoute>
-              <GardeningInterface />
+              <Browsing />
             </ProtectedRoute>
           } />
           
