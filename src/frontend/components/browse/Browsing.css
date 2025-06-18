@@ -13,12 +13,13 @@
     margin: 0 auto;
   }
   
-  /* Profiles Grid */
+  /* Profiles Grid - Updated for centering */
   .profiles-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 350px));
     gap: var(--space-xl);
     margin-bottom: var(--space-xl);
+    justify-content: center; /* Centers the grid items */
   }
   
   /* Profile Card */
@@ -28,6 +29,8 @@
     overflow: hidden;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    width: 100%; /* Ensure cards fill their grid cell */
+    max-width: 350px; /* Maximum width for cards */
   }
   
   .profile-card-browse:hover {
@@ -193,14 +196,20 @@
     margin-bottom: var(--space-md);
   }
   
-  /* Mobile responsiveness */
+  /* Responsive breakpoints */
+  @media (max-width: 1200px) {
+    .profiles-grid {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 320px));
+    }
+  }
+  
   @media (max-width: 768px) {
     .browsing-container {
       padding: var(--space-lg) var(--space-md);
     }
   
     .profiles-grid {
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: var(--space-lg);
     }
   
@@ -221,6 +230,10 @@
     .profiles-grid {
       grid-template-columns: 1fr;
       gap: var(--space-lg);
+    }
+    
+    .profile-card-browse {
+      max-width: 100%;
     }
     
     .profile-image-container {
