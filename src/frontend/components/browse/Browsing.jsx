@@ -1,6 +1,6 @@
 // Browsing Component
 // Path: src/frontend/components/browse/Browsing.jsx
-// Purpose: Browse profiles with vertical scroll interface
+// Purpose: Browse all profiles in a responsive grid layout
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -27,7 +27,7 @@ const Browsing = () => {
         return;
       }
 
-      const response = await fetch('/api/match/browse', {
+      const response = await fetch('/api/profile/all', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -60,7 +60,7 @@ const Browsing = () => {
       alert('You\'ve already sent a seed to this person.');
       return;
     }
-    
+
     try {
       const token = localStorage.getItem('token');
 
@@ -108,9 +108,7 @@ const Browsing = () => {
       <div className="browsing-container">
         <div className="error-message">
           <p>{error}</p>
-          <button className="btn-primary" onClick={() => navigate('/')}>
-            Go Back
-          </button>
+          <button className="btn-primary" onClick={() => navigate('/')}>Go Back</button>
         </div>
       </div>
     );
@@ -122,9 +120,7 @@ const Browsing = () => {
         <div className="no-profiles-message">
           <h2>No profiles available</h2>
           <p>Check back later for new members.</p>
-          <button className="btn-primary" onClick={() => navigate('/garden')}>
-            Visit My Garden
-          </button>
+          <button className="btn-primary" onClick={() => navigate('/garden')}>Visit My Garden</button>
         </div>
       </div>
     );
@@ -133,12 +129,10 @@ const Browsing = () => {
   return (
     <div className="browsing-page-container">
       <div className="browsing-container">
-        {/* Profiles Grid */}
         <div className="profiles-grid">
           {profiles.map((profile) => (
             <div key={profile.id} className="profile-card-browse">
-              {/* Profile image section - clickable */}
-              <div 
+              <div
                 className="profile-image-container"
                 onClick={() => handleProfileClick(profile.id)}
                 style={{
@@ -150,9 +144,7 @@ const Browsing = () => {
                     : '#C8A2C8'
                 }}
               >
-                {/* Gradient overlay */}
                 <div className="profile-gradient-overlay">
-                  {/* No photo placeholder */}
                   {(!profile.photos || profile.photos.length === 0) && (
                     <div className="no-photo-placeholder">
                       <span>🌸</span>
@@ -162,15 +154,10 @@ const Browsing = () => {
                 </div>
               </div>
 
-              {/* Profile info section */}
               <div className="profile-info-bottom">
-                <h3 className="profile-name">
-                  {profile.username}, {profile.age || '??'}
-                </h3>
-                <p className="profile-location">
-                  {profile.location || 'Location not set'}
-                </p>
-                
+                <h3 className="profile-name">{profile.username}, {profile.age || '??'}</h3>
+                <p className="profile-location">{profile.location || 'Location not set'}</p>
+
                 <button 
                   className={`seed-btn ${sentSeeds.has(profile.id) ? 'seed-sent' : ''}`}
                   onClick={(e) => {
@@ -180,15 +167,9 @@ const Browsing = () => {
                   disabled={seedsRemaining === 0 || sentSeeds.has(profile.id)}
                 >
                   {sentSeeds.has(profile.id) ? (
-                    <>
-                      <span className="btn-icon">✓</span>
-                      <span>Seed Sent</span>
-                    </>
+                    <><span className="btn-icon">✓</span><span>Seed Sent</span></>
                   ) : (
-                    <>
-                      <span className="btn-icon">🌱</span>
-                      <span>Send Seed</span>
-                    </>
+                    <><span className="btn-icon">🌱</span><span>Send Seed</span></>
                   )}
                 </button>
               </div>
@@ -196,18 +177,13 @@ const Browsing = () => {
           ))}
         </div>
 
-        {/* Out of seeds overlay */}
         {seedsRemaining === 0 && (
           <div className="out-of-seeds-overlay">
             <p>You're out of seeds!</p>
-            <button className="cta-btn" onClick={() => navigate('/profile')}>
-              Get More Seeds
-            </button>
+            <button className="cta-btn" onClick={() => navigate('/profile')}>Get More Seeds</button>
           </div>
         )}
       </div>
-      
-      {/* Footer */}
       <Footer />
     </div>
   );
