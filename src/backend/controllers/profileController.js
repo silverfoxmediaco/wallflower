@@ -53,7 +53,6 @@ exports.updateProfile = [verifyToken, async (req, res) => {
       prompts
     } = req.body;
     
-    // Build update object
     const updateData = {
       'profile.age': age,
       'profile.height': height,
@@ -66,8 +65,7 @@ exports.updateProfile = [verifyToken, async (req, res) => {
       'profile.prompts': prompts
     };
     
-    // Remove undefined values
-    Object.keys(updateData).forEach(key => 
+    Object.keys(updateData).forEach(key =>
       updateData[key] === undefined && delete updateData[key]
     );
     
@@ -92,39 +90,31 @@ exports.updateProfile = [verifyToken, async (req, res) => {
   }
 }];
 
-// Upload profile photos with Cloudinary
+// Upload profile photos
 exports.uploadPhotos = [verifyToken, upload.array('photos', 6), async (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'No photos uploaded' 
-      });
+      return res.status(400).json({ success: false, message: 'No photos uploaded' });
     }
 
-    // Get current user to check existing photos
     const user = await User.findById(req.userId);
     const currentPhotoCount = user.profile.photos ? user.profile.photos.length : 0;
     
-    // Check if total would exceed 6
     if (currentPhotoCount + req.files.length > 6) {
-      // Delete uploaded files from Cloudinary since we're rejecting them
       for (const file of req.files) {
         await cloudinary.uploader.destroy(file.filename);
       }
-      
       return res.status(400).json({ 
         success: false, 
         message: `You can only have 6 photos total. You currently have ${currentPhotoCount}.` 
       });
     }
 
-    // Create photo objects with Cloudinary URLs
     const photos = req.files.map((file, index) => ({
-      url: file.path, // Cloudinary URL
-      publicId: file.filename, // For deletion later
-      isMain: currentPhotoCount === 0 && index === 0, // First photo is main if no existing photos
-      displayMode: 'contain', // Default display mode
+      url: file.path,
+      publicId: file.filename,
+      isMain: currentPhotoCount === 0 && index === 0,
+      displayMode: 'contain',
       thumbnailUrl: cloudinary.url(file.filename, {
         width: 200,
         height: 200,
@@ -133,16 +123,9 @@ exports.uploadPhotos = [verifyToken, upload.array('photos', 6), async (req, res)
       })
     }));
 
-    // Update user profile with new photos
     const updatedUser = await User.findByIdAndUpdate(
       req.userId,
-      { 
-        $push: { 
-          'profile.photos': { 
-            $each: photos
-          } 
-        } 
-      },
+      { $push: { 'profile.photos': { $each: photos } } },
       { new: true }
     ).select('-password');
 
@@ -153,8 +136,6 @@ exports.uploadPhotos = [verifyToken, upload.array('photos', 6), async (req, res)
     });
   } catch (error) {
     console.error('Photo upload error:', error);
-    
-    // Clean up any uploaded files if there was an error
     if (req.files) {
       for (const file of req.files) {
         try {
@@ -164,11 +145,7 @@ exports.uploadPhotos = [verifyToken, upload.array('photos', 6), async (req, res)
         }
       }
     }
-    
-    res.status(500).json({ 
-      success: false, 
-      message: 'Failed to upload photos' 
-    });
+    res.status(500).json({ success: false, message: 'Failed to upload photos' });
   }
 }];
 
@@ -176,47 +153,26 @@ exports.uploadPhotos = [verifyToken, upload.array('photos', 6), async (req, res)
 exports.deletePhoto = [verifyToken, async (req, res) => {
   try {
     const { photoId } = req.params;
-    
-    // Find the user and the specific photo
     const user = await User.findById(req.userId);
-    if (!user) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'User not found' 
-      });
-    }
-    
-    const photoIndex = user.profile.photos.findIndex(
-      p => p._id.toString() === photoId
-    );
-    
-    if (photoIndex === -1) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Photo not found' 
-      });
-    }
-    
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+    const photoIndex = user.profile.photos.findIndex(p => p._id.toString() === photoId);
+    if (photoIndex === -1) return res.status(404).json({ success: false, message: 'Photo not found' });
+
     const photo = user.profile.photos[photoIndex];
-    
-    // Delete from Cloudinary
     try {
       await cloudinary.uploader.destroy(photo.publicId);
-    } catch (cloudinaryError) {
-      console.error('Cloudinary deletion error:', cloudinaryError);
-      // Continue even if Cloudinary deletion fails
+    } catch (err) {
+      console.error('Cloudinary deletion error:', err);
     }
-    
-    // Remove from database
+
     user.profile.photos.splice(photoIndex, 1);
-    
-    // If deleted photo was main and there are other photos, make first photo main
     if (photo.isMain && user.profile.photos.length > 0) {
       user.profile.photos[0].isMain = true;
     }
-    
+
     await user.save();
-    
+
     res.json({ 
       success: true, 
       message: 'Photo deleted successfully',
@@ -224,10 +180,7 @@ exports.deletePhoto = [verifyToken, async (req, res) => {
     });
   } catch (error) {
     console.error('Photo deletion error:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Failed to delete photo' 
-    });
+    res.status(500).json({ success: false, message: 'Failed to delete photo' });
   }
 }];
 
@@ -236,39 +189,21 @@ exports.updatePhotoDisplayMode = [verifyToken, async (req, res) => {
   try {
     const { photoId } = req.params;
     const { displayMode } = req.body;
-    
-    // Validate display mode
+
     if (!['contain', 'cover'].includes(displayMode)) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Invalid display mode. Must be "contain" or "cover"' 
-      });
+      return res.status(400).json({ success: false, message: 'Invalid display mode. Must be \"contain\" or \"cover\"' });
     }
-    
-    // Find user and update the specific photo's display mode
+
     const user = await User.findOneAndUpdate(
-      { 
-        _id: req.userId,
-        'profile.photos._id': photoId 
-      },
-      { 
-        $set: { 
-          'profile.photos.$.displayMode': displayMode 
-        } 
-      },
-      { 
-        new: true,
-        runValidators: true 
-      }
+      { _id: req.userId, 'profile.photos._id': photoId },
+      { $set: { 'profile.photos.$.displayMode': displayMode } },
+      { new: true, runValidators: true }
     ).select('-password');
-    
+
     if (!user) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Photo not found' 
-      });
+      return res.status(404).json({ success: false, message: 'Photo not found' });
     }
-    
+
     res.json({ 
       success: true, 
       message: 'Display mode updated successfully',
@@ -276,9 +211,38 @@ exports.updatePhotoDisplayMode = [verifyToken, async (req, res) => {
     });
   } catch (error) {
     console.error('Update display mode error:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Failed to update display mode' 
-    });
+    res.status(500).json({ success: false, message: 'Failed to update display mode' });
+  }
+}];
+
+// NEW: Get all user profiles for browsing
+exports.getAllProfiles = [verifyToken, async (req, res) => {
+  try {
+    const users = await User.find({
+      _id: { $ne: req.userId },
+      'profile.bio': { $exists: true, $ne: '' },
+      'profile.interests': { $exists: true, $ne: [] }
+    }).select('-password -email');
+
+    const profiles = users.map(user => ({
+      id: user._id,
+      username: user.username,
+      age: user.profile.age || 'Not specified',
+      height: user.profile.height || 'Not specified',
+      bodyType: user.profile.bodyType || 'Not specified',
+      location: user.profile.location || 'Location not set',
+      bio: user.profile.bio,
+      interests: user.profile.interests,
+      photos: user.profile.photos || [],
+      lastActive: 'Recently active',
+      personalityType: user.profile.personalityType || 'Not specified',
+      prompts: user.profile.prompts || []
+    }));
+
+    const currentUser = await User.findById(req.userId);
+    res.json({ success: true, profiles, seedsRemaining: currentUser.seeds.available });
+  } catch (error) {
+    console.error('Fetch all profiles error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 }];

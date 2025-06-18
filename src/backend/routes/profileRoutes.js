@@ -9,7 +9,8 @@ const {
   updateProfile, 
   uploadPhotos, 
   deletePhoto,
-  updatePhotoDisplayMode 
+  updatePhotoDisplayMode,
+  getAllProfiles // ✅ NEW: Import getAllProfiles controller
 } = require('../controllers/profileController');
 
 // Middleware to verify JWT token
@@ -29,6 +30,9 @@ const verifyToken = (req, res, next) => {
     return res.status(401).json({ success: false, message: 'Invalid token' });
   }
 };
+
+// ✅ NEW: GET /api/profile/all - Get all user profiles (no match filter)
+router.get('/all', getAllProfiles);
 
 // GET /api/profile - Get current user's profile
 router.get('/', getProfile);
@@ -134,7 +138,6 @@ router.put('/notifications', verifyToken, async (req, res) => {
       });
     }
     
-    // Validate notification object structure
     const validKeys = ['emailEnabled', 'seedReceived', 'newMessage', 'newMatch', 'lowSeedBalance', 'marketing'];
     const providedKeys = Object.keys(notifications);
     const invalidKeys = providedKeys.filter(key => !validKeys.includes(key));
@@ -146,7 +149,6 @@ router.put('/notifications', verifyToken, async (req, res) => {
       });
     }
     
-    // Update user's notification preferences
     const user = await User.findByIdAndUpdate(
       req.userId,
       { 
